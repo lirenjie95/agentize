@@ -11,6 +11,12 @@ from pathlib import Path
 from typing import Any, Optional
 
 from agentize.server.log import _log
+from agentize.server.platform import (
+    detect_platform,
+    get_host,
+    load_project_config,
+    parse_repo_slug,
+)
 from agentize.server.runtime_config import load_runtime_config
 
 
@@ -50,58 +56,23 @@ def _is_debug_enabled() -> bool:
     return _coerce_bool(debug_value, False)
 
 
-def load_config() -> tuple[str, int, Optional[str]]:
+def load_config() -> tuple[str, int, Optional[str], str, Optional[str]]:
     """Load project config from .agentize.yaml.
 
     Returns:
-        Tuple of (org, project_id, remote_url) where remote_url may be None.
+        Tuple of (org, project_id, remote_url, platform, host).
     """
-    yaml_path = Path('.agentize.yaml')
-    if not yaml_path.exists():
-        # Search parent directories
-        current = Path.cwd()
-        while current != current.parent:
-            yaml_path = current / '.agentize.yaml'
-            if yaml_path.exists():
-                break
-            current = current.parent
-        else:
-            raise FileNotFoundError(".agentize.yaml not found")
-
-    # Simple YAML parsing (no external deps)
-    org = None
-    project_id = None
-    remote_url = None
-    with open(yaml_path) as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith('org:'):
-                org = line.split(':', 1)[1].strip()
-            elif line.startswith('id:'):
-                project_id = int(line.split(':', 1)[1].strip())
-            elif line.startswith('remote_url:'):
-                remote_url = line.split(':', 1)[1].strip()
-                # Handle URLs with : in them (e.g., https://...)
-                if remote_url.startswith('https') or remote_url.startswith('git@'):
-                    # Re-read the full value after 'remote_url:'
-                    remote_url = line.split('remote_url:', 1)[1].strip()
+    cfg = load_project_config()
+    org = cfg.get("org")
+    project_id = cfg.get("id")
+    remote_url = cfg.get("remote_url")
+    platform = cfg.get("platform") or "github"
+    host = cfg.get("host")
 
     if not org or not project_id:
         raise ValueError(".agentize.yaml missing project.org or project.id")
 
-    # Fallback to git remote if remote_url not configured
-    if remote_url is None:
-        result = subprocess.run(
-            ['git', 'remote', 'get-url', 'origin'],
-            capture_output=True, text=True
-        )
-        if result.returncode == 0:
-            url = result.stdout.strip()
-            if url:
-                remote_url = url
-                _log("remote_url not in .agentize.yaml, using git remote origin")
-
-    return org, project_id, remote_url
+    return org, int(project_id), remote_url, str(platform), host
 
 
 def get_repo_owner_name() -> tuple[str, str]:
@@ -112,26 +83,16 @@ def get_repo_owner_name() -> tuple[str, str]:
     )
     if result.returncode != 0:
         raise RuntimeError(f"Failed to get git remote: {result.stderr}")
+    return parse_repo_slug(result.stdout.strip())
 
-    url = result.stdout.strip()
-    # Handle SSH format: git@github.com:owner/repo.git
-    if url.startswith('git@'):
-        path = url.split(':')[1]
-    # Handle HTTPS format: https://github.com/owner/repo.git
-    elif 'github.com' in url:
-        path = url.split('github.com/')[1]
-    else:
-        raise RuntimeError(f"Unrecognized git remote format: {url}")
 
-    # Remove .git suffix and trailing slash properly
-    if path.endswith('/'):
-        path = path[:-1]
-    if path.endswith('.git'):
-        path = path[:-4]
-    parts = path.split('/')
-    if len(parts) >= 2:
-        return parts[0], parts[1]
-    raise RuntimeError(f"Cannot parse owner/repo from: {url}")
+def _get_platform() -> tuple[str, Optional[str]]:
+    """Return (platform, host) from current config."""
+    try:
+        cfg = load_project_config()
+        return str(cfg.get("platform") or "github"), cfg.get("host")
+    except Exception:
+        return "github", None
 
 
 def lookup_project_graphql_id(org: str, project_number: int) -> str:
@@ -140,6 +101,10 @@ def lookup_project_graphql_id(org: str, project_number: int) -> str:
     Uses repositoryOwner query which works for both organizations and personal user accounts.
     Result is cached to avoid repeated lookups.
     """
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        return ''
+
     cache_key = (org, project_number)
     if cache_key in _project_id_cache:
         return _project_id_cache[cache_key]
@@ -185,7 +150,30 @@ query($owner: String!, $projectNumber: Int!) {
 
 
 def discover_candidate_issues(owner: str, repo: str) -> list[int]:
-    """Discover open issues with agentize:plan label using gh issue list."""
+    """Discover open issues with agentize:plan label."""
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        result = subprocess.run(
+            ['glab', 'issue', 'list',
+             '-R', f'{owner}/{repo}',
+             '--label', 'agentize:plan',
+             '--state', 'open',
+             '--output', 'json'],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            _log(f"Failed to list issues: {result.stderr}", level="ERROR")
+            return []
+        try:
+            data = json.loads(result.stdout)
+            if isinstance(data, list):
+                return [int(item.get("iid", item.get("number", 0))) for item in data if item.get("iid") or item.get("number")]
+            return []
+        except (ValueError, json.JSONDecodeError) as e:
+            _log(f"Failed to parse issue list: {e}", level="ERROR")
+            return []
+
+    # GitHub path
     result = subprocess.run(
         ['gh', 'issue', 'list',
          '-R', f'{owner}/{repo}',
@@ -204,7 +192,6 @@ def discover_candidate_issues(owner: str, repo: str) -> list[int]:
     for line in result.stdout.strip().split('\n'):
         line = line.strip()
         if line:
-            # Handle both tab-separated format and plain number format
             try:
                 issue_no = int(line.split('\t')[0])
                 issues.append(issue_no)
@@ -241,7 +228,12 @@ def query_issue_project_status(owner: str, repo: str, issue_no: int, project_id:
     """Fetch an issue's Status field value for the configured project.
 
     Returns the status string (e.g., "Plan Accepted") or empty string if not found.
+    On GitLab this always returns empty string because Projects v2 is GitHub-only.
     """
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        return ''
+
     result = subprocess.run(
         ['gh', 'api', 'graphql',
          '-f', f'query={ISSUE_STATUS_QUERY.strip()}',
@@ -427,11 +419,50 @@ def filter_ready_refinements(items: list[dict]) -> list[int]:
 
 
 def discover_candidate_prs(owner: str, repo: str) -> list[dict]:
-    """Discover open PRs with agentize:pr label.
+    """Discover open PRs/MRs with agentize:pr label.
 
     Returns:
-        List of PR metadata dicts with number, headRefName, mergeable fields.
+        List of PR/MR metadata dicts with number, headRefName, mergeable fields.
     """
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        result = subprocess.run(
+            ['glab', 'mr', 'list',
+             '-R', f'{owner}/{repo}',
+             '--label', 'agentize:pr',
+             '--state', 'open',
+             '--output', 'json'],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            _log(f"Failed to list MRs: {result.stderr}", level="ERROR")
+            return []
+        try:
+            mrs = json.loads(result.stdout)
+            if not isinstance(mrs, list):
+                mrs = []
+        except json.JSONDecodeError as e:
+            _log(f"Failed to parse MR list response: {e}", level="ERROR")
+            return []
+        if not mrs:
+            if _is_debug_enabled():
+                _log("No candidate MRs found with agentize:pr label")
+            return []
+        # Normalise to gh-like shape
+        normalised = []
+        for mr in mrs:
+            normalised.append({
+                'number': mr.get('iid', mr.get('number')),
+                'headRefName': mr.get('source_branch', ''),
+                'mergeable': 'MERGEABLE' if mr.get('merge_status') == 'can_be_merged' else 'CONFLICTING',
+                'body': mr.get('description', ''),
+                'closingIssuesReferences': [],
+            })
+        if _is_debug_enabled():
+            _log(f"Found {len(normalised)} candidate MRs")
+        return normalised
+
+    # GitHub path
     result = subprocess.run(
         ['gh', 'pr', 'list',
          '-R', f'{owner}/{repo}',
@@ -554,7 +585,30 @@ def resolve_issue_from_pr(pr: dict) -> Optional[int]:
 
 
 def discover_candidate_feat_requests(owner: str, repo: str) -> list[int]:
-    """Discover open issues with agentize:dev-req label using gh issue list."""
+    """Discover open issues with agentize:dev-req label."""
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        result = subprocess.run(
+            ['glab', 'issue', 'list',
+             '-R', f'{owner}/{repo}',
+             '--label', 'agentize:dev-req',
+             '--state', 'open',
+             '--output', 'json'],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            _log(f"Failed to list dev-req issues: {result.stderr}", level="ERROR")
+            return []
+        try:
+            data = json.loads(result.stdout)
+            if isinstance(data, list):
+                return [int(item.get("iid", item.get("number", 0))) for item in data if item.get("iid") or item.get("number")]
+            return []
+        except (ValueError, json.JSONDecodeError) as e:
+            _log(f"Failed to parse dev-req issue list: {e}", level="ERROR")
+            return []
+
+    # GitHub path
     result = subprocess.run(
         ['gh', 'issue', 'list',
          '-R', f'{owner}/{repo}',
@@ -628,7 +682,27 @@ def query_feat_request_items(org: str, project_number: int) -> list[dict]:
 
 
 def _query_issue_labels(owner: str, repo: str, issue_no: int) -> list[str]:
-    """Query an issue's labels via gh issue view."""
+    """Query an issue's labels."""
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        result = subprocess.run(
+            ['glab', 'issue', 'view', str(issue_no),
+             '-R', f'{owner}/{repo}',
+             '--output', 'json'],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            return []
+        try:
+            data = json.loads(result.stdout)
+            labels = data.get("labels", [])
+            if isinstance(labels, list):
+                return [str(lbl.get("name", lbl)) if isinstance(lbl, dict) else str(lbl) for lbl in labels]
+            return []
+        except json.JSONDecodeError:
+            return []
+
+    # GitHub path
     result = subprocess.run(
         ['gh', 'issue', 'view', str(issue_no),
          '-R', f'{owner}/{repo}',
@@ -702,16 +776,15 @@ def filter_ready_feat_requests(items: list[dict]) -> list[int]:
 
 
 def has_unresolved_review_threads(owner: str, repo: str, pr_no: int) -> bool:
-    """Check if a PR has unresolved, non-outdated review threads.
+    """Check if a PR/MR has unresolved, non-outdated review threads.
 
-    Args:
-        owner: Repository owner
-        repo: Repository name
-        pr_no: Pull request number
-
-    Returns:
-        True if any unresolved, non-outdated thread exists, False otherwise.
+    On GitLab this always returns False because review thread APIs differ significantly.
     """
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        # TODO: Implement GitLab MR discussion check via glab api
+        return False
+
     result = subprocess.run(
         ['scripts/gh-graphql.sh', 'review-threads', owner, repo, str(pr_no)],
         capture_output=True, text=True

@@ -34,16 +34,16 @@ Stage-specific keys override `planner.backend`. Defaults are `claude:sonnet` for
 | Function | Location | Purpose |
 |----------|----------|---------|
 | `_planner_run_pipeline` | `planner/pipeline.sh` | Forwards planner execution to the Python backend |
-| `_planner_issue_create` | `planner/github.sh` | Legacy GitHub helper (not used by adapter) |
-| `_planner_issue_fetch` | `planner/github.sh` | Legacy GitHub helper (not used by adapter) |
-| `_planner_issue_publish` | `planner/github.sh` | Legacy GitHub helper (not used by adapter) |
+| `_planner_issue_create` | `planner/forge.sh` | Forge-agnostic issue helper (GitHub/GitLab) |
+| `_planner_issue_fetch` | `planner/forge.sh` | Forge-agnostic issue helper (GitHub/GitLab) |
+| `_planner_issue_publish` | `planner/forge.sh` | Forge-agnostic issue helper (GitHub/GitLab) |
 
 ## Module Load Order
 
 ```
 planner.sh           # Loader: determines script dir, sources modules
 planner/pipeline.sh  # Python backend adapter
-planner/github.sh    # Legacy GitHub helpers
+planner/forge.sh     # Forge-agnostic issue helpers (GitHub/GitLab)
 ```
 
 ## Output Behavior

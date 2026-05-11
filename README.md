@@ -9,10 +9,11 @@
 - **Git** - Version control (checked during installation)
 - **Make** - Build automation (checked during installation)
 - **Bash** - Shell interpreter, version 3.2+ (checked during installation)
-- **GitHub CLI (`gh`)** - Required for GitHub integration features
-  - Install: https://cli.github.com/
-  - Authenticate after installation: `gh auth login`
-  - Used by: `/setup-viewboard`, `/open-issue`, `/open-pr`, GitHub workflow automation
+- **GitHub CLI (`gh`)** or **GitLab CLI (`glab`)** - Required for forge integration features
+  - For GitHub: https://cli.github.com/ — authenticate with `gh auth login`
+  - For GitLab: https://gitlab.com/gitlab-org/cli — authenticate with `glab auth login`
+    - For self-hosted GitLab: `glab auth login --hostname gitlab.company.com`
+  - Used by: `/setup-viewboard`, `/open-issue`, `/open-pr`, `/open-mr`, workflow automation
 - **Python 3.10+** - Required for permission automation module, otherwise you can have infinite `yes` to prompt!
   - Use Python `venv` or `anaconda` to manage a good Python release!
   - Requires **PyYAML** (`pip install pyyaml`) for YAML configuration parsing
@@ -25,10 +26,11 @@
 
 ### Verification
 
-After installing prerequisites, the installer will automatically verify `git`, `make`, and `bash` availability. GitHub CLI authentication can be verified with:
+After installing prerequisites, the installer will automatically verify `git`, `make`, and `bash` availability. Forge CLI authentication can be verified with:
 
 ```bash
-gh auth status
+gh auth status      # GitHub
+glab auth status    # GitLab
 ```
 
 ## Quick Start
@@ -66,6 +68,8 @@ After installation, the installer creates `~/.agentize.local.yaml` in your home 
 2. **Clone** with worktrees:
    ```bash
    wt clone https://github.com/org/repo.git myproject.git
+   # or for GitLab:
+   wt clone https://gitlab.com/org/repo.git myproject.git
    ```
    `wt clone` sets up a bare repository and leaves you in `trees/main`.
 

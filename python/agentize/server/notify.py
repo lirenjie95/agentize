@@ -17,6 +17,7 @@ if str(_plugin_dir) not in sys.path:
 
 from lib.telegram_utils import escape_html, telegram_request
 from agentize.server.log import _log
+from agentize.server.platform import build_issue_url, build_mr_url, detect_platform, get_host, parse_repo_slug
 
 
 # Telegram API timeout in seconds
@@ -82,30 +83,20 @@ def notify_server_start(token: str, chat_id: str, org: str, project_id: int, per
 
 
 def _extract_repo_slug(remote_url: str) -> Optional[str]:
-    """Extract org/repo slug from a GitHub remote URL.
+    """Extract org/repo slug from a git remote URL.
 
-    Handles:
-    - https://github.com/org/repo
-    - https://github.com/org/repo.git
-    - git@github.com:org/repo.git
+    Supports any git forge host (GitHub, GitLab, self-hosted).
 
     Returns:
-        org/repo string or None if URL format not recognized
+        org/repo string or None if URL format not recognized.
     """
     if not remote_url:
         return None
-
-    # HTTPS format: https://github.com/org/repo[.git]
-    https_match = re.match(r'https://github\.com/([^/]+)/([^/]+?)(?:\.git)?$', remote_url)
-    if https_match:
-        return f"{https_match.group(1)}/{https_match.group(2)}"
-
-    # SSH format: git@github.com:org/repo.git
-    ssh_match = re.match(r'git@github\.com:([^/]+)/([^/]+?)(?:\.git)?$', remote_url)
-    if ssh_match:
-        return f"{ssh_match.group(1)}/{ssh_match.group(2)}"
-
-    return None
+    try:
+        owner, repo = parse_repo_slug(remote_url)
+        return f"{owner}/{repo}"
+    except RuntimeError:
+        return None
 
 
 def _format_worker_assignment_message(
@@ -117,10 +108,10 @@ def _format_worker_assignment_message(
     """Build HTML-formatted Telegram message for worker assignment.
 
     Args:
-        issue_no: GitHub issue number
+        issue_no: Issue number
         issue_title: Issue title (will be HTML-escaped)
         worker_id: Worker slot ID
-        issue_url: Full GitHub issue URL or None
+        issue_url: Full issue URL or None
 
     Returns:
         HTML-formatted message for Telegram
@@ -148,10 +139,10 @@ def _format_worker_completion_message(
     """Build HTML-formatted Telegram message for worker completion.
 
     Args:
-        issue_no: GitHub issue number
+        issue_no: Issue number
         worker_id: Worker slot ID
-        issue_url: Full GitHub issue URL or None
-        pr_url: Full GitHub PR URL or None
+        issue_url: Full issue URL or None
+        pr_url: Full PR/MR URL or None
 
     Returns:
         HTML-formatted message for Telegram

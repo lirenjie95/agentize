@@ -37,19 +37,48 @@ project_preflight_check() {
         return 0
     fi
 
-    if ! command -v gh &> /dev/null; then
-        echo "Error: GitHub CLI (gh) is not installed"
-        echo ""
-        echo "Please install gh:"
-        echo "  https://cli.github.com/manual/installation"
+    # Detect platform
+    local platform="github"
+    local cfg_platform=""
+    if [ -n "$METADATA_FILE" ] && [ -f "$METADATA_FILE" ]; then
+        cfg_platform="$(grep -E '^\s*platform:' "$METADATA_FILE" 2>/dev/null | head -1 | sed 's/.*platform:\s*//' | tr -d '[:space:]"' | tr -d "'" | tr '[:upper:]' '[:lower:]')"
+    fi
+    if [ -n "$cfg_platform" ]; then
+        platform="$cfg_platform"
+    fi
+
+    local cmd="gh"
+    if [ "$platform" = "gitlab" ]; then
+        cmd="glab"
+    fi
+
+    if ! command -v "$cmd" &> /dev/null; then
+        if [ "$platform" = "gitlab" ]; then
+            echo "Error: GitLab CLI (glab) is not installed"
+            echo ""
+            echo "Please install glab:"
+            echo "  https://gitlab.com/gitlab-org/cli#installation"
+        else
+            echo "Error: GitHub CLI (gh) is not installed"
+            echo ""
+            echo "Please install gh:"
+            echo "  https://cli.github.com/manual/installation"
+        fi
         return 1
     fi
 
-    if ! gh auth status &> /dev/null; then
-        echo "Error: GitHub CLI is not authenticated"
-        echo ""
-        echo "Please authenticate gh:"
-        echo "  gh auth login"
+    if ! "$cmd" auth status &> /dev/null; then
+        if [ "$platform" = "gitlab" ]; then
+            echo "Error: GitLab CLI is not authenticated"
+            echo ""
+            echo "Please authenticate glab:"
+            echo "  glab auth login"
+        else
+            echo "Error: GitHub CLI is not authenticated"
+            echo ""
+            echo "Please authenticate gh:"
+            echo "  gh auth login"
+        fi
         return 1
     fi
 }
@@ -105,6 +134,24 @@ project_update_metadata() {
 project_create() {
     local owner="$1"
     local title="$2"
+
+    # Detect platform
+    local platform="github"
+    local cfg_platform=""
+    if [ -n "$METADATA_FILE" ] && [ -f "$METADATA_FILE" ]; then
+        cfg_platform="$(grep -E '^\s*platform:' "$METADATA_FILE" 2>/dev/null | head -1 | sed 's/.*platform:\s*//' | tr -d '[:space:]"' | tr -d "'" | tr '[:upper:]' '[:lower:]')"
+    fi
+    if [ -n "$cfg_platform" ]; then
+        platform="$cfg_platform"
+    fi
+
+    if [ "$platform" = "gitlab" ]; then
+        echo "Note: GitHub Projects v2 board creation is not supported on GitLab."
+        echo "GitLab Issues Boards can be configured via the GitLab web UI."
+        echo ""
+        echo "Skipping project board creation."
+        return 0
+    fi
 
     # Default owner to repository owner
     if [ -z "$owner" ]; then
@@ -199,6 +246,24 @@ project_associate() {
         return 1
     fi
 
+    # Detect platform
+    local platform="github"
+    local cfg_platform=""
+    if [ -n "$METADATA_FILE" ] && [ -f "$METADATA_FILE" ]; then
+        cfg_platform="$(grep -E '^\s*platform:' "$METADATA_FILE" 2>/dev/null | head -1 | sed 's/.*platform:\s*//' | tr -d '[:space:]"' | tr -d "'" | tr '[:upper:]' '[:lower:]')"
+    fi
+    if [ -n "$cfg_platform" ]; then
+        platform="$cfg_platform"
+    fi
+
+    if [ "$platform" = "gitlab" ]; then
+        echo "Note: GitHub Projects v2 board association is not supported on GitLab."
+        echo "GitLab Issues Boards can be configured via the GitLab web UI."
+        echo ""
+        echo "Skipping project board association."
+        return 0
+    fi
+
     # Parse owner/id
     local owner="${associate_arg%%/*}"
     local project_id="${associate_arg##*/}"
@@ -270,6 +335,25 @@ project_associate() {
 # If write_path is provided, writes to file; otherwise prints to stdout
 project_generate_automation() {
     local write_path="$1"
+
+    # Detect platform
+    local platform="github"
+    local cfg_platform=""
+    if [ -n "$METADATA_FILE" ] && [ -f "$METADATA_FILE" ]; then
+        cfg_platform="$(grep -E '^\s*platform:' "$METADATA_FILE" 2>/dev/null | head -1 | sed 's/.*platform:\s*//' | tr -d '[:space:]"' | tr -d "'" | tr '[:upper:]' '[:lower:]')"
+    fi
+    if [ -n "$cfg_platform" ]; then
+        platform="$cfg_platform"
+    fi
+
+    if [ "$platform" = "gitlab" ]; then
+        echo "Note: GitHub Projects v2 automation workflow generation is not supported on GitLab."
+        echo "GitLab CI/CD and issue board automation can be configured via .gitlab-ci.yml"
+        echo "and GitLab's native board automation rules."
+        echo ""
+        echo "Skipping workflow generation."
+        return 0
+    fi
 
     # Read project metadata
     local owner project_id
@@ -404,6 +488,23 @@ project_verify_status_options() {
     if [ -z "$owner" ] || [ -z "$project_id" ]; then
         echo "Error: owner and project_id are required" >&2
         return 1
+    fi
+
+    # Detect platform
+    local platform="github"
+    local cfg_platform=""
+    if [ -n "$METADATA_FILE" ] && [ -f "$METADATA_FILE" ]; then
+        cfg_platform="$(grep -E '^\s*platform:' "$METADATA_FILE" 2>/dev/null | head -1 | sed 's/.*platform:\s*//' | tr -d '[:space:]"' | tr -d "'" | tr '[:upper:]' '[:lower:]')"
+    fi
+    if [ -n "$cfg_platform" ]; then
+        platform="$cfg_platform"
+    fi
+
+    if [ "$platform" = "gitlab" ]; then
+        echo "Note: GitHub Projects v2 Status field verification is not supported on GitLab."
+        echo "GitLab Issues Boards use a different data model."
+        echo ""
+        return 0
     fi
 
     # Get project GraphQL ID

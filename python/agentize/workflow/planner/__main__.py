@@ -18,7 +18,7 @@ from typing import Optional
 
 from agentize.shell import resolve_repo_root
 from agentize.workflow.api import run_acw
-from agentize.workflow.api import gh as gh_utils
+from agentize.workflow.api import forge as forge_utils
 from agentize.workflow.planner.pipeline import run_consensus_stage, run_planner_pipeline
 
 
@@ -265,8 +265,8 @@ def main(argv: list[str]) -> int:
 
     if refine_issue_number:
         refine_instructions = feature_desc
-        issue_body = gh_utils.issue_body(refine_issue_number, cwd=repo_root)
-        issue_url = gh_utils.issue_url(refine_issue_number, cwd=repo_root)
+        issue_body = forge_utils.issue_body(refine_issue_number, cwd=repo_root)
+        issue_url = forge_utils.issue_url(refine_issue_number, cwd=repo_root)
         issue_body = _strip_plan_footer(issue_body)
         if not _PLAN_HEADER_HINT_RE.search(issue_body):
             print(
@@ -282,7 +282,7 @@ def main(argv: list[str]) -> int:
     elif issue_mode:
         short_desc = _shorten_feature_desc(feature_desc, max_len=50)
         title = f"[plan] placeholder: {short_desc}"
-        issue_number, issue_url = gh_utils.issue_create(
+        issue_number, issue_url = forge_utils.issue_create(
             title,
             feature_desc,
             cwd=repo_root,
@@ -375,13 +375,13 @@ def main(argv: list[str]) -> int:
         if not plan_title:
             plan_title = _shorten_feature_desc(feature_desc, max_len=50)
         plan_title = _apply_issue_tag(plan_title, issue_number)
-        gh_utils.issue_edit(
+        forge_utils.issue_edit(
             issue_number,
             title=f"[plan] {plan_title}",
             body_file=consensus_path,
             cwd=repo_root,
         )
-        gh_utils.label_add(issue_number, ["agentize:plan"], cwd=repo_root)
+        forge_utils.label_add(issue_number, ["agentize:plan"], cwd=repo_root)
         if issue_url:
             _log(f"See the full plan at: {issue_url}")
 

@@ -5,7 +5,7 @@
 #
 # Module structure:
 #   planner/pipeline.sh  - Python backend adapter
-#   planner/github.sh    - GitHub issue creation/update helpers
+#   planner/forge.sh     - Forge-agnostic issue creation/update helpers (GitHub/GitLab)
 
 # Determine script directory for sourcing modules
 # Works in both sourced and executed contexts
@@ -27,4 +27,4 @@ source "$_PLANNER_DIR/term/colors.sh"
 
 # Source all modules in dependency order
 source "$_PLANNER_DIR/planner/pipeline.sh"
-source "$_PLANNER_DIR/planner/github.sh"
+source "$_PLANNER_DIR/planner/forge.sh"

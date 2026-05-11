@@ -3,6 +3,8 @@ project:
   org: Synthesys-Lab
   name: agentize
   lang: none
+  # platform: github   # Optional: "github" or "gitlab". Auto-detected from git remote if omitted.
+  # host: ""           # Optional: for self-hosted GitLab (e.g., "gitlab.company.com").
 
 # Optional: Explicit remote URL for Telegram notification hyperlinks
 # If omitted, automatically resolved from `git remote get-url origin`

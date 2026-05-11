@@ -40,6 +40,8 @@ if [ "$1" = "issue" ] && [ "$2" = "view" ]; then
 fi
 GHSTUB
     chmod +x bin/gh
+    # Also create glab symlink so GitLab path works in tests
+    ln -sf gh bin/glab
     export PATH="$PWD/bin:$PATH"
 }
 

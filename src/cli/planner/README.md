@@ -9,7 +9,7 @@ Internal pipeline module used by `lol plan`; the standalone `planner` command ha
 ```
 planner.sh           - Loader: determines script dir, sources modules
 planner/pipeline.sh  - Thin adapter that forwards `lol plan` inputs to the Python backend
-planner/github.sh    - Legacy GH helpers (kept for reference; pipeline now uses Python)
+planner/forge.sh     - Forge-agnostic issue helpers for GitHub/GitLab
 ```
 
 ## Load Order

@@ -105,8 +105,8 @@ def run_server(
 
     Telegram credentials are loaded from .agentize.local.yaml only.
     """
-    org, project_id, remote_url = load_config()
-    print(f"Starting server: org={org}, project={project_id}, period={period}s, workers={num_workers}")
+    org, project_id, remote_url, platform, host = load_config()
+    print(f"Starting server: org={org}, project={project_id}, period={period}s, workers={num_workers}, platform={platform}")
 
     # Extract repo slug for issue links (computed once)
     repo_slug = _extract_repo_slug(remote_url) if remote_url else None
@@ -188,7 +188,11 @@ def run_server(
                         # Send Telegram notification if configured
                         if token and chat_id:
                             issue_title = issue_titles.get(issue_no, '')
-                            issue_url = f"https://github.com/{repo_slug}/issues/{issue_no}" if repo_slug else None
+                            if repo_slug:
+                                owner, repo = repo_slug.split('/', 1)
+                                issue_url = build_issue_url(owner, repo, issue_no, platform, host)
+                            else:
+                                issue_url = None
                             msg = _format_worker_assignment_message(issue_no, issue_title, worker_id, issue_url)
                             send_telegram_message(token, chat_id, msg)
                     else:
@@ -220,7 +224,11 @@ def run_server(
                         # Send Telegram notification if configured
                         if token and chat_id:
                             issue_title = issue_titles.get(issue_no, '')
-                            issue_url = f"https://github.com/{repo_slug}/issues/{issue_no}" if repo_slug else None
+                            if repo_slug:
+                                owner, repo = repo_slug.split('/', 1)
+                                issue_url = build_issue_url(owner, repo, issue_no, platform, host)
+                            else:
+                                issue_url = None
                             msg = f"🔄 Refinement started: <a href=\"{issue_url}\">#{issue_no}</a> {issue_title}" if issue_url else f"🔄 Refinement started: #{issue_no} {issue_title}"
                             send_telegram_message(token, chat_id, msg)
                     else:
@@ -252,7 +260,11 @@ def run_server(
 
                         # Send Telegram notification if configured
                         if token and chat_id:
-                            issue_url = f"https://github.com/{repo_slug}/issues/{issue_no}" if repo_slug else None
+                            if repo_slug:
+                                owner, repo = repo_slug.split('/', 1)
+                                issue_url = build_issue_url(owner, repo, issue_no, platform, host)
+                            else:
+                                issue_url = None
                             msg = f"📝 Dev-req planning started: <a href=\"{issue_url}\">#{issue_no}</a>" if issue_url else f"📝 Dev-req planning started: #{issue_no}"
                             send_telegram_message(token, chat_id, msg)
                     else:
@@ -301,7 +313,11 @@ def run_server(
                             print(f"PR #{pr_no} (issue #{issue_no}) rebase assigned to worker {worker_id}")
 
                             if token and chat_id:
-                                pr_url = f"https://github.com/{repo_slug}/pull/{pr_no}" if repo_slug else None
+                                if repo_slug:
+                                    owner, repo = repo_slug.split('/', 1)
+                                    pr_url = build_mr_url(owner, repo, pr_no, platform, host)
+                                else:
+                                    pr_url = None
                                 msg = f"🔄 PR rebase started: <a href=\"{pr_url}\">#{pr_no}</a> (issue #{issue_no})" if pr_url else f"🔄 PR rebase started: #{pr_no} (issue #{issue_no})"
                                 send_telegram_message(token, chat_id, msg)
                         else:
@@ -342,7 +358,11 @@ def run_server(
                             print(f"PR #{pr_no} (issue #{issue_no}) review resolution assigned to worker {worker_id}")
 
                             if token and chat_id:
-                                pr_url = f"https://github.com/{repo_slug}/pull/{pr_no}" if repo_slug else None
+                                if repo_slug:
+                                    owner, repo = repo_slug.split('/', 1)
+                                    pr_url = build_mr_url(owner, repo, pr_no, platform, host)
+                                else:
+                                    pr_url = None
                                 msg = f"📝 Review resolution started: <a href=\"{pr_url}\">#{pr_no}</a> (issue #{issue_no})" if pr_url else f"📝 Review resolution started: #{pr_no} (issue #{issue_no})"
                                 send_telegram_message(token, chat_id, msg)
                         else:

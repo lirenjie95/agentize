@@ -11,7 +11,7 @@ from typing import Iterable
 
 from agentize.shell import run_shell_function
 from agentize.workflow.api import Session
-from agentize.workflow.api import gh as gh_utils
+from agentize.workflow.api import forge as forge_utils
 from agentize.workflow.api import path as path_utils
 from agentize.workflow.api import prompt as prompt_utils
 from agentize.workflow.api.session import PipelineError
@@ -171,7 +171,7 @@ def _prefetch_issue(issue_no: int, issue_file: Path, *, cwd: Path) -> None:
         '.body + "\\n")'
     )
     try:
-        output = gh_utils.issue_view(issue_no, query, cwd=cwd)
+        output = forge_utils.issue_view(issue_no, query, cwd=cwd)
     except RuntimeError as exc:
         if issue_file.exists():
             issue_file.unlink()
@@ -308,7 +308,7 @@ def _wait_for_pr_mergeable(
     *,
     push_remote: str,
 ) -> None:
-    pr_data = gh_utils.pr_view(
+    pr_data = forge_utils.pr_view(
         pr_number,
         fields="mergeStateStatus,mergeable,url",
         cwd=worktree_path,
@@ -327,7 +327,7 @@ def _wait_for_pr_mergeable(
         force=True,
     )
 
-    pr_data = gh_utils.pr_view(
+    pr_data = forge_utils.pr_view(
         pr_number,
         fields="mergeStateStatus,mergeable,url",
         cwd=worktree_path,
@@ -405,7 +405,7 @@ def _push_and_create_pr(
     _append_closes_line(finalize_file, issue_no)
     pr_body = finalize_file.read_text() if finalize_file.exists() else ""
     try:
-        pr_number, pr_url = gh_utils.pr_create(
+        pr_number, pr_url = forge_utils.pr_create(
             pr_title,
             pr_body,
             base=base_branch,
@@ -683,7 +683,7 @@ def run_impl_workflow(
             )
 
             print("Waiting for PR CI...")
-            exit_code, checks = gh_utils.pr_checks(
+            exit_code, checks = forge_utils.pr_checks(
                 pr_number,
                 watch=True,
                 interval=30,

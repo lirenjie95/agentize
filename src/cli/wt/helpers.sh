@@ -183,16 +183,52 @@ wt_claim_issue_status() {
         return 0
     fi
 
-    # Parse owner/repo from remote URL (handles both HTTPS and SSH formats)
+    # Parse owner/repo from remote URL (handles both HTTPS and SSH formats, any host)
     # Shell-neutral regex capture: BASH_REMATCH for bash, match for zsh
     # One expands to the capture group, the other to empty string
-    if [[ "$remote_url" =~ github\.com[:/]([^/]+)/([^/.]+)(\.git)?$ ]]; then
-        repo_owner="${BASH_REMATCH[1]}${match[1]}"
-        repo_name="${BASH_REMATCH[2]}${match[2]}"
+    local path_part=""
+    if [[ "$remote_url" =~ ^git@([^:]+):(.+)$ ]]; then
+        path_part="${BASH_REMATCH[2]}${match[2]}"
+    elif [[ "$remote_url" =~ ^https?://[^/]+/(.+)$ ]]; then
+        path_part="${BASH_REMATCH[1]}${match[1]}"
+    fi
+
+    if [ -n "$path_part" ]; then
         # Remove .git suffix if present
-        repo_name="${repo_name%.git}"
+        path_part="${path_part%.git}"
+        path_part="${path_part%/}"
+        repo_owner="$(echo "$path_part" | cut -d'/' -f1)"
+        repo_name="$(echo "$path_part" | cut -d'/' -f2)"
     else
         return 0  # couldn't parse remote URL
+    fi
+
+    # Detect platform from config or remote URL
+    local platform="github"
+    local host=""
+    if [ -f "$config_file" ]; then
+        local cfg_platform
+        cfg_platform="$(grep -E '^\s*platform:' "$config_file" 2>/dev/null | head -1 | sed 's/.*platform:\s*//' | tr -d '[:space:]"'"'"' | tr '[:upper:]' '[:lower:]')"
+        if [ -n "$cfg_platform" ]; then
+            platform="$cfg_platform"
+        fi
+        local cfg_host
+        cfg_host="$(grep -E '^\s*host:' "$config_file" 2>/dev/null | head -1 | sed 's/.*host:\s*//' | tr -d '[:space:]"'"'"')"
+        if [ -n "$cfg_host" ]; then
+            host="$cfg_host"
+        fi
+    fi
+    if [ -z "$host" ]; then
+        if [[ "$remote_url" =~ git@([^:]+): ]]; then
+            host="${BASH_REMATCH[1]}"
+        elif [[ "$remote_url" =~ https?://([^/]+)/ ]]; then
+            host="${BASH_REMATCH[1]}"
+        fi
+    fi
+
+    # On GitLab, skip Projects board status update (gh-graphql.sh is GitHub-only)
+    if [ "$platform" = "gitlab" ]; then
+        return 0
     fi
 
     # Find gh-graphql.sh script

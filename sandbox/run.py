@@ -455,6 +455,15 @@ def create_sandbox_container(
     if gh_hosts.exists():
         cmd.extend(["-v", f"{gh_hosts}:/home/agentizer/.config/gh/hosts.yml:ro"])
 
+    # GitLab CLI credentials
+    glab_config = home / ".config" / "glab-cli" / "config.yml"
+    if glab_config.exists():
+        cmd.extend(["-v", f"{glab_config}:/home/agentizer/.config/glab-cli/config.yml:ro"])
+
+    glab_hosts = home / ".config" / "glab-cli" / "hosts.yml"
+    if glab_hosts.exists():
+        cmd.extend(["-v", f"{glab_hosts}:/home/agentizer/.config/glab-cli/hosts.yml:ro"])
+
     # Git credentials
     git_creds = home / ".git-credentials"
     if git_creds.exists():
@@ -470,6 +479,10 @@ def create_sandbox_container(
     # Environment variables
     if "GITHUB_TOKEN" in os.environ:
         cmd.extend(["-e", f"GITHUB_TOKEN={os.environ['GITHUB_TOKEN']}"])
+    if "GITLAB_TOKEN" in os.environ:
+        cmd.extend(["-e", f"GITLAB_TOKEN={os.environ['GITLAB_TOKEN']}"])
+    if "GITLAB_HOST" in os.environ:
+        cmd.extend(["-e", f"GITLAB_HOST={os.environ['GITLAB_HOST']}"])
 
     if not ccr_mode:
         if "ANTHROPIC_API_KEY" in os.environ:

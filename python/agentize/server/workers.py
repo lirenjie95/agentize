@@ -11,6 +11,8 @@ from typing import Optional
 
 from agentize.shell import run_shell_function
 from agentize.server.log import _log
+from agentize.server.platform import _get_platform
+from agentize.workflow.api import forge as forge_utils
 
 
 # Worker status file management
@@ -98,12 +100,31 @@ def _check_issue_has_label(issue_no: int, label: str) -> bool:
     """Check if issue has a specific label.
 
     Args:
-        issue_no: GitHub issue number
+        issue_no: Issue number
         label: Label name to check for
 
     Returns:
         True if the issue has the label, False otherwise.
     """
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        result = subprocess.run(
+            ['glab', 'issue', 'view', str(issue_no), '--output', 'json'],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode != 0:
+            return False
+        try:
+            data = json.loads(result.stdout)
+            labels = data.get("labels", [])
+            if isinstance(labels, list):
+                label_names = [str(l.get("name", l)) if isinstance(l, dict) else str(l) for l in labels]
+                return label in label_names
+            return False
+        except json.JSONDecodeError:
+            return False
+
     result = subprocess.run(
         ['gh', 'issue', 'view', str(issue_no), '--json', 'labels', '--jq', '.labels[].name'],
         capture_output=True,
@@ -118,14 +139,22 @@ def _cleanup_refinement(issue_no: int) -> None:
     """Clean up after refinement: remove agentize:refine label and reset status to Proposed.
 
     Args:
-        issue_no: GitHub issue number
+        issue_no: Issue number
     """
     # Remove agentize:refine label
-    subprocess.run(
-        ['gh', 'issue', 'edit', str(issue_no), '--remove-label', 'agentize:refine'],
-        capture_output=True,
-        text=True
-    )
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        subprocess.run(
+            ['glab', 'issue', 'unlabel', str(issue_no), 'agentize:refine'],
+            capture_output=True,
+            text=True
+        )
+    else:
+        subprocess.run(
+            ['gh', 'issue', 'edit', str(issue_no), '--remove-label', 'agentize:refine'],
+            capture_output=True,
+            text=True
+        )
 
     # Reset issue status to "Proposed" (best-effort pattern)
     result = run_shell_function('wt pathto main', capture_output=True)
@@ -143,14 +172,22 @@ def _cleanup_feat_request(issue_no: int) -> None:
     """Clean up after feat-request planning: remove agentize:dev-req label and reset status to Proposed.
 
     Args:
-        issue_no: GitHub issue number
+        issue_no: Issue number
     """
     # Remove agentize:dev-req label
-    subprocess.run(
-        ['gh', 'issue', 'edit', str(issue_no), '--remove-label', 'agentize:dev-req'],
-        capture_output=True,
-        text=True
-    )
+    platform, _ = _get_platform()
+    if platform == "gitlab":
+        subprocess.run(
+            ['glab', 'issue', 'unlabel', str(issue_no), 'agentize:dev-req'],
+            capture_output=True,
+            text=True
+        )
+    else:
+        subprocess.run(
+            ['gh', 'issue', 'edit', str(issue_no), '--remove-label', 'agentize:dev-req'],
+            capture_output=True,
+            text=True
+        )
 
     # Reset issue status to "Proposed" (best-effort pattern)
     result = run_shell_function('wt pathto main', capture_output=True)
@@ -511,13 +548,20 @@ def cleanup_dead_workers(
                     # This resets "In Progress" to "Proposed" if applicable
                     _cleanup_review_resolution(issue_no)
 
-                    issue_url = f"https://github.com/{repo_slug}/issues/{issue_no}" if repo_slug else None
+                    # Build issue/PR URLs with platform awareness
+                    from agentize.server.platform import build_issue_url, build_mr_url
+                    platform, host = _get_platform()
+                    if repo_slug:
+                        owner, repo = repo_slug.split('/', 1)
+                        issue_url = build_issue_url(owner, repo, issue_no, platform, host)
+                    else:
+                        issue_url = None
 
-                    # Build PR URL if pr_number is available in session state
                     pr_url = None
                     pr_number = session_state.get('pr_number')
                     if pr_number and repo_slug:
-                        pr_url = f"https://github.com/{repo_slug}/pull/{pr_number}"
+                        owner, repo = repo_slug.split('/', 1)
+                        pr_url = build_mr_url(owner, repo, pr_number, platform, host)
 
                     msg = _format_worker_completion_message(issue_no, i, issue_url, pr_url=pr_url)
                     if send_telegram_message(tg_token, tg_chat_id, msg):

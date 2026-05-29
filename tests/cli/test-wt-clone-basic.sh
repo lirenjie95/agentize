@@ -4,6 +4,12 @@
 source "$(dirname "$0")/../common.sh"
 source "$(dirname "$0")/../helpers-worktree.sh"
 
+# Pre-commit hooks run inside 'git commit' which exports GIT_INDEX_FILE.
+# Without clearing it, 'git worktree add' inside wt clone will try to
+# reuse the parent repo's index path and fail with:
+#   fatal: .git/index: index file open failed: Not a directory
+clean_git_env
+
 test_info "wt clone creates bare repo with trees/main"
 
 WT_CLI="$PROJECT_ROOT/src/cli/wt.sh"

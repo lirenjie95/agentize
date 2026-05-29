@@ -41,7 +41,9 @@ fi
 GHSTUB
     chmod +x bin/gh
     # Also create glab symlink so GitLab path works in tests
-    ln -sf gh bin/glab
+    if ! ln -sf gh bin/glab 2>/dev/null; then
+        cp gh bin/glab
+    fi
     export PATH="$PWD/bin:$PATH"
 }
 

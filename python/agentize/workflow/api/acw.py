@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Callable
 
-from agentize.shell import get_agentize_home
+from agentize.shell import _find_bash, _normalize_path, get_agentize_home
 
 _ACW_PROVIDERS_CACHE: list[str] | None = None
 _ACW_PROVIDERS_LOCK = threading.Lock()
@@ -36,7 +36,7 @@ def _resolve_overrides_cmd(env: dict[str, str] | None = None) -> str:
     if overrides_path:
         override_path = Path(overrides_path).expanduser()
         if override_path.exists():
-            return f' && source "{override_path}"'
+            return f' && source "{_normalize_path(override_path)}"'
     return ""
 
 
@@ -126,15 +126,16 @@ def run_acw(
     # Quote paths to handle spaces
     cmd_args = " ".join(f'"{arg}"' for arg in cmd_parts)
     overrides_cmd = _resolve_overrides_cmd(merged_env)
-    bash_cmd = f'source "{acw_script}"{overrides_cmd} && acw {cmd_args}'
+    bash_cmd = f'source "{_normalize_path(acw_script)}"{overrides_cmd} && acw {cmd_args}'
 
+    bash_bin = _find_bash()
     return subprocess.run(
-        ["bash", "-c", bash_cmd],
+        [bash_bin, "-c", bash_cmd],
         env=merged_env,
         capture_output=True,
         text=True,
         timeout=timeout,
-        cwd=str(cwd) if cwd else None,
+        cwd=_normalize_path(cwd) if cwd else None,
     )
 
 
@@ -153,10 +154,11 @@ def list_acw_providers() -> list[str]:
         agentize_home = merged_env["AGENTIZE_HOME"]
         acw_script = _resolve_acw_script(agentize_home, merged_env)
         overrides_cmd = _resolve_overrides_cmd(merged_env)
-        bash_cmd = f'source "{acw_script}"{overrides_cmd} && acw --complete providers'
+        bash_cmd = f'source "{_normalize_path(acw_script)}"{overrides_cmd} && acw --complete providers'
 
+        bash_bin = _find_bash()
         result = subprocess.run(
-            ["bash", "-c", bash_cmd],
+            [bash_bin, "-c", bash_cmd],
             env=merged_env,
             capture_output=True,
             text=True,

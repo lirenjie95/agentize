@@ -42,7 +42,7 @@ TESTS_DIR="$PROJECT_ROOT/tests"
 PYTHON_BIN=""
 select_python_bin() {
   local candidate
-  for candidate in python python3; do
+  for candidate in python python3 python3.13 python3.12 python3.11 python3.10; do
     if ! command -v "$candidate" >/dev/null 2>&1; then
       continue
     fi

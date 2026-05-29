@@ -22,6 +22,22 @@ Direct execution from local clone:
 ./scripts/install [OPTIONS]
 ```
 
+### Windows Installation
+
+On Windows 10, use **Git Bash** (included with [Git for Windows](https://git-scm.com/download/win)):
+
+1. Install [Git for Windows](https://git-scm.com/download/win)
+2. Open **Git Bash** and install `make`:
+   ```bash
+   pacman -S make
+   ```
+3. Run the installer from Git Bash:
+   ```bash
+   bash scripts/install
+   ```
+
+After installation, source `setup.sh` from Git Bash to enable `wt` and `lol` commands.
+
 ## Options
 
 - `--dir <path>` - Installation directory (default: `$HOME/.agentize`)
@@ -32,10 +48,10 @@ Direct execution from local clone:
 
 The installer performs the following steps:
 
-1. **Dependency check** - Verifies `git`, `make`, and `bash` are available
+1. **Dependency check** - Verifies `git`, `make`, and `bash` are available (on Windows, offers `pacman -S` guidance if a tool is missing)
 2. **Clone repository** - Clones (or copies from local path) to install directory
 3. **Initialize worktree** - Runs `wt init` to create `trees/main` worktree
-4. **Run setup** - Executes `make setup` in `trees/main` to generate `setup.sh`
+4. **Run setup** - Executes `make setup` in `trees/main` to generate `setup.sh` (Windows-aware `PYTHONPATH` with `;` separator)
 5. **Register Claude plugin** (optional) - If `claude` CLI is available:
    - Removes any stale marketplace/plugin entries
    - Registers the install directory as a local plugin marketplace

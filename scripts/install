@@ -77,7 +77,12 @@ echo "Checking dependencies..."
 for cmd in git make bash; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         echo "Error: Required command '$cmd' not found" >&2
-        echo "Please install $cmd and try again" >&2
+        if [ -n "${MSYSTEM:-}" ] || [ -n "${MINGW_PREFIX:-}" ] || [ "${OSTYPE:-}" = "cygwin" ]; then
+            echo "You appear to be on Windows. Install missing tools via Git Bash:" >&2
+            echo "  pacman -S $cmd" >&2
+        else
+            echo "Please install $cmd and try again" >&2
+        fi
         exit 1
     fi
 done

@@ -18,6 +18,20 @@
   - Use Python `venv` or `anaconda` to manage a good Python release!
   - Requires **PyYAML** (`pip install pyyaml`) for YAML configuration parsing
 
+### Windows Support
+
+Agentize supports Windows 10 through **Git Bash** (included with [Git for Windows](https://git-scm.com/download/win)).
+
+**Windows prerequisites:**
+1. Install [Git for Windows](https://git-scm.com/download/win) (includes Git Bash)
+2. Open **Git Bash** and install `make`:
+   ```bash
+   pacman -S make
+   ```
+3. Ensure `bash`, `git`, and `make` are available in Git Bash before running the installer.
+
+All Agentize commands (`wt`, `lol`) should be run inside Git Bash. Python modules automatically discover `bash.exe` from common Git for Windows install locations.
+
 ### Recommended Libraries
 
 - **Anthropic Python Library** - For custom AI integrations (optional)

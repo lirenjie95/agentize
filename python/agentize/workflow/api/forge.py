@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from agentize.server.platform import _get_platform, detect_platform, get_host, load_project_config
+from agentize.shell import _find_bash, _normalize_path
 
 
 def _resolve_overrides() -> Path | None:
@@ -44,8 +45,9 @@ def _forge_available(platform: str | None = None) -> bool:
         return False
     if overrides is not None:
         check_cmd = _shell_command([cmd, "auth", "status"])
+        bash_bin = _find_bash()
         result = subprocess.run(
-            ["bash", "-c", f"source {shlex.quote(str(overrides))} && {check_cmd}"],
+            [bash_bin, "-c", f"source {shlex.quote(str(overrides))} && {check_cmd}"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
@@ -70,11 +72,12 @@ def _run_forge(
     overrides = _resolve_overrides()
     if overrides is not None:
         shell_cmd = _shell_command([cmd, *args])
+        bash_bin = _find_bash()
         result = subprocess.run(
-            ["bash", "-c", f"source {shlex.quote(str(overrides))} && {shell_cmd}"],
+            [bash_bin, "-c", f"source {shlex.quote(str(overrides))} && {shell_cmd}"],
             capture_output=True,
             text=True,
-            cwd=str(cwd) if cwd else None,
+            cwd=_normalize_path(cwd) if cwd else None,
         )
     else:
         result = subprocess.run(
@@ -103,11 +106,12 @@ def _run_forge_with_status(
     overrides = _resolve_overrides()
     if overrides is not None:
         shell_cmd = _shell_command([cmd, *args])
+        bash_bin = _find_bash()
         result = subprocess.run(
-            ["bash", "-c", f"source {shlex.quote(str(overrides))} && {shell_cmd}"],
+            [bash_bin, "-c", f"source {shlex.quote(str(overrides))} && {shell_cmd}"],
             capture_output=capture_output,
             text=True,
-            cwd=str(cwd) if cwd else None,
+            cwd=_normalize_path(cwd) if cwd else None,
         )
     else:
         result = subprocess.run(

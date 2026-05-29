@@ -29,6 +29,7 @@ pre-commit:
 	mkdir -p "$$HOOKS_DIR"; \
 	if ! ln -sf ../../scripts/pre-commit "$$HOOKS_DIR/pre-commit" 2>/dev/null; then \
 		cp ../../scripts/pre-commit "$$HOOKS_DIR/pre-commit"; \
+		echo "⚠ Pre-commit hook copied (not symlinked). Re-run 'make pre-commit' after editing scripts/pre-commit."; \
 	fi; \
 	echo "✓ Pre-commit hook installed";
 

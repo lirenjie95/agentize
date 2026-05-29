@@ -17,6 +17,9 @@ def _find_bash() -> str:
         candidates = [
             r"C:\Program Files\Git\bin\bash.exe",
             r"C:\Program Files (x86)\Git\bin\bash.exe",
+            os.path.join(os.environ.get("LOCALAPPDATA", ""), r"Programs\Git\bin\bash.exe"),
+            os.path.join(os.environ.get("USERPROFILE", ""), r"scoop\apps\git\current\bin\bash.exe"),
+            r"C:\ProgramData\chocolatey\bin\bash.exe",
         ]
         for candidate in candidates:
             if os.path.isfile(candidate):
@@ -104,9 +107,9 @@ def run_shell_function(
     cmd_parts = []
     setup_path = Path(home) / "setup.sh"
     if setup_path.exists():
-        cmd_parts.append(f'source "{setup_path}"')
+        cmd_parts.append(f'source "{_normalize_path(setup_path)}"')
     if override_path:
-        cmd_parts.append(f'source "{override_path}"')
+        cmd_parts.append(f'source "{_normalize_path(override_path)}"')
     cmd_parts.append(cmd)
     full_cmd = " && ".join(cmd_parts)
 

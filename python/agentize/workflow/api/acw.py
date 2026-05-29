@@ -126,7 +126,7 @@ def run_acw(
     # Quote paths to handle spaces
     cmd_args = " ".join(f'"{arg}"' for arg in cmd_parts)
     overrides_cmd = _resolve_overrides_cmd(merged_env)
-    bash_cmd = f'source "{acw_script}"{overrides_cmd} && acw {cmd_args}'
+    bash_cmd = f'source "{_normalize_path(acw_script)}"{overrides_cmd} && acw {cmd_args}'
 
     bash_bin = _find_bash()
     return subprocess.run(

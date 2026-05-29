@@ -27,7 +27,9 @@ test-fast:
 pre-commit:
 	HOOKS_DIR=$$(git rev-parse --git-path hooks 2>/dev/null || echo ".git/hooks"); \
 	mkdir -p "$$HOOKS_DIR"; \
-	ln -sf ../../scripts/pre-commit "$$HOOKS_DIR/pre-commit"; \
+	if ! ln -sf ../../scripts/pre-commit "$$HOOKS_DIR/pre-commit" 2>/dev/null; then \
+		cp ../../scripts/pre-commit "$$HOOKS_DIR/pre-commit"; \
+	fi; \
 	echo "✓ Pre-commit hook installed";
 
 # Build sandbox image (uses local config or auto-detection)
@@ -46,7 +48,11 @@ setup:
 	@echo '# This file is local-only and gitignored' >> setup.sh
 	@echo '' >> setup.sh
 	@echo 'export AGENTIZE_HOME="$(CURDIR)"' >> setup.sh
-	@echo 'export PYTHONPATH="$$AGENTIZE_HOME/python:$$PYTHONPATH"' >> setup.sh
+	@echo 'if [ -n "$${MSYSTEM:-}" ] || [ -n "$${MINGW_PREFIX:-}" ] || [ "$$OSTYPE" = "cygwin" ]; then' >> setup.sh
+	@echo '  export PYTHONPATH="$$AGENTIZE_HOME/python;$$PYTHONPATH"' >> setup.sh
+	@echo 'else' >> setup.sh
+	@echo '  export PYTHONPATH="$$AGENTIZE_HOME/python:$$PYTHONPATH"' >> setup.sh
+	@echo 'fi' >> setup.sh
 	@echo 'source "$$AGENTIZE_HOME/src/cli/wt.sh"' >> setup.sh
 	@echo 'source "$$AGENTIZE_HOME/src/cli/lol.sh"' >> setup.sh
 	@echo 'source "$$AGENTIZE_HOME/src/cli/acw.sh"' >> setup.sh

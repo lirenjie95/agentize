@@ -174,6 +174,11 @@ for file in $STAGED_FILES; do
     # Check if file has a source extension
     for ext in "${SOURCE_EXTENSIONS[@]}"; do
         if [[ "$file" == *."$ext" ]]; then
+            # Skip if the source file itself was deleted (no doc needed)
+            if ! file_exists "$REPO_ROOT/$file"; then
+                break
+            fi
+
             # Get the base name without extension
             base="${file%.*}"
             md_file="${base}.md"
@@ -198,6 +203,10 @@ for file in $STAGED_FILES; do
 
     # Check if file is a test file (in tests/ directory or named test_*.sh)
     if [[ "$file" == tests/* ]] || [[ "$file" == test_*.sh ]]; then
+        # Skip if the test file itself was deleted (no doc needed)
+        if ! file_exists "$REPO_ROOT/$file"; then
+            continue
+        fi
         # For shell scripts, check for inline documentation first
         if [[ "$file" == *.sh ]]; then
             if has_inline_test_docs "$REPO_ROOT/$file"; then

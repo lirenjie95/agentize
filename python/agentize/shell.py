@@ -3,9 +3,37 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Optional
+
+
+def _find_bash() -> str:
+    """Locate bash executable, with Windows-aware discovery."""
+    if sys.platform == "win32":
+        # Common Git for Windows install locations
+        candidates = [
+            r"C:\Program Files\Git\bin\bash.exe",
+            r"C:\Program Files (x86)\Git\bin\bash.exe",
+        ]
+        for candidate in candidates:
+            if os.path.isfile(candidate):
+                return candidate
+        # Also check PATH
+        found = shutil.which("bash")
+        if found:
+            return found
+    return "bash"
+
+
+def _normalize_path(path: str | Path) -> str:
+    """Normalize path separators for bash on Windows."""
+    s = str(path)
+    if sys.platform == "win32":
+        s = s.replace("\\", "/")
+    return s
 
 
 def get_agentize_home() -> str:
@@ -82,10 +110,11 @@ def run_shell_function(
     cmd_parts.append(cmd)
     full_cmd = " && ".join(cmd_parts)
 
+    bash_bin = _find_bash()
     return subprocess.run(
-        ["bash", "-c", full_cmd],
+        [bash_bin, "-c", full_cmd],
         env=env,
         capture_output=capture_output,
         text=True,
-        cwd=str(cwd) if cwd else None,
+        cwd=_normalize_path(cwd) if cwd else None,
     )

@@ -25,7 +25,7 @@
   - However, it is allowed to use `cd` if you create `.sh` scripts committed to this project.
 - Documentation (`docs/`, root `README.md`, and folder `README.md` files) is written in **Chinese by default**.
   - Write new documentation in Chinese; keep code, commands, paths, and proper nouns in English.
-  - Agent behavior files (skills, prompts, agents, commands under `.claude-plugin/`, `.opencode/`, `.codex/`, `.cursor/`) remain in English, except folder `README.md` files which follow the Chinese-default rule.
+  - Agent behavior files (skills, prompts, agents, commands under `.claude-plugin/`, `.opencode/`, `.codex/`, `.cursor/`, `.kimi/`) remain in English, except folder `README.md` files which follow the Chinese-default rule.
 - `README.md` in each folder shall decribe the folder purpose and organization.
   - If not, please create one!
 - Each source code file shall have a documentation with the same name but with `.md` suffix.

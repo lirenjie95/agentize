@@ -1,11 +1,11 @@
-# Simp Workflow Module
+# Simp 工作流模块
 
-Python implementation of the `lol simp` semantic-preserving simplifier workflow.
+`lol simp` 保持语义的简化器工作流的 Python 实现。
 
-## Organization
+## 组织
 
-- `simp.py` - Workflow orchestration, target selection, and prompt rendering
-- `prompt.md` - Prompt template for simplification
-- `__main__.py` - CLI entrypoint for `python -m agentize.workflow.simp`
-- `__init__.py` - Public exports for the module
-- Companion `.md` files document interfaces and design rationale
+- `simp.py` - 工作流编排、目标选择和提示词渲染
+- `prompt.md` - 用于简化的提示词模板
+- `__main__.py` - `python -m agentize.workflow.simp` 的 CLI 入口
+- `__init__.py` - 模块的公共导出
+- 配套的 `.md` 文件记录了接口和设计理由

@@ -1,42 +1,34 @@
-# Workflow Module
+# Workflow 模块
 
-Python-native orchestration for multi-stage LLM planner workflows, the `lol impl` loop,
-and the `lol simp` simplifier workflow.
+多阶段 LLM planner 工作流、`lol impl` 循环以及 `lol simp` 简化器工作流的 Python 原生编排。
 
-## Purpose
+## 用途
 
-This module provides a Python entrypoint for running the 5-stage planner flow that powers
-`lol plan`, the issue-to-implementation loop for `lol impl`, and the simplifier workflow
-for `lol simp`. The planner pipeline reuses established prompt templates from
-`.claude-plugin/agents/` to maintain behavioral consistency while enabling Python
-scripting integration and external consensus synthesis. Standalone workflows like
-`impl` and `simp` keep their prompt templates alongside the module for clarity.
+本模块提供 Python 入口，用于运行驱动 `lol plan` 的 5 阶段 planner 流程、`lol impl` 的 issue 到实现循环，以及 `lol simp` 的简化器工作流。planner 流水线复用 `.claude-plugin/agents/` 中已有的提示词模板，以保持行为一致性，同时支持 Python 脚本集成和外部共识合成。像 `impl` 和 `simp` 这样的独立工作流将提示词模板与模块放在一起，以保持清晰。
 
-## Architecture
+## 架构
 
-The workflow module wraps the `acw` shell function (Agentize Claude Wrapper) to execute
-each pipeline stage. Prompts are rendered by combining:
+workflow 模块封装了 `acw` shell 函数（Agentize Claude Wrapper）来执行各个流水线阶段。提示词通过组合以下内容进行渲染：
 
-1. Base agent prompts from `.claude-plugin/agents/*.md`
-2. Plan-guideline content from `.claude-plugin/skills/plan-guideline/SKILL.md` (for applicable stages)
-3. Feature description provided by the caller
-4. Previous stage output (for chained stages)
+1. 来自 `.claude-plugin/agents/*.md` 的基础 agent 提示词
+2. 来自 `.claude-plugin/skills/plan-guideline/SKILL.md` 的 plan-guideline 内容（适用于相应阶段）
+3. 调用方提供的功能描述
+4. 上一阶段的输出（用于链式阶段）
 
-Artifacts (input prompts and outputs) are written to `.tmp/` with a configurable prefix
-and output suffix.
+产物（输入提示词和输出）以可配置的前缀和输出后缀写入 `.tmp/`。
 
-## Modules
+## 模块
 
-| Module | Purpose |
+| 模块 | 用途 |
 |--------|---------|
-| `__init__.py` | Package exports: `run_acw`, `ACW`, `run_planner_pipeline`, `run_impl_workflow`, `StageResult`, `ImplError` |
-| `utils/` | Helper package for ACW invocation, GitHub operations, prompt rendering, and path resolution |
-| `planner/` | Standalone planning pipeline package (`python -m agentize.workflow.planner`) |
-| `planner.py` | **DEPRECATED** - Re-exports for backward compatibility (will be removed) |
-| `impl/` | Issue-to-implementation workflow (Python) with file-based prompt and `python -m agentize.workflow.impl` entrypoint |
-| `simp/` | Semantic-preserving simplifier workflow with a module-local prompt and `python -m agentize.workflow.simp` entrypoint |
+| `__init__.py` | 包导出：`run_acw`、`ACW`、`run_planner_pipeline`、`run_impl_workflow`、`StageResult`、`ImplError` |
+| `utils/` | 用于 ACW 调用、GitHub 操作、提示词渲染和路径解析的辅助包 |
+| `planner/` | 独立的规划流水线包（`python -m agentize.workflow.planner`） |
+| `planner.py` | **已弃用** - 为向后兼容而做的再导出（将被移除） |
+| `impl/` | issue 到实现的工作流（Python），带基于文件的提示词和 `python -m agentize.workflow.impl` 入口 |
+| `simp/` | 保持语义的简化器工作流，带模块本地的提示词和 `python -m agentize.workflow.simp` 入口 |
 
-## Pipeline Stages
+## 流水线阶段
 
 ```
 understander → bold → critique → reducer → consensus (optional)
@@ -44,15 +36,15 @@ understander → bold → critique → reducer → consensus (optional)
                      (parallel-only)
 ```
 
-1. **Understander**: Gathers codebase context and constraints
-2. **Bold**: Proposes innovative implementation approaches
-3. **Critique**: Validates assumptions and analyzes feasibility
-4. **Reducer**: Simplifies proposals following "less is more" philosophy
-5. **Consensus**: Synthesizes a unified implementation plan (optional for library use; CLI delegates to the external consensus script)
+1. **Understander**：收集代码库上下文和约束
+2. **Bold**：提出创新的实现方案
+3. **Critique**：验证假设并分析可行性
+4. **Reducer**：遵循“少即是多”的理念简化方案
+5. **Consensus**：合成统一的实现计划（库使用时可选；CLI 委托给外部共识脚本）
 
-Critique and reducer are always executed in parallel.
+critique 和 reducer 始终并行执行。
 
-## Usage
+## 用法
 
 ```python
 from agentize.workflow import run_planner_pipeline
@@ -64,13 +56,13 @@ results = run_planner_pipeline(
     skip_consensus=True,
 )
 
-# Access per-stage results
+# 访问各阶段结果
 for stage, result in results.items():
     print(f"{stage}: {result.output_path}")
 ```
 
-## Dependencies
+## 依赖
 
-- `acw` shell function via `setup.sh`
-- Prompt templates in `.claude-plugin/agents/` and `.claude-plugin/skills/`
-- Python stdlib only (no third-party dependencies)
+- 通过 `setup.sh` 提供的 `acw` shell 函数
+- `.claude-plugin/agents/` 和 `.claude-plugin/skills/` 中的提示词模板
+- 仅使用 Python 标准库（无第三方依赖）

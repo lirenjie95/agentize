@@ -1,46 +1,46 @@
-# Skills
+# Skills（技能）
 
-This document describes the skill definitions for Claude Code. Skills are reusable AI behaviors that can be invoked by commands or directly.
+本文档介绍 Claude Code 的 skill 定义。Skill 是可复用的 AI 行为，可以被 command 调用或直接调用。
 
-## Purpose
+## 目的
 
-Skills provide modular, reusable AI capabilities that can be composed into larger workflows. Each skill is defined in a subdirectory under `.claude-plugin/skills/` with a `SKILL.md` file containing frontmatter and instructions.
+Skill 提供模块化、可复用的 AI 能力，可以组合成更大的工作流。每个 skill 定义在 `.claude-plugin/skills/` 下的一个子目录中，其中包含一个带有 frontmatter 和说明的 `SKILL.md` 文件。
 
-## Configuration
+## 配置
 
-Each skill subdirectory contains:
-- `SKILL.md`: Skill definition with frontmatter (name, description) and instructions
-- Optional supporting files (scripts, templates)
+每个 skill 子目录包含：
+- `SKILL.md`：带有 frontmatter（name、description）和说明的 skill 定义
+- 可选的辅助文件（脚本、模板）
 
-## Available Skills
+## 可用 Skills
 
-### Git Operations
+### Git 操作
 
-- `commit-msg`: Commit staged changes to git with meaningful messages
-- `fork-dev-branch`: Create a development branch for a GitHub issue with standardized naming
+- `commit-msg`：以有意义的提交消息将暂存的变更提交到 git
+- `fork-dev-branch`：为 GitHub issue 创建标准化命名的开发分支
 
-### GitHub Integration
+### GitHub 集成
 
-- `open-issue`: Create GitHub issues from conversation context with proper formatting and tag selection
-- `open-pr`: Create GitHub pull requests from conversation context with proper formatting and tag selection
+- `open-issue`：从对话上下文创建格式规范、标签恰当的 GitHub issue
+- `open-pr`：从对话上下文创建格式规范、标签恰当的 GitHub pull request
 
-### Planning & Documentation
+### 规划与文档
 
-- `plan-guideline`: Create comprehensive implementation plans with detailed file-level changes and test strategies
-- `doc-architect`: Generate comprehensive documentation checklist for feature implementation
-- `document-guideline`: Documentation standards for design docs, folder READMEs, source code interfaces, and test cases
+- `plan-guideline`：创建包含详细文件级变更和测试策略的全面实现计划
+- `doc-architect`：为功能实现生成全面的文档检查清单
+- `document-guideline`：设计文档、目录 README、源代码接口和测试用例的文档标准
 
-### Implementation
+### 实现
 
-- `milestone`: Drive implementation forward incrementally with automatic progress tracking, LOC monitoring, and milestone checkpoint creation
-- `move-a-file`: Move or rename a file while automatically updating all references in source code and documentation
+- `milestone`：以自动进度跟踪、LOC 监控和里程碑检查点创建来增量推进实现
+- `move-a-file`：移动或重命名文件，同时自动更新源代码和文档中的所有引用
 
-### Review & Quality
+### 评审与质量
 
-- `review-standard`: Systematic code review checking documentation quality and promoting code reuse
-- `shell-script-review`: Review shell scripts for shell-neutral behavior (bash/zsh compatibility)
-- `external-consensus`: Synthesize consensus implementation plan from multi-agent debate reports using external AI review
+- `review-standard`：系统化的代码评审，检查文档质量并促进代码复用
+- `shell-script-review`：评审 shell 脚本的 shell 中立行为（bash/zsh 兼容性）
+- `external-consensus`：利用外部 AI 评审，从多 agent 辩论报告中综合出共识实现计划
 
-### Debugging
+### 调试
 
-- `debug-report`: Debug a codebase when a test case fails, and report bugs through GitHub Issues if unresolved
+- `debug-report`：当测试用例失败时调试代码库，若无法解决则通过 GitHub Issues 报告 bug

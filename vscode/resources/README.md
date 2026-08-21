@@ -1,9 +1,9 @@
-# Resources
+# 资源文件
 
-Static assets for the VS Code extension.
+VS Code 扩展的静态资源。
 
-## Organization
+## 组织结构
 
-- `plan.svg` is the Activity Bar icon for the Agentize container.
-- `worktree.svg` is the icon for the Worktree tab.
-- `settings.svg` is the icon for the Settings tab.
+- `plan.svg` 是 Agentize 容器的 Activity Bar 图标。
+- `worktree.svg` 是 Worktree 标签页的图标。
+- `settings.svg` 是 Settings 标签页的图标。

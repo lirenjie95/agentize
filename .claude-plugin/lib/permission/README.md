@@ -1,42 +1,42 @@
-# Permission Module
+# Permission 模块
 
-This module provides the permission determination logic for the PreToolUse hook.
+本模块为 PreToolUse hook 提供权限判定逻辑。
 
-## Purpose
+## 用途
 
-Evaluates tool permission requests using rules, Haiku LLM fallback, and optional Telegram approval integration. Returns `allow`, `deny`, or `ask` decisions for Claude Code tool usage.
+使用规则、Haiku LLM 回退以及可选的 Telegram 审批集成来评估工具权限请求。为 Claude Code 的工具使用返回 `allow`、`deny` 或 `ask` 决策。
 
-Read-only observation tools (`Grep`, `Glob`, `LSP`, `Monitor`) are hardcoded to `allow` since they cannot mutate state.
+只读观察工具（`Grep`、`Glob`、`LSP`、`Monitor`）被硬编码为 `allow`，因为它们无法改变状态。
 
-## Files
+## 文件
 
-| File | Purpose |
+| 文件 | 用途 |
 |------|---------|
-| `__init__.py` | Exports `determine()` function |
-| `determine.py` | Main entry point and orchestration logic |
-| `rules.py` | Permission rule definitions and matching |
-| `parser.py` | Hook input parsing and target extraction |
-| `strips.py` | Bash command normalization (env vars, shell prefixes) |
+| `__init__.py` | 导出 `determine()` 函数 |
+| `determine.py` | 主入口和编排逻辑 |
+| `rules.py` | 权限规则定义和匹配 |
+| `parser.py` | Hook 输入解析和目标提取 |
+| `strips.py` | Bash 命令规范化（环境变量、shell 前缀） |
 
-## Integration
+## 集成
 
-Called by `.claude/hooks/pre-tool-use.py` which is a thin wrapper:
+由 `.claude/hooks/pre-tool-use.py` 调用，后者是一个薄封装：
 
 ```python
 from agentize.permission import determine
 result = determine(sys.stdin.read())
 ```
 
-## Rule Sources
+## 规则来源
 
-Permission rules come from multiple sources, evaluated in this order:
+权限规则来自多个来源，按以下顺序评估：
 
-1. **Hardcoded rules** (`rules.py`) - Built-in rules in `PERMISSION_RULES` dict. Deny rules here always win.
-2. **Project rules** (`.agentize.yaml`) - Team-shared rules under `permissions.allow` and `permissions.deny`
-3. **Local rules** (`.agentize.local.yaml`) - Developer-specific rules under `permissions.allow` and `permissions.deny`
+1. **硬编码规则**（`rules.py`）- `PERMISSION_RULES` 字典中的内置规则。此处的 deny 规则始终优先。
+2. **项目规则**（`.agentize.yaml`）- `permissions.allow` 和 `permissions.deny` 下的团队共享规则
+3. **本地规则**（`.agentize.local.yaml`）- `permissions.allow` 和 `permissions.deny` 下的开发者专属规则
 
-YAML rules use arrays of strings or dicts:
-- String: `"^pattern"` → matches Bash tool by default
-- Dict: `{pattern: "^pattern", tool: "Read"}` → explicit tool
+YAML 规则使用字符串或字典的数组：
+- 字符串：`"^pattern"` → 默认匹配 Bash 工具
+- 字典：`{pattern: "^pattern", tool: "Read"}` → 显式指定工具
 
-See `.claude/hooks/pre-tool-use.md` for rule syntax and `docs/feat/permissions/rules.md` for full details.
+规则语法请参阅 `.claude/hooks/pre-tool-use.md`，完整细节请参阅 `docs/feat/permissions/rules.md`。

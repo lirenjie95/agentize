@@ -1,8 +1,8 @@
 # Plan Runner
 
-This folder provides the command execution layer for Plan sessions.
+本文件夹为 Plan 会话提供命令执行层。
 
-## Organization
+## 组织结构
 
-- `types.ts` defines the run input and event contracts.
-- `planRunner.ts` spawns the CLI process, streams output, and tracks running sessions.
+- `types.ts` 定义运行输入和事件契约。
+- `planRunner.ts` 启动 CLI 进程、流式输出，并跟踪正在运行的会话。

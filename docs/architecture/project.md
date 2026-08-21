@@ -1,59 +1,59 @@
-# Project Management
+# 项目管理
 
-In `./metadata.md`, we discussed the metadata file `.agentize.yaml` that stores
-the GitHub Projects v2 association information:
+在 `./metadata.md` 中，我们讨论了存储 GitHub Projects v2 关联信息的
+元数据文件 `.agentize.yaml`：
 
 ```yaml
 project:
-   org: Synthesys-Lab  # Owner (organization or personal user login)
+   org: Synthesys-Lab  # 所有者（组织或个人用户登录名）
    id: 3
 ```
 
-This section discusses how to integrate GitHub Projects v2 with an `agentize`d project.
+本节讨论如何将 GitHub Projects v2 与 `agentize` 化的项目集成。
 
-## Creating or Associating a Project
+## 创建或关联项目
 
-**Guided setup (recommended):**
-Use the `/setup-viewboard` command for self-contained project setup with labels, automation, and Status field verification:
+**引导式设置（推荐）：**
+使用 `/setup-viewboard` 命令进行自包含的项目设置，包含标签、自动化和 Status 字段验证：
 ```
 /setup-viewboard [--org <org-name>]
 ```
 
-The `/setup-viewboard` command performs all project operations directly via `gh` GraphQL without calling CLI commands. It verifies Status field options and provides a guidance URL when options are missing.
+`/setup-viewboard` 命令直接通过 `gh` GraphQL 执行所有项目操作，而不调用 CLI 命令。它会验证 Status 字段选项，并在选项缺失时提供指导 URL。
 
-See [/setup-viewboard documentation](../commands/setup-viewboard.md) for details.
+详情请参见 [/setup-viewboard 文档](../commands/setup-viewboard.md)。
 
-**CLI commands:**
-Create a new GitHub Projects v2 board and associate it with the current repository:
+**CLI 命令：**
+创建一个新的 GitHub Projects v2 看板并将其与当前仓库关联：
 ```bash
 lol project --create [--org <owner>] [--title <title>]
 ```
 
-Associate an existing GitHub Projects v2 board with the current repository:
+将已有的 GitHub Projects v2 看板与当前仓库关联：
 ```bash
 lol project --associate <owner>/<id>
 ```
 
-The `--org` flag accepts either a GitHub organization or personal user login. When omitted, it defaults to the repository owner.
+`--org` 标志接受 GitHub 组织或个人用户登录名。省略时默认为仓库所有者。
 
-Both commands (and `/setup-viewboard`) share implementation via `src/cli/lol/project-lib.sh` and update `.agentize.yaml` with `project.org` (owner login) and `project.id` fields.
+这两个命令（以及 `/setup-viewboard`）通过 `src/cli/lol/project-lib.sh` 共享实现，并会用 `project.org`（所有者登录名）和 `project.id` 字段更新 `.agentize.yaml`。
 
-## Automation
+## 自动化
 
-The `lol project` command provides project association but does not automatically install automation workflows. To automatically add issues and pull requests to your project board, see the [GitHub Projects automation guide](../workflows/github-projects-automation.md).
+`lol project` 命令提供项目关联，但不会自动安装自动化工作流。要自动将 issue 和 pull request 添加到你的项目看板，请参见 [GitHub Projects 自动化指南](../workflows/github-projects-automation.md)。
 
-Generate an automation workflow template:
+生成自动化工作流模板：
 ```bash
 lol project --automation [--write <path>]
 ```
 
-## Project Field Management
+## 项目字段管理
 
-Before configuring your Kanban board, you need to create custom fields in GitHub Projects v2 using the GraphQL API.
+在配置看板之前，你需要使用 GraphQL API 在 GitHub Projects v2 中创建自定义字段。
 
-### Converting Project Number to GraphQL ID
+### 将项目编号转换为 GraphQL ID
 
-Convert the project number (e.g., `3` from `.agentize.yaml`) to its GraphQL ID. Use the `repositoryOwner` query which works for both organizations and personal user accounts:
+将项目编号（例如 `.agentize.yaml` 中的 `3`）转换为其 GraphQL ID。使用 `repositoryOwner` 查询，它对组织和个人用户账户都适用：
 
 ```bash
 gh api graphql -f query='
@@ -65,34 +65,34 @@ query($owner: String!, $number: Int!) {
 }' -f owner="Synthesys-Lab" -F number=3
 ```
 
-### Configuring the Default Status Field
+### 配置默认 Status 字段
 
-GitHub Projects v2 includes a built-in **Status** field that integrates natively with the Board view. The `lol project --automation` command configures this default Status field with agentize-specific options.
+GitHub Projects v2 包含一个内置的 **Status** 字段，可与 Board 视图原生集成。`lol project --automation` 命令会使用 agentize 特定的选项配置这个默认 Status 字段。
 
-**Why use the default Status field?**
+**为什么使用默认 Status 字段？**
 
-- **Board View Affinity**: GitHub's Board view is designed around the Status field—columns automatically map to Status options, and drag-and-drop updates the Status field seamlessly.
-- **Built-in Automations**: GitHub's native automations (e.g., "Item closed → Done") work with the Status field out of the box.
-- **No Custom Field Maintenance**: Using the built-in field eliminates the need to create and maintain custom fields.
+- **Board 视图亲和性**：GitHub 的 Board 视图围绕 Status 字段设计——列自动映射到 Status 选项，拖放操作无缝更新 Status 字段。
+- **内置自动化**：GitHub 的原生自动化（例如 "Item closed → Done"）开箱即可与 Status 字段配合使用。
+- **无需维护自定义字段**：使用内置字段省去了创建和维护自定义字段的需要。
 
-**Status field options:**
+**Status 字段选项：**
 
-| Option | Description | Board Column |
+| 选项 | 描述 | 看板列 |
 |--------|-------------|--------------|
-| Proposed | Plan proposed by agentize, awaiting approval | Leftmost |
-| Refining | Plan is being refined by `/ultra-planner --refine` | Second |
-| Rebasing | PR is being rebased with main branch | Third |
-| Plan Accepted | Plan approved, ready for implementation | Fourth |
-| In Progress | Actively being worked on | Fifth |
-| Done | Implementation complete | Rightmost |
+| Proposed | agentize 提出的计划，等待批准 | 最左 |
+| Refining | 计划正在通过 `/ultra-planner --refine` 精炼 | 第二列 |
+| Rebasing | PR 正在与 main 分支 rebase | 第三列 |
+| Plan Accepted | 计划已批准，可以开始实现 | 第四列 |
+| In Progress | 正在积极开发中 | 第五列 |
+| Done | 实现完成 | 最右 |
 
-**Automatic configuration:**
+**自动配置：**
 
-The `lol project --automation --write` command automatically queries and configures the Status field options via GraphQL. If you need to manually add options, use the `updateProjectV2` mutation (see GitHub's GraphQL API documentation).
+`lol project --automation --write` 命令会通过 GraphQL 自动查询并配置 Status 字段选项。如果需要手动添加选项，请使用 `updateProjectV2` mutation（参见 GitHub 的 GraphQL API 文档）。
 
-### Querying Issue Project Fields
+### 查询 Issue 的项目字段
 
-Look up an issue's project field values (including Status):
+查询 issue 的项目字段值（包括 Status）：
 
 ```bash
 gh api graphql -f query='
@@ -124,11 +124,11 @@ query($owner:String!, $repo:String!, $number:Int!) {
 }' -f owner='OWNER' -f repo='REPO' -F number=ISSUE_NUMBER
 ```
 
-This returns all project associations and their field values, allowing you to index issues by their status.
+这会返回所有项目关联及其字段值，使你可以按状态索引 issue。
 
-### Listing Field and Option IDs for Automation
+### 列出自动化所需的字段和选项 ID
 
-GitHub Actions workflows that update project fields require field and option IDs. To list all fields and their options for automation configuration:
+更新项目字段的 GitHub Actions 工作流需要字段和选项 ID。列出所有字段及其选项以配置自动化：
 
 ```bash
 gh api graphql -f query='
@@ -152,66 +152,66 @@ query {
 }'
 ```
 
-Replace `PVT_xxx` with your project's GraphQL ID (obtained via the project number query in "Converting Project Number to GraphQL ID" section).
+将 `PVT_xxx` 替换为你的项目的 GraphQL ID（通过“将项目编号转换为 GraphQL ID”一节中的项目编号查询获得）。
 
-This returns all single-select fields (like Stage, Status, Priority) along with their option IDs, which are needed for automation workflows that update field values via GraphQL mutations.
+这会返回所有单选字段（如 Stage、Status、Priority）及其选项 ID，通过 GraphQL mutation 更新字段值的自动化工作流需要这些 ID。
 
-### Dumping Project Configuration
+### 导出项目配置
 
-Automation workflows can dump and version control your project field configuration for reproducibility.
+自动化工作流可以导出你的项目字段配置并纳入版本控制，以保证可复现性。
 
-## Kanban Design [^1]
+## 看板设计 [^1]
 
-We have two Kanban boards for plans (GitHub Issues) and implementations (Pull Requests).
+我们有两个看板，分别用于计划（GitHub Issues）和实现（Pull Requests）。
 
-### Issue Status: Board View Integration
+### Issue 状态：Board 视图集成
 
-For issues, we use GitHub Projects v2's **default Status field** with options that map directly to Board view columns:
+对于 issue，我们使用 GitHub Projects v2 的**默认 Status 字段**，其选项直接映射到 Board 视图的列：
 
-| Status | Description | Board Column |
+| 状态 | 描述 | 看板列 |
 |--------|-------------|--------------|
-| Proposed | Plan proposed by agentize, awaiting approval | Leftmost |
-| Refining | Plan is being refined by `/ultra-planner --refine` | Second |
-| Rebasing | PR is being rebased with main branch | Third |
-| Plan Accepted | Plan approved, ready for implementation | Fourth |
-| In Progress | Actively being worked on | Fifth |
-| Done | Implementation complete | Rightmost |
+| Proposed | agentize 提出的计划，等待批准 | 最左 |
+| Refining | 计划正在通过 `/ultra-planner --refine` 精炼 | 第二列 |
+| Rebasing | PR 正在与 main 分支 rebase | 第三列 |
+| Plan Accepted | 计划已批准，可以开始实现 | 第四列 |
+| In Progress | 正在积极开发中 | 第五列 |
+| Done | 实现完成 | 最右 |
 
-**Workflow:**
+**工作流：**
 
-1. **Proposed**: All issues created by AI agents start with this status. Issues are under review or awaiting stakeholder approval.
-2. **Refining**: The plan is being refined by the server via `/ultra-planner --refine`. During refinement, the issue is temporarily locked to prevent concurrent operations.
-3. **Rebasing**: The PR associated with this issue is being rebased with the main branch by `wt rebase`. This provides visibility into which issues are currently undergoing rebase operations.
-4. **Plan Accepted**: The issue plan is approved and ready for implementation. `/issue-to-impl` command and `lol serve` require issues to be at this status (the "approval gate"). Note: The `agentize:plan` label is used for discovery but does NOT replace the Plan Accepted status gate.
-5. **In Progress**: Implementation has started. Use **assignees** to indicate who is working on it, and **linked PRs** to track progress.
-6. **Done**: Implementation is complete. GitHub's built-in automation can move issues here when they are closed.
+1. **Proposed**：所有由 AI agent 创建的 issue 都以此状态开始。Issue 正在评审中或等待利益相关者批准。
+2. **Refining**：计划正在由 server 通过 `/ultra-planner --refine` 精炼。精炼期间，issue 会被临时锁定以防止并发操作。
+3. **Rebasing**：与此 issue 关联的 PR 正在由 `wt rebase` 与 main 分支 rebase。这提供了哪些 issue 正在进行 rebase 操作的可视性。
+4. **Plan Accepted**：issue 计划已批准，可以开始实现。`/issue-to-impl` 命令和 `lol serve` 要求 issue 处于此状态（“批准关卡”）。注意：`agentize:plan` 标签用于发现问题，但并不能替代 Plan Accepted 状态关卡。
+5. **In Progress**：实现已开始。使用 **assignees** 表明谁在做，使用 **linked PRs** 跟踪进度。
+6. **Done**：实现完成。GitHub 的内置自动化可以在 issue 关闭时将其移到此状态。
 
-### Local Status Update via `wt spawn`
+### 通过 `wt spawn` 进行本地状态更新
 
-When `wt spawn <issue-no>` runs, it attempts to set the issue's Status to "In Progress" on the associated GitHub Projects v2 board. This is a **best-effort** operation:
+当 `wt spawn <issue-no>` 运行时，它会尝试在关联的 GitHub Projects v2 看板上将该 issue 的 Status 设置为 "In Progress"。这是一个**尽力而为**的操作：
 
-- Requires `.agentize.yaml` with `project.org` and `project.id` configured
-- The issue must already be on the configured project board
-- Status update occurs **after** successful worktree creation
-- Failures are logged but do not block worktree creation or Claude invocation
-- If the Status field or "In Progress" option is not found, a warning is emitted
+- 需要 `.agentize.yaml` 中配置了 `project.org` 和 `project.id`
+- 该 issue 必须已经在配置的项目看板上
+- 状态更新发生在 worktree 创建成功**之后**
+- 失败会被记录，但不会阻塞 worktree 创建或 Claude 调用
+- 如果找不到 Status 字段或 "In Progress" 选项，会发出警告
 
-This local update provides visibility on the kanban board that work has started, complementing GitHub Actions workflows that handle issue/PR lifecycle automation.
+这个本地更新在看板上提供了工作已开始的可视性，是对处理 issue/PR 生命周期自动化的 GitHub Actions 工作流的补充。
 
-**Why use the default Status field?**
+**为什么使用默认 Status 字段？**
 
-- **Board View Affinity**: GitHub's Board view is designed around the Status field—columns automatically map to Status options, and drag-and-drop updates the Status field.
-- **4 Clear States**: Covers the full lifecycle from proposal to completion without excessive granularity.
-- **Built-in Automations**: GitHub's native automations (e.g., "Item closed → Done") work seamlessly.
-- **No Custom Field**: Uses the built-in field instead of creating a custom "Stage" field, simplifying setup.
+- **Board 视图亲和性**：GitHub 的 Board 视图围绕 Status 字段设计——列自动映射到 Status 选项，拖放操作会更新 Status 字段。
+- **4 个清晰的状态**：覆盖从提案到完成的完整生命周期，没有过度的粒度。
+- **内置自动化**：GitHub 的原生自动化（例如 "Item closed → Done"）无缝工作。
+- **无自定义字段**：使用内置字段而不是创建自定义的 "Stage" 字段，简化了设置。
 
-### Pull Request Status
+### Pull Request 状态
 
-For pull requests, we use the standard GitHub Projects workflow:
-- `Initial Review`: The PR is created and waiting for review.
-- `Changes Requested`: Changes are requested on the PR.
-- `Dependency`: This PR is blocked for merging because of dependencies on other PRs.
-- `Approved`: The PR is approved and ready to be merged.
-- `Merged`: The PR has been merged.
+对于 pull request，我们使用标准的 GitHub Projects 工作流：
+- `Initial Review`：PR 已创建，等待评审。
+- `Changes Requested`：PR 被要求修改。
+- `Dependency`：由于依赖其他 PR，此 PR 被阻塞无法合并。
+- `Approved`：PR 已批准，可以合并。
+- `Merged`：PR 已合并。
 
-[^1]: Kanban is **NOT** a Japanese word! 看 (kan4) means view, and 板 (ban3) means board. So Kanban literally means a "view board".
+[^1]: Kanban **不是**日语词！看（kan4）意为查看，板（ban3）意为板子。所以 Kanban 的字面意思就是“查看板”。

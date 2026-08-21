@@ -1,7 +1,7 @@
 # Tests
 
-This folder contains tests for the open-issue skill.
+本文件夹包含 open-issue skill 的测试。
 
-## Files
+## 文件
 
-- `open-issue-draft.sh` - Verifies the draft issue output format.
+- `open-issue-draft.sh` - 验证草稿 issue 的输出格式。

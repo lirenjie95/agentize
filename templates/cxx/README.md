@@ -1,13 +1,13 @@
 # C++ SDK
 
-- `CMakeLists.txt`: This CMake configuration file is used to build the C++ SDK.
-- `src/`: A folder containing source files for the C++ SDK (can be changed via `AGENTIZE_SOURCE_PATH`).
-  - `hello.cpp`: A sample C++ source code for a function `hello` which prints "Hello, World!" to the screen.
-- `include/`: A folder containing header files for the C++ SDK.
-  - `hello.hpp`: The header file for the `hello` function.
-- `tests/`: A folder containing test cases for the C++ SDK.
-  - `test_main.cpp`: A simple case added to `ctest` which calls the `hello` function and checks the output to stdout is "Hello, World!".
-- `Makefile`: The Makefile defines the build commands for the C++ SDK.
-  - `make build`: `cmake -S . -B build && cmake --build build` to build the SDK.
-  - `make clean`: `make -C build clean` to clean the build files.
-  - `make test`: Runs the test cases for the C++ SDK.
+- `CMakeLists.txt`：用于构建 C++ SDK 的 CMake 配置文件。
+- `src/`：包含 C++ SDK 源文件的文件夹（可通过 `AGENTIZE_SOURCE_PATH` 更改）。
+  - `hello.cpp`：一个示例 C++ 源代码，其中的 `hello` 函数向屏幕打印 "Hello, World!"。
+- `include/`：包含 C++ SDK 头文件的文件夹。
+  - `hello.hpp`：`hello` 函数的头文件。
+- `tests/`：包含 C++ SDK 测试用例的文件夹。
+  - `test_main.cpp`：一个添加到 `ctest` 的简单用例，调用 `hello` 函数并检查 stdout 输出是否为 "Hello, World!"。
+- `Makefile`：定义 C++ SDK 构建命令的 Makefile。
+  - `make build`：执行 `cmake -S . -B build && cmake --build build` 构建 SDK。
+  - `make clean`：执行 `make -C build clean` 清理构建文件。
+  - `make test`：运行 C++ SDK 的测试用例。

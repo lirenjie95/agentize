@@ -1,11 +1,11 @@
 # Python SDK
 
-- `Makefile`: The Makefile defines the build commands for the Python SDK.
-  - `make setup`: Generates a per-project `setup.sh` script to set up environment variables (e.g., PYTHONPATH) for this SDK project.
-  - `make build`: No-op for Python (no compilation needed).
-  - `make clean`: Removes Python cache files and directories.
-  - `make test`: Runs the test cases for the Python SDK.
-- `project_name/`: A folder containing the Python package (can be renamed via `AGENTIZE_PROJECT_NAME`).
-  - `__init__.py`: The package initialization file which prints "Hello, World!" when imported.
-- `tests/`: A folder containing test cases for the Python SDK.
-  - `test_main.py`: A simple test case which imports the package and checks the output.
+- `Makefile`：定义 Python SDK 构建命令的 Makefile。
+  - `make setup`：生成一个项目级的 `setup.sh` 脚本，用于为此 SDK 项目设置环境变量（例如 PYTHONPATH）。
+  - `make build`：对 Python 是空操作（无需编译）。
+  - `make clean`：移除 Python 缓存文件和目录。
+  - `make test`：运行 Python SDK 的测试用例。
+- `project_name/`：包含 Python 包的文件夹（可通过 `AGENTIZE_PROJECT_NAME` 重命名）。
+  - `__init__.py`：包初始化文件，导入时打印 "Hello, World!"。
+- `tests/`：包含 Python SDK 测试用例的文件夹。
+  - `test_main.py`：一个简单的测试用例，导入该包并检查输出。

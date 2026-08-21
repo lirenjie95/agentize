@@ -1,32 +1,31 @@
-# Developer Server and Telegram Bot Integration
+# 开发者服务器与 Telegram Bot 集成
 
-In this tutorial, we will guide you to boot our development server and connect it with a Telegram bot.
-As the server lauches Claude Code development session totally headlessly, [Telegram](https://telegram.org/) bot will help
-you to interact with the sessions on your device to approve permissions and view progress.
+在本教程中，我们将指导你启动开发服务器并将其与 Telegram bot 连接。
+由于服务器以完全无头（headless）的方式启动 Claude Code 开发会话，[Telegram](https://telegram.org/) bot 可以帮助
+你在设备上与会话交互，以批准权限和查看进度。
 
 
-## Prerequisites 1: Setup the Viewboard
+## 前置条件 1：配置 Viewboard
 
-Use the `\setup-viewboard` command to setup the viewboard using Github Project v2 for your repository.
-Look at [project setup](./04a-project.md) for more details on how to setup the project
-on both local commandline and Github.
+使用 `\setup-viewboard` 命令为你的仓库配置基于 GitHub Project v2 的 viewboard。
+关于如何在本地命令行和 GitHub 上配置项目的更多细节，
+请查看 [项目配置](./04a-project.md)。
 
-## Prerequisites 2: Create a Telegram Bot
+## 前置条件 2：创建 Telegram Bot
 
-Before that, did you have your Telegram downloaded and registered?
-If not, go to [Telegram](https://telegram.org/) and create an account.
+在此之前，你是否已下载并注册了 Telegram？
+如果没有，请前往 [Telegram](https://telegram.org/) 创建账号。
 
-Next, create a Telegram bot to receive messages from our development server
-by following these steps:
+接下来，按照以下步骤创建一个 Telegram bot 来接收来自开发服务器的消息：
 
-1. Go to Telegram and search for `@BotFather` to create a new bot.
-   - Start a chat with BotFather and send the command `/newbot`.
-   - Follow the prompts to set a name and username for your bot.
-   - After creation, BotFather will provide you with a bot token. Save this token securely. `YOUR_BOT_TOKEN`
-2. Find your Telegram user ID:
-   - Search for `@idbot` on Telegram.
-   - Use `/getid` command to get your user ID, which should be 8 digits. Save this ID securely. `YOUR_USER_ID`
-3. Configure Telegram credentials in `.agentize.local.yaml` (or `$HOME/.agentize.local.yaml` for user-wide config):
+1. 打开 Telegram 并搜索 `@BotFather` 来创建新 bot。
+   - 与 BotFather 开始对话并发送命令 `/newbot`。
+   - 按照提示为你的 bot 设置名称和用户名。
+   - 创建完成后，BotFather 会为你提供 bot token。请妥善保存该 token。`YOUR_BOT_TOKEN`
+2. 找到你的 Telegram 用户 ID：
+   - 在 Telegram 上搜索 `@idbot`。
+   - 使用 `/getid` 命令获取你的用户 ID，应为 8 位数字。请妥善保存该 ID。`YOUR_USER_ID`
+3. 在 `.agentize.local.yaml`（或用于用户级配置的 `$HOME/.agentize.local.yaml`）中配置 Telegram 凭据：
 
 ```yaml
 telegram:
@@ -35,17 +34,17 @@ telegram:
   chat_id: "YOUR_USER_ID"
 ```
 
-4. Start our local polling server using `lol serve` subcommand
+4. 使用 `lol serve` 子命令启动本地轮询服务器
 
 ```bash
 lol serve --period=2m --num-workers=5
 ```
 
-This command will start a local server that polls your issue board every 2 minutes and sends updates
-to your Telegram bot.
+该命令将启动一个本地服务器，每 2 分钟轮询一次你的 issue 看板，并将更新
+发送到你的 Telegram bot。
 
-Once there is:
-- An issue with `agentize:plan` label and project status `Plan Accepted`, a new development session will be started.
-- An issue with `agentize:dev-req` label triggers `/ultra-planner --refine` (current server behavior per `docs/cli/lol.md`).
-- A PR with unmerge-able status, a `/sync-master` session will be started to rebase the PR branch onto master.
-- A permission that is not determined yet, a permission request message will be sent to your Telegram bot for you to click the buttons to approve or reject.
+一旦出现以下情况：
+- 带有 `agentize:plan` 标签且项目状态为 `Plan Accepted` 的 issue，将启动一个新的开发会话。
+- 带有 `agentize:dev-req` 标签的 issue 会触发 `/ultra-planner --refine`（当前服务器行为见 `docs/cli/lol.md`）。
+- 状态为不可合并的 PR，将启动一个 `/sync-master` 会话，将 PR 分支 rebase 到 master 上。
+- 尚未确定的权限，一条权限请求消息将发送到你的 Telegram bot，供你点击按钮批准或拒绝。

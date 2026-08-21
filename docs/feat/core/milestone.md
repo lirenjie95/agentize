@@ -1,37 +1,37 @@
-# Milestone Workflow
+# Milestone 工作流
 
-This document describes the milestone workflow for implementing large features incrementally with automatic progress tracking and checkpoint creation.
+本文档描述 milestone 工作流，用于通过自动进度追踪和检查点创建来增量实现大型功能。
 
-## Overview
+## 概述
 
-The milestone workflow enables AI agents to implement large features (typically > 800 LOC) in manageable increments, creating checkpoint documents that track progress, test status, and remaining work. This allows development to span multiple sessions while maintaining clear context.
+milestone 工作流使 AI 智能体能够以可管理的增量实现大型功能（通常 > 800 LOC），创建追踪进度、测试状态和剩余工作的检查点文档。这使得开发可以跨越多个会话，同时保持清晰的上下文。
 
-### What are Milestones?
+### 什么是 Milestone？
 
-Milestones are development checkpoints created during the implementation of large features. Each milestone:
+Milestone 是在实现大型功能过程中创建的开发检查点。每个 milestone：
 
-- **Tracks progress**: Records what has been implemented and what remains
-- **Monitors tests**: Shows which tests are passing and which are not
-- **Provides context**: Enables resuming work from where you left off
-- **Commits progress**: Creates git commits with `--no-verify` to bypass pre-commit hooks when tests are incomplete
+- **追踪进度**：记录已实现的内容和剩余内容
+- **监控测试**：显示哪些测试通过、哪些未通过
+- **提供上下文**：支持从中断处恢复工作
+- **提交进度**：使用 `--no-verify` 创建 git 提交，在测试不完整时绕过 pre-commit hook
 
-### When to Use Milestones
+### 何时使用 Milestone
 
-Use the milestone workflow when:
+在以下情况使用 milestone 工作流：
 
-- **Large features**: Implementation estimated at > 800 LOC
-- **Multi-session work**: Feature requires breaking work across multiple sessions
-- **Complex implementations**: Step-by-step incremental progress is beneficial
-- **Test-driven development**: Tests exist but implementation is in progress
+- **大型功能**：实现预估 > 800 LOC
+- **多会话工作**：功能需要跨多个会话拆分工作
+- **复杂实现**：逐步增量推进更有益
+- **测试驱动开发**：测试已存在但实现正在进行中
 
-**Do NOT use milestones for:**
-- Small features (< 200 LOC) - implement directly
-- Bug fixes - use regular commits
-- Documentation-only changes - no need for incremental tracking
+**不要在以下情况使用 milestone：**
+- 小型功能（< 200 LOC）——直接实现
+- Bug 修复——使用常规提交
+- 仅文档变更——无需增量追踪
 
 ---
 
-## Workflow Diagram
+## 工作流图
 
 ```mermaid
 graph TD
@@ -59,21 +59,21 @@ graph TD
     style L fill:#ffddcc
 ```
 
-**Legend:**
-- **Blue boxes**: Automated steps performed by AI agents/skills/commands
-- **Yellow boxes**: Milestone creation points
-- **Green boxes**: Completion/success states
-- **Red boxes**: User intervention required (start new session)
+**图例：**
+- **蓝色方框**：由 AI 智能体/skills/commands 执行的自动化步骤
+- **黄色方框**：Milestone 创建点
+- **绿色方框**：完成/成功状态
+- **红色方框**：需要用户干预（开始新会话）
 
 ---
 
-## Milestone Document Format
+## Milestone 文档格式
 
-Milestone documents are stored in `.tmp/milestones/issue-{N}-milestone-{M}.md` where:
-- `{N}` is the issue number
-- `{M}` is the milestone number (1, 2, 3, ...)
+Milestone 文档存储在 `.tmp/milestones/issue-{N}-milestone-{M}.md`，其中：
+- `{N}` 是 issue 号
+- `{M}` 是 milestone 号（1、2、3……）
 
-### Document Structure
+### 文档结构
 
 ```markdown
 # Milestone {M} for Issue #{N}
@@ -115,35 +115,35 @@ Milestone documents are stored in `.tmp/milestones/issue-{N}-milestone-{M}.md` w
 
 ---
 
-## Commands and Skills
+## 命令与 Skills
 
-### `/issue-to-impl` - Start Implementation
+### `/issue-to-impl` - 开始实现
 
-Orchestrates the full implementation workflow from issue to completion.
+编排从 issue 到完成的完整实现工作流。
 
-**Usage:**
+**用法：**
 ```
 /issue-to-impl [issue-number]
 ```
 
-If issue number is not provided, it will be extracted from conversation context.
+如果未提供 issue 号，将从对话上下文中提取。
 
-**What it does:**
-1. Creates a new development branch using the `fork-dev-branch` skill
-2. Updates documentation based on the plan in the issue
-3. Creates/updates test cases based on the plan
-4. Creates **Milestone 1** automatically (commits docs + tests)
-5. Starts the automatic milestone skill loop:
-   - Implements code in chunks (~100-200 LOC)
-   - Runs tests after each chunk
-   - Stops when LOC ≥ 800 without completion (creates next milestone)
-   - Continues until all tests pass (completion)
+**它做什么：**
+1. 使用 `fork-dev-branch` skill 创建新的开发分支
+2. 根据 issue 中的计划更新文档
+3. 根据计划创建/更新测试用例
+4. 自动创建 **Milestone 1**（提交文档 + 测试）
+5. 启动自动 milestone skill 循环：
+   - 分块实现代码（每块约 100-200 LOC）
+   - 每块之后运行测试
+   - 当 LOC ≥ 800 且未完成时停止（创建下一个 milestone）
+   - 继续直到所有测试通过（完成）
 
-**Stopping conditions:**
-- **Milestone created**: Agent stops and informs user to resume in next session
-- **Completion**: All tests pass, ready for PR creation
+**停止条件：**
+- **Milestone 已创建**：智能体停止并告知用户在下一个会话中恢复
+- **完成**：所有测试通过，可创建 PR
 
-**Example:**
+**示例：**
 ```
 User: /issue-to-impl 42
 Agent: Creating branch issue-42...
@@ -155,11 +155,11 @@ Agent: Milestone 2 created at 850 LOC (3/8 tests pass).
 Agent: Resume with: "Continue from the latest milestone"
 ```
 
-### Resuming from Milestones
+### 从 Milestone 恢复
 
-When a milestone is created, use natural language to resume implementation.
+创建 milestone 后，使用自然语言恢复实现。
 
-**Usage:**
+**用法：**
 ```
 User: Resume from the latest milestone
 User: Continue implementation
@@ -167,15 +167,15 @@ User: Continue from .tmp/milestones/issue-42-milestone-2.md
 ```
 
 
-**What happens:**
-1. Validates you're on a development branch (issue-{N}-*)
-2. Finds the latest milestone file: `.tmp/milestones/issue-{N}-milestone-*.md`
-3. Loads context: work remaining, next file changes, test status
-4. Displays milestone summary
-5. Invokes the milestone skill to continue implementation
-6. Creates next milestone or completes if all tests pass
+**会发生什么：**
+1. 验证你在开发分支上（issue-{N}-*）
+2. 找到最新的 milestone 文件：`.tmp/milestones/issue-{N}-milestone-*.md`
+3. 加载上下文：剩余工作、下一步文件变更、测试状态
+4. 显示 milestone 摘要
+5. 调用 milestone skill 继续实现
+6. 创建下一个 milestone，或如果所有测试通过则完成
 
-**Example:**
+**示例：**
 ```
 User: Continue from the latest milestone
 Agent: Resuming from Milestone 2 for Issue #42
@@ -187,26 +187,26 @@ Agent: Milestone 3 created at 780 LOC (6/8 tests pass).
 Agent: Resume with: "Continue from the latest milestone"
 ```
 
-### `milestone` Skill - Implementation Driver
+### `milestone` Skill - 实现驱动器
 
-The core skill that drives incremental implementation. Automatically invoked by `/issue-to-impl` and natural-language resume requests.
+驱动增量实现的核心 skill。由 `/issue-to-impl` 和自然语言恢复请求自动调用。
 
-**What it does:**
-- Reads the plan from issue or latest milestone document
-- Implements code in chunks (100-200 LOC per chunk)
-- Tracks total LOC count using `git diff --stat`
-- Runs tests after each implementation chunk
-- Parses test results to track passed/failed counts
-- Creates milestone documents when LOC ≥ 800 without completion
-- Signals completion when all tests pass
+**它做什么：**
+- 从 issue 或最新 milestone 文档读取计划
+- 分块实现代码（每块 100-200 LOC）
+- 使用 `git diff --stat` 追踪总 LOC 计数
+- 每个实现块之后运行测试
+- 解析测试结果以追踪通过/失败计数
+- 当 LOC ≥ 800 且未完成时创建 milestone 文档
+- 当所有测试通过时发出完成信号
 
 ---
 
-## Example Walkthrough
+## 示例演练
 
-### Scenario: Implementing a Large Feature (1200 LOC estimated)
+### 场景：实现一个大型功能（预估 1200 LOC）
 
-**Step 1: Planning**
+**步骤 1：规划**
 ```
 User: /make-a-plan
 [Agent creates comprehensive plan with 1200 LOC estimate]
@@ -215,7 +215,7 @@ User: /open-issue
 [Agent creates issue #42 with the plan]
 ```
 
-**Step 2: Start Implementation**
+**步骤 2：开始实现**
 ```
 User: /issue-to-impl 42
 
@@ -233,7 +233,7 @@ Agent: Milestone 2 created at 820 LOC (3/8 tests pass)
 Agent: Resume with: "Continue from the latest milestone"
 ```
 
-**Step 3: Resume (Next Session)**
+**步骤 3：恢复（下一个会话）**
 ```
 User: Continue from the latest milestone
 
@@ -248,45 +248,45 @@ Agent: Implementation complete, ready for PR creation.
 
 ---
 
-## Best Practices
+## 最佳实践
 
-### 1. Always Start with a Plan
+### 1. 始终从计划开始
 
-Create a detailed plan using `/make-a-plan` before starting implementation. The plan should include:
-- Specific files to modify/create
-- LOC estimates for each step
-- Test strategy
-- Implementation steps in Design-first TDD order
+在开始实现之前，使用 `/make-a-plan` 创建详细计划。计划应包括：
+- 要修改/创建的具体文件
+- 每个步骤的 LOC 预估
+- 测试策略
+- 按设计优先 TDD 顺序排列的实现步骤
 
-### 2. Run `/issue-to-impl` Instead of Manual Branch Creation
+### 2. 使用 `/issue-to-impl` 而非手动创建分支
 
-Don't manually create branches and implement - use `/issue-to-impl` which:
-- Creates the branch correctly
-- Sets up docs and tests first
-- Creates the first milestone automatically
-- Starts implementation in the right order
+不要手动创建分支并实现——使用 `/issue-to-impl`，它会：
+- 正确创建分支
+- 先设置文档和测试
+- 自动创建第一个 milestone
+- 按正确顺序开始实现
 
-### 3. Resume After Each Milestone
+### 3. 每个 Milestone 之后恢复
 
-When a milestone is created, the agent stops. To continue, use natural language:
+创建 milestone 后，智能体会停止。要继续，使用自然语言：
 ```
 User: Resume from the latest milestone
 User: Continue implementation
 ```
 
-This loads the context and continues from where you left off.
+这会加载上下文并从中断处继续。
 
-### 4. Milestone Commits Use `--no-verify`
+### 4. Milestone 提交使用 `--no-verify`
 
-Milestone commits bypass pre-commit hooks because tests are expected to be incomplete. However:
-- Tests are ALWAYS run to track progress
-- Milestone commits include test status (e.g., "3/8 tests pass")
-- Only delivery commits (all tests pass) are merged to main
-- Never use milestone commits on the main branch
+Milestone 提交绕过 pre-commit hook，因为测试预期是不完整的。但是：
+- 测试始终会运行以追踪进度
+- Milestone 提交包含测试状态（例如 "3/8 tests pass"）
+- 只有交付提交（所有测试通过）才会合并到 main
+- 绝不在 main 分支上使用 milestone 提交
 
-### 5. Monitor Test Progress
+### 5. 监控测试进度
 
-Each milestone shows test status:
+每个 milestone 显示测试状态：
 ```
 **Test Status:** 3/8 tests passed
 
@@ -303,95 +303,95 @@ Each milestone shows test status:
 - Test 8: Error recovery
 ```
 
-This helps you track progress toward completion.
+这帮助你追踪朝向完成的进度。
 
-### 6. Completion = All Tests Pass
+### 6. 完成 = 所有测试通过
 
-Implementation is complete when all tests pass. At this point:
-- No milestone is created
-- Agent signals completion
-- **Final commit must be a delivery commit** (without `[milestone]` tag):
-  - Use `purpose=delivery` in commit-msg skill
-  - No `--no-verify` flag (pre-commit hooks run normally)
-  - Only delivery commits should be merged to main
-- Ready for code review and PR creation
+当所有测试通过时实现即完成。此时：
+- 不创建 milestone
+- 智能体发出完成信号
+- **最终提交必须是交付提交**（不带 `[milestone]` 标签）：
+  - 在 commit-msg skill 中使用 `purpose=delivery`
+  - 不使用 `--no-verify` 标志（pre-commit hook 正常运行）
+  - 只有交付提交应合并到 main
+- 可以进行代码审查和 PR 创建
 
-### 7. Review and PR Workflow
+### 7. 审查与 PR 工作流
 
-After implementation completes with all tests passing, follow this workflow:
+实现完成且所有测试通过后，遵循以下工作流：
 
-**Option A: Manual workflow (recommended for control)**
+**选项 A：手动工作流（推荐用于需要控制时）**
 ```
-1. /code-review          # Review changes, get feedback
-2. [Fix any issues found]
-3. /open-pr              # Create pull request
-```
-
-**Option B: Convenience wrapper (recommended after implementation completion)**
-```
-/pull-request --open     # Review + create PR in one step
+1. /code-review          # 审查变更，获取反馈
+2. [修复发现的任何问题]
+3. /open-pr              # 创建 pull request
 ```
 
-The `/pull-request` command provides a streamlined workflow:
-- **Without flags**: Runs code review and stops with next-step guidance
-- **With --open flag**: Runs code review, then creates PR immediately if review passes
+**选项 B：便捷封装（推荐在实现完成后使用）**
+```
+/pull-request --open     # 一步完成审查 + 创建 PR
+```
+
+`/pull-request` 命令提供简化的工作流：
+- **不带标志**：运行代码审查并停止，给出下一步指引
+- **带 --open 标志**：运行代码审查，如果审查通过则立即创建 PR
 
 ---
 
-## Troubleshooting
+## 故障排查
 
 ### "No milestone files found"
 
-You're trying to resume from a milestone on a branch without milestones.
+你正在尝试在没有 milestone 的分支上恢复。
 
-**Solution**: Use `/issue-to-impl` to start implementation, which creates the first milestone.
+**解决方案**：使用 `/issue-to-impl` 开始实现，它会创建第一个 milestone。
 
 ### "Not on development branch"
 
-You're on `main` or another non-development branch.
+你在 `main` 或其他非开发分支上。
 
-**Solution**: Switch to your development branch (issue-{N}) or start with `/issue-to-impl`.
+**解决方案**：切换到你的开发分支（issue-{N}）或使用 `/issue-to-impl` 开始。
 
 ### "Milestone file corrupted"
 
-The milestone document is not properly formatted.
+Milestone 文档格式不正确。
 
-**Solution**: Check the file in `.tmp/milestones/` and fix the format, or delete it and restart with `/issue-to-impl`.
+**解决方案**：检查 `.tmp/milestones/` 中的文件并修复格式，或删除它并用 `/issue-to-impl` 重新开始。
 
-### Tests are Not Running
+### 测试未运行
 
-Ensure your project has a `make test` target or specify test commands in your plan.
+确保你的项目有 `make test` 目标，或在计划中指定测试命令。
 
-**Solution**: Add test execution to your Makefile or update the plan to specify how tests should be run.
+**解决方案**：在 Makefile 中添加测试执行，或更新计划以指定测试的运行方式。
 
 ---
 
-## Technical Details
+## 技术细节
 
-### LOC Tracking Mechanism
+### LOC 追踪机制
 
-The milestone skill tracks LOC using `git diff --stat`:
-- Accumulates total LOC count across the session
-- Checks against 800 LOC threshold after each implementation chunk
-- Stops when LOC ≥ 800 without all tests passing
-- Creates milestone document with current status
+milestone skill 使用 `git diff --stat` 追踪 LOC：
+- 在会话期间累计总 LOC 计数
+- 每个实现块之后对照 800 LOC 阈值检查
+- 当 LOC ≥ 800 且并非所有测试都通过时停止
+- 创建包含当前状态的 milestone 文档
 
-### Test Status Parsing
+### 测试状态解析
 
-After running tests, the milestone skill parses output to extract:
-- Total test count
-- Passed test count
-- Failed test count
-- Individual test case names and status
+运行测试后，milestone skill 解析输出以提取：
+- 总测试数
+- 通过测试数
+- 失败测试数
+- 各个测试用例名称和状态
 
-This information is included in milestone documents and commit messages.
+这些信息包含在 milestone 文档和提交消息中。
 
-### Milestone Document Versioning
+### Milestone 文档版本化
 
-Milestone documents are immutable once created:
-- `issue-42-milestone-1.md` - First milestone
-- `issue-42-milestone-2.md` - Second milestone
-- `issue-42-milestone-3.md` - Third milestone
-- etc.
+Milestone 文档一旦创建即不可变：
+- `issue-42-milestone-1.md` - 第一个 milestone
+- `issue-42-milestone-2.md` - 第二个 milestone
+- `issue-42-milestone-3.md` - 第三个 milestone
+- 等等
 
-Each file represents a snapshot in time. Git history shows the evolution of the implementation.
+每个文件代表一个时间点的快照。Git 历史展示实现的演进过程。

@@ -1,20 +1,20 @@
 # Doc-Architect Skill
 
-Analyzes a feature implementation plan and generates a comprehensive documentation checklist covering design docs, folder READMEs, and interface documentation.
+分析功能实现计划，并生成覆盖设计文档、文件夹 README 和接口文档的全面文档清单。
 
-## Purpose
+## 用途
 
-Ensures documentation impacts are systematically identified during planning, avoiding documentation debt and ensuring all required docs are created/updated during implementation.
+确保在规划阶段系统地识别文档影响，避免文档债务，并确保所有必需的文档在实现过程中被创建/更新。
 
-## Usage
+## 用法
 
 ```
 /doc-architect
 ```
 
-The skill analyzes the current feature requirements from conversation context and produces a Documentation Planning section.
+该 skill 从对话上下文中分析当前功能需求，并产出 Documentation Planning 章节。
 
-## Output Format
+## 输出格式
 
 ```markdown
 ## Documentation Planning
@@ -30,6 +30,6 @@ The skill analyzes the current feature requirements from conversation context an
 - `src/module/component.md` — update interface documentation
 ```
 
-## Integration
+## 集成
 
-This skill is designed to be invoked during planning workflows (e.g., `/ultra-planner`, `/make-a-plan`) to produce the Documentation Planning section that gets included in the consensus plan. The `/issue-to-impl` workflow consumes this section in Step 5 (documentation updates).
+该 skill 设计为在规划工作流（例如 `/ultra-planner`、`/make-a-plan`）中被调用，产出包含在共识计划中的 Documentation Planning 章节。`/issue-to-impl` 工作流在第 5 步（文档更新）中消费该章节。

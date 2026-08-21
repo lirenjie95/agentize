@@ -1,10 +1,10 @@
-# Handsoff Mode
+# Handsoff 模式
 
-Handsoff mode aims at minimizing user intervention during the development process.
-By default, the agent will automatically proceed the task without asking user,
-including the next steps and permissions.
+Handsoff 模式旨在最大限度地减少开发过程中的人工干预。
+默认情况下，agent 会自动推进任务而不询问用户，
+包括后续步骤和权限。
 
-To disable handsoff mode, set in `.agentize.local.yaml`:
+要禁用 handsoff 模式，在 `.agentize.local.yaml` 中设置：
 
 ```yaml
 handsoff:
@@ -12,30 +12,30 @@ handsoff:
   auto_permission: false
 ```
 
-`handsoff.enabled` enables automatic continuation of the workflow.
-Upon Claude `stop.py`, it feeds back a prompt to ask the agent
-automatically determine the status of the current workflow.
-If finished, stop the workflow. If not, continue to the next step.
-Currently, we support:
+`handsoff.enabled` 启用工作流的自动续接。
+在 Claude 的 `stop.py` 触发时，它会回喂一个提示，让 agent
+自动判断当前工作流的状态。
+如果已完成，则停止工作流；否则继续下一步。
+目前我们支持：
 
-- `ultra-planner` for planning tasks, until the detailed implementation plan is posted on Github Issues.
-- `issue-to-impl` for implementation tasks, until the implementation is completed and PR is created.
-  - Before creating PR, the agent will run tests, linters, and code reviews to ensure code quality.
-- `plan-to-issue` for creating GitHub [plan] issues from user-provided plans until the issue is successfully created.
+- `ultra-planner` 用于规划任务，直到详细的实现计划发布到 GitHub Issues。
+- `issue-to-impl` 用于实现任务，直到实现完成并创建 PR。
+  - 创建 PR 之前，agent 会运行测试、linter 和代码评审以确保代码质量。
+- `plan-to-issue` 用于从用户提供的计划创建 GitHub [plan] issue，直到 issue 成功创建。
 
-To differentiate each workflow, upon user prompt submit, we have a hook to create a metadata file
-to store the workflow status metadata, including the current step, issue number, PR number, etc.
-Currently, we register the hook for `ultra-planner`, `issue-to-impl`, and `plan-to-issue` workflows.
+为了区分各个工作流，在用户提交提示时，我们有一个钩子来创建元数据文件，
+用于存储工作流状态元数据，包括当前步骤、issue 编号、PR 编号等。
+目前，我们为 `ultra-planner`、`issue-to-impl` 和 `plan-to-issue` 工作流注册了该钩子。
 
-## Handsoff Mode Check
+## Handsoff 模式检查
 
-Hooks that need to respect handsoff mode use a centralized helper:
+需要遵循 handsoff 模式的钩子使用一个集中式的辅助函数：
 
 ```python
 from lib.session_utils import is_handsoff_enabled
 
 if not is_handsoff_enabled():
-    sys.exit(0)  # Skip hook when handsoff disabled
+    sys.exit(0)  # handsoff 禁用时跳过钩子
 ```
 
-The helper reads `handsoff.enabled` from `.agentize.local.yaml` (searching project root → `$AGENTIZE_HOME` → `$HOME`). Returns `True` by default when not configured.
+该辅助函数从 `.agentize.local.yaml` 读取 `handsoff.enabled`（查找顺序：项目根目录 → `$AGENTIZE_HOME` → `$HOME`）。未配置时默认返回 `True`。

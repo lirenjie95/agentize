@@ -1,12 +1,12 @@
-# Ultra Planner Workflow
+# Ultra Planner 工作流
 
-Multi-agent debate-based planning workflow for complex features with issue-based refinement.
+基于多智能体辩论的规划工作流，用于复杂功能，支持基于 issue 的改进。
 
-## Overview
+## 概述
 
-The ultra-planner workflow creates implementation plans through multi-agent debate and automatically publishes them as GitHub issues. This enables early visibility and issue-based refinement.
+ultra-planner 工作流通过多智能体辩论创建实现计划，并自动将其发布为 GitHub issue。这实现了早期可见性和基于 issue 的改进。
 
-## Workflow Diagram
+## 工作流图
 
 ```mermaid
 graph TD
@@ -43,19 +43,19 @@ graph TD
     style Z fill:#dddddd
 ```
 
-## Key Features
+## 关键特性
 
-### 1. Automatic Complexity-Based Routing
+### 1. 基于复杂度的自动路由
 
-Ultra-planner automatically routes between lightweight and full debate workflows based on estimated modification complexity. After the understander gathers codebase context, it estimates the modification's LOC and recommends a path:
+Ultra-planner 根据预估的修改复杂度，自动在轻量级和完整辩论工作流之间路由。在 understander 收集代码库上下文后，它会估算修改的 LOC 并推荐路径：
 
-- **Lite path**: Single-agent planner when ALL conditions met:
-  - All knowledge within repo (no internet research needed)
-  - < 5 files affected
-  - < 150 LOC total
-- **Full path**: Multi-agent debate with web research (otherwise)
+- **Lite 路径**：当以下所有条件满足时使用单智能体规划器：
+  - 所有知识都在仓库内（无需互联网研究）
+  - 影响 < 5 个文件
+  - 总计 < 150 LOC
+- **Full 路径**：否则使用带网络研究的多智能体辩论
 
-**Workflow with routing:**
+**带路由的工作流：**
 
 ```mermaid
 graph TD
@@ -72,28 +72,28 @@ graph TD
     G --> H
 ```
 
-**Benefits:**
-- 55-70% cost reduction for simple tasks
-- 4-8 minute time savings (1-2 min lite vs 6-12 min full)
-- No user intervention required
+**优势：**
+- 简单任务成本降低 55-70%
+- 节省 4-8 分钟时间（lite 1-2 分钟 vs full 6-12 分钟）
+- 无需用户干预
 
-**Override flag:**
+**覆盖标志：**
 ```
 /ultra-planner --force-full <feature-description>
 ```
-Forces full multi-agent debate regardless of complexity estimation.
+无论复杂度估算如何，强制使用完整多智能体辩论。
 
-### 2. Automatic Issue Creation
+### 2. 自动 Issue 创建
 
-Ultra-planner creates a GitHub issue **before** running the multi-agent debate workflow:
+Ultra-planner 在运行多智能体辩论工作流**之前**创建 GitHub issue：
 
-- **Placeholder created first** - issue established immediately after feature validation
-- **Issue-numbered artifacts** - all planning files use `issue-{N}-` prefix from the start
-- **Plan prefix** - title gets `[plan][tag]` format
-- **Updated after consensus** - same issue is updated with final plan (no second issue created)
-- **Early collaboration** - stakeholders can see issue number and planning progress immediately
+- **先创建占位 issue** - 功能验证后立即建立 issue
+- **以 issue 号命名的工件** - 所有规划文件从一开始就使用 `issue-{N}-` 前缀
+- **计划前缀** - 标题采用 `[plan][tag]` 格式
+- **共识后更新** - 同一 issue 会用最终计划更新（不会创建第二个 issue）
+- **早期协作** - 利益相关者可以立即看到 issue 号和规划进度
 
-**Example:**
+**示例：**
 ```
 Created placeholder issue: #42
 Title: [plan][feat] Add user authentication
@@ -108,16 +108,16 @@ To refine: /ultra-planner --refine 42
 To implement: /issue-to-impl 42
 ```
 
-### 2a. Issue-Based Refinement
+### 2a. 基于 Issue 的改进
 
-Refinement mode (`/ultra-planner --refine`) enables iterative plan improvement:
+改进模式（`/ultra-planner --refine`）支持迭代的计划改进：
 
-- **Fetches issue body** - pulls current plan from GitHub
-- **Runs full debate** - same three-agent workflow as initial planning
-- **Accepts refinement focus** - optional inline instructions guide the agents
-- **Updates issue atomically** - replaces body only after consensus completes
+- **获取 issue 正文** - 从 GitHub 拉取当前计划
+- **运行完整辩论** - 与初始规划相同的三智能体工作流
+- **接受改进焦点** - 可选的内联指令引导智能体
+- **原子性更新 issue** - 仅在共识完成后替换正文
 
-**Example (General refinement):**
+**示例（一般改进）：**
 ```
 /ultra-planner --refine 42
 
@@ -130,7 +130,7 @@ Issue #42 updated with refined plan.
 Summary: Reduced LOC 280→250, improved security
 ```
 
-**Example (Directed refinement):**
+**示例（定向改进）：**
 ```
 /ultra-planner --refine 42 Focus on reducing complexity
 
@@ -144,29 +144,29 @@ Issue #42 updated with refined plan.
 Summary: Reduced LOC 280→150, removed OAuth2, simplified middleware
 ```
 
-### 2b. Label-Triggered Auto Refinement
+### 2b. 标签触发的自动改进
 
-The server can automatically trigger refinement when the `agentize:refine` label is added to a plan issue. This enables refinement requests without manual `/ultra-planner --refine` invocation.
+当 `agentize:refine` 标签被添加到计划 issue 时，server 可以自动触发改进。这实现了无需手动调用 `/ultra-planner --refine` 的改进请求。
 
-**To trigger auto refinement:**
-1. Ensure the issue has Status = `Proposed`
-2. Add the `agentize:refine` label (via GitHub UI or `gh issue edit --add-label agentize:refine`)
-3. The server's next poll cycle will:
-   - Detect the refinement candidate
-   - Set Status to `Refining` (concurrency control)
-   - Run `/ultra-planner --refine` headlessly
-   - On completion: reset Status to `Proposed` and remove the label
+**触发自动改进的方法：**
+1. 确保 issue 的 Status 为 `Proposed`
+2. 添加 `agentize:refine` 标签（通过 GitHub UI 或 `gh issue edit --add-label agentize:refine`）
+3. server 的下一次轮询周期将：
+   - 检测到改进候选
+   - 将 Status 设为 `Refining`（并发控制）
+   - 以 headless 方式运行 `/ultra-planner --refine`
+   - 完成后：将 Status 重置为 `Proposed` 并移除标签
 
-**Requirements:**
-- Issue must have both `agentize:plan` and `agentize:refine` labels
-- Status must be `Proposed` (not `Plan Accepted` or `In Progress`)
-- Server must be running (`lol serve`)
+**要求：**
+- issue 必须同时具有 `agentize:plan` 和 `agentize:refine` 标签
+- Status 必须是 `Proposed`（而非 `Plan Accepted` 或 `In Progress`）
+- server 必须正在运行（`lol serve`）
 
-### 3. Documentation Planning with Diff Previews
+### 3. 带 Diff 预览的文档规划
 
-The external consensus process must explicitly identify documentation impacts and produce a **Documentation Planning** section in the final plan. This ensures all documentation changes are identified early and tracked through implementation.
+外部共识过程必须显式识别文档影响，并在最终计划中生成 **Documentation Planning** 部分。这确保所有文档变更都被尽早识别并在实现过程中被追踪。
 
-**Standard format:**
+**标准格式：**
 ```markdown
 ## Documentation Planning
 
@@ -181,9 +181,9 @@ The external consensus process must explicitly identify documentation impacts an
 - `src/api/endpoints.md` — update API interface documentation
 ```
 
-**Enhanced format with diff previews:**
+**带 diff 预览的增强格式：**
 
-When using `/doc-architect --diff`, the Documentation Planning section includes markdown diff previews showing proposed changes:
+当使用 `/doc-architect --diff` 时，Documentation Planning 部分包含展示建议变更的 markdown diff 预览：
 
 ```markdown
 ## Documentation Planning
@@ -213,191 +213,191 @@ When using `/doc-architect --diff`, the Documentation Planning section includes 
 ` ` `
 ```
 
-**Benefits of diff previews:**
-- Task list checkboxes enable progress tracking in GitHub UI
-- Diff blocks show exact proposed changes before implementation
-- Reduces ambiguity in documentation requirements
-- `/issue-to-impl` Step 5 can apply diff specifications directly
+**diff 预览的优势：**
+- 任务列表复选框支持在 GitHub UI 中追踪进度
+- diff 块在实现前展示确切的建议变更
+- 减少文档需求的歧义
+- `/issue-to-impl` 步骤 5 可以直接应用 diff 规范
 
-The consensus plan references command interfaces by citing actual `docs/` files (e.g., `docs/workflows/ultra-planner.md`, `docs/tutorial/02-issue-to-impl.md`) to ensure accuracy and grounding.
+共识计划通过引用实际的 `docs/` 文件（例如 `docs/workflows/ultra-planner.md`、`docs/tutorial/02-issue-to-impl.md`）来引用命令接口，以确保准确性和落地性。
 
-**Skill integration:**
-The `/doc-architect` skill generates this checklist format. Use `/doc-architect --diff` for diff previews.
+**Skill 集成：**
+`/doc-architect` skill 生成此清单格式。使用 `/doc-architect --diff` 获取 diff 预览。
 
-### 4. Review and Implementation
+### 4. 审查与实现
 
-After reviewing a plan issue:
+审查计划 issue 后：
 
-- **Review on GitHub** - examine the plan details in the issue body
-- **Refine if needed** - use `/ultra-planner --refine` for improvements
-- **Implement when ready** - use `/issue-to-impl` to start implementation
-- **Flexible timing** - implement when ready, no time pressure
+- **在 GitHub 上审查** - 在 issue 正文中检查计划细节
+- **需要时改进** - 使用 `/ultra-planner --refine` 进行改进
+- **准备好后实现** - 使用 `/issue-to-impl` 开始实现
+- **时间灵活** - 准备好时实现，没有时间压力
 
-## Runtime Expectations
+## 运行时预期
 
-### Ultra-Planner Initial Run
+### Ultra-Planner 初始运行
 
-**With automatic routing**, timing depends on the estimated complexity:
+**使用自动路由**时，耗时取决于预估的复杂度：
 
-#### Lite Path (repo-only, <5 files, <150 LOC)
+#### Lite 路径（仅仓库内、<5 个文件、<150 LOC）
 
-**Duration:** 1-2 minutes end-to-end
+**时长：** 端到端 1-2 分钟
 
-**Breakdown:**
-- Understander agent: 1-2 minutes (codebase exploration + complexity estimation)
-- Planner-lite agent: 30-60 seconds (single-agent planning)
-- No consensus step (single agent, nothing to synthesize)
-- Draft issue creation: <10 seconds
+**分解：**
+- Understander 智能体：1-2 分钟（代码库探索 + 复杂度估算）
+- Planner-lite 智能体：30-60 秒（单智能体规划）
+- 无共识步骤（单智能体，无需综合）
+- 草稿 issue 创建：<10 秒
 
-**Cost:** ~$0.30-0.80 per planning session (2 Sonnet agents, no external review)
+**成本：** 每次规划会话约 $0.30-0.80（2 个 Sonnet 智能体，无外部评审）
 
-#### Full Path (≥ 200 LOC)
+#### Full 路径（≥ 200 LOC）
 
-**Duration:** 6-12 minutes end-to-end
+**时长：** 端到端 6-12 分钟
 
-**Breakdown:**
-- Understander agent: 1-2 minutes (codebase exploration + complexity estimation)
-- Bold-proposer agent: 2-3 minutes (research + proposal, with context)
-- Critique + Reducer agents (parallel-only): 2-3 minutes
-- External consensus review: 1-2 minutes
-- Draft issue creation: <10 seconds
+**分解：**
+- Understander 智能体：1-2 分钟（代码库探索 + 复杂度估算）
+- Bold-proposer 智能体：2-3 分钟（研究 + 提案，带上下文）
+- Critique + Reducer 智能体（仅并行）：2-3 分钟
+- 外部共识评审：1-2 分钟
+- 草稿 issue 创建：<10 秒
 
-**Cost:** ~$2.50-6 per planning session (1 Sonnet + 3 Opus agents + 1 external review)
+**成本：** 每次规划会话约 $2.50-6（1 个 Sonnet + 3 个 Opus 智能体 + 1 次外部评审）
 
-### Refinement Run (--refine mode)
+### 改进运行（--refine 模式）
 
-**Duration:** 6-12 minutes end-to-end (same as initial run)
+**时长：** 端到端 6-12 分钟（与初始运行相同）
 
-**Breakdown:**
-- Same agent execution times as ultra-planner (includes understander)
-- Issue fetch/update: <5 seconds
+**分解：**
+- 与 ultra-planner 相同的智能体执行时间（包含 understander）
+- issue 获取/更新：<5 秒
 
-**Cost:** ~$2.50-6 per refinement (same as initial planning)
+**成本：** 每次改进约 $2.50-6（与初始规划相同）
 
-## Lifecycle States
+## 生命周期状态
 
-1. **Plan Issue** - `[plan][tag]: Title`
-   - Created automatically by ultra-planner
-   - Visible to all stakeholders
-   - Can be refined via `/ultra-planner --refine`
-   - Can be implemented via `/issue-to-impl`
+1. **计划 Issue** - `[plan][tag]: Title`
+   - 由 ultra-planner 自动创建
+   - 对所有利益相关者可见
+   - 可通过 `/ultra-planner --refine` 改进
+   - 可通过 `/issue-to-impl` 实现
 
-2. **Closed/Abandoned** - Issue closed on GitHub
-   - Plan completed (close reason: `completed`) or not pursued (close reason: `not planned`)
-   - Closed issues can be reopened later if needed
-   - Use GitHub's close reason to distinguish between completed work vs abandoned ideas
+2. **已关闭/已放弃** - issue 在 GitHub 上被关闭
+   - 计划已完成（关闭原因：`completed`）或未继续（关闭原因：`not planned`）
+   - 已关闭的 issue 可在需要时重新打开
+   - 使用 GitHub 的关闭原因区分已完成的工作与放弃的想法
 
-## Commands Summary
+## 命令汇总
 
 ### `/ultra-planner <feature-description>`
 
-Creates initial plan via automatic routing (lite or full path) and auto-creates plan issue.
+通过自动路由（lite 或 full 路径）创建初始计划，并自动创建计划 issue。
 
-**Usage:**
+**用法：**
 ```
 /ultra-planner Add user authentication with JWT and RBAC
 ```
 
-**Routing:** Understander checks lite conditions:
-- Lite path (repo-only, <5 files, <150 LOC): Single-agent planning (1-2 min)
-- Full path (otherwise): Multi-agent debate with web research (6-12 min)
+**路由：** Understander 检查 lite 条件：
+- Lite 路径（仅仓库内、<5 个文件、<150 LOC）：单智能体规划（1-2 分钟）
+- Full 路径（其他情况）：带网络研究的多智能体辩论（6-12 分钟）
 
-**Output:** Plan issue URL and refinement/implementation instructions
+**输出：** 计划 issue URL 和改进/实现说明
 
 ### `/ultra-planner --dry-run <feature-description>`
 
-Runs the full planning workflow but skips GitHub issue creation/updates.
+运行完整的规划工作流，但跳过 GitHub issue 创建/更新。
 
-**Usage:**
+**用法：**
 ```
 /ultra-planner --dry-run Add user authentication with JWT tokens
 ```
 
-**Behavior:**
-- Runs understander, bold-proposer, critique, and reducer agents
-- Generates consensus plan to `.tmp/` files
-- Prints dry-run summary showing what issue would be created
-- **Does NOT**: Create placeholder issue, update issue body, or add labels
+**行为：**
+- 运行 understander、bold-proposer、critique 和 reducer 智能体
+- 将共识计划生成到 `.tmp/` 文件
+- 打印 dry-run 摘要，展示将创建的 issue
+- **不会**：创建占位 issue、更新 issue 正文或添加标签
 
-**Output:** Dry-run summary with planned issue title, tags, and LOC estimate
+**输出：** 包含计划 issue 标题、标签和 LOC 预估的 dry-run 摘要
 
-**Note:** Token costs remain similar to regular runs since the multi-agent debate still executes. Use this when you want to review the plan before committing to GitHub.
+**注意：** 由于多智能体辩论仍会执行，token 成本与常规运行相近。当你想在提交到 GitHub 之前审查计划时使用此模式。
 
 ### `/ultra-planner --force-full <feature-description>`
 
-Forces full multi-agent debate regardless of complexity estimation.
+无论复杂度估算如何，强制使用完整多智能体辩论。
 
-**Usage:**
+**用法：**
 ```
 /ultra-planner --force-full Add simple helper function
 ```
 
-**Use case:** When you want thorough multi-perspective analysis even for simple changes.
+**使用场景：** 当你希望对简单变更也进行彻底的多视角分析时。
 
-**Output:** Plan issue URL and refinement/implementation instructions
+**输出：** 计划 issue URL 和改进/实现说明
 
 ### `/ultra-planner --refine <issue-number> [refinement-instructions]`
 
-Refines existing plan issue via multi-agent debate and updates issue body.
+通过多智能体辩论改进现有计划 issue 并更新 issue 正文。
 
-**Usage:**
+**用法：**
 ```
 /ultra-planner --refine 42
 /ultra-planner --refine 42 Focus on reducing complexity
 /ultra-planner --refine 42 Add more error handling and edge cases
 ```
 
-**Output:** Updated issue URL and summary of changes
+**输出：** 更新后的 issue URL 和变更摘要
 
 ### `/ultra-planner --from-issue <issue-number>`
 
-Creates a plan for an existing issue (typically a feature request) without creating a new placeholder issue.
+为现有 issue（通常是功能请求）创建计划，不创建新的占位 issue。
 
-**Usage:**
+**用法：**
 ```
 /ultra-planner --from-issue 42
 ```
 
-**Behavior:**
-1. Reads issue #42's title and body as the feature description
-2. Runs the full multi-agent debate workflow (same as initial planning)
-3. Updates issue #42 with the consensus plan (adds `[plan]` prefix to title)
-4. Adds `agentize:plan` label to mark as planned
+**行为：**
+1. 读取 issue #42 的标题和正文作为功能描述
+2. 运行完整的多智能体辩论工作流（与初始规划相同）
+3. 用共识计划更新 issue #42（在标题添加 `[plan]` 前缀）
+4. 添加 `agentize:plan` 标签以标记为已规划
 
-**Use case:** Server-driven feature request planning. When the server discovers issues with `agentize:dev-req` label, it invokes `/ultra-planner --from-issue <N>` to automatically generate implementation plans.
+**使用场景：** server 驱动的功能请求规划。当 server 发现带 `agentize:dev-req` 标签的 issue 时，会调用 `/ultra-planner --from-issue <N>` 自动生成实现计划。
 
-**Output:** Updated issue URL and plan summary
+**输出：** 更新后的 issue URL 和计划摘要
 
 ### `/issue-to-impl <issue-number>`
 
-Implements plan issue.
+实现计划 issue。
 
-**Usage:**
+**用法：**
 ```
 /issue-to-impl 42
 ```
 
-**Output:** Implementation progress and milestone commits
+**输出：** 实现进度和 milestone 提交
 
-## CLI Implementation
+## CLI 实现
 
-The debate pipeline described above is available through the `lol plan` command:
+上述辩论流水线可通过 `lol plan` 命令使用：
 
 ```bash
 lol plan "<feature-description>"
 ```
 
-This does not change the `/ultra-planner` command interface documented above. See `docs/cli/planner.md` for pipeline details used by `lol plan`.
+这不会改变上文记录的 `/ultra-planner` 命令接口。`lol plan` 使用的流水线细节见 `docs/cli/planner.md`。
 
-## Comparison to Previous Workflow
+## 与之前工作流的对比
 
-| Aspect | Previous (v1) | Current (v2) |
+| 方面 | 之前（v1） | 当前（v2） |
 |--------|----------|-------------|
-| **Issue creation** | After user approval | Automatic placeholder first |
-| **Approval step** | CLI prompt before issue | Review after issue creation |
-| **Refinement** | No refinement support | `--refine` mode for iteration |
-| **Collaboration** | Plan files in `.tmp` | GitHub issues from start |
-| **Visibility** | Private until approved | Public issues immediately |
-| **Workflow** | Approval → Issue → Impl | Issue → Refine* → Impl |
+| **Issue 创建** | 用户批准之后 | 自动先创建占位 issue |
+| **批准步骤** | issue 前的 CLI 提示 | issue 创建后审查 |
+| **改进** | 不支持改进 | `--refine` 模式支持迭代 |
+| **协作** | `.tmp` 中的计划文件 | 从一开始就是 GitHub issue |
+| **可见性** | 批准前私有 | issue 立即公开 |
+| **工作流** | 批准 → Issue → 实现 | Issue → 改进* → 实现 |
 
-*Refinement is optional and can be done multiple times using `--refine`
+*改进是可选的，可以使用 `--refine` 多次进行

@@ -1,9 +1,9 @@
 # Worktree Webview
 
-UI assets for the Worktree Activity Bar tab.
+Worktree Activity Bar 标签页的 UI 资源。
 
-## Organization
+## 组织结构
 
-- `index.ts` renders the placeholder UI.
-- `styles.css` provides the Worktree tab styling.
-- `tsconfig.json` compiles the webview script to `out/`.
+- `index.ts` 渲染占位 UI。
+- `styles.css` 提供 Worktree 标签页样式。
+- `tsconfig.json` 将 webview 脚本编译到 `out/`。

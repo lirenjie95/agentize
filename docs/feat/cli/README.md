@@ -1,69 +1,69 @@
-# CLI Reference Documentation
+# CLI 参考文档
 
-This directory contains detailed reference documentation for Agentize command-line tools.
+本目录包含 Agentize 命令行工具的详细参考文档。
 
-## Purpose
+## 目的
 
-These documents provide comprehensive command-line interface specifications, including all flags, options, usage patterns, and examples for each tool in the Agentize framework.
+这些文档提供全面的命令行接口规范，包括 Agentize 框架中每个工具的所有标志、选项、用法模式和示例。
 
-**Canonical source location:** CLI implementations live in `src/cli/` as source-first libraries. The documentation here describes the user-facing interface; see `src/cli/*.md` for function-level interface documentation and `src/cli/*/README.md` for module maps.
+**规范源码位置：** CLI 实现以源码优先库的形式存放在 `src/cli/` 中。这里的文档描述面向用户的接口；函数级接口文档见 `src/cli/*.md`，模块映射见 `src/cli/*/README.md`。
 
-## Files
+## 文件
 
 ### acw.md
-The `acw` command for unified AI CLI invocation. See [docs/cli/acw.md](../../cli/acw.md) for interface documentation. Provides file-based input/output for claude, codex, opencode, cursor, and kimi CLIs.
+用于统一调用 AI CLI 的 `acw` 命令。接口文档见 [docs/cli/acw.md](../../cli/acw.md)。为 claude、codex、opencode、cursor 和 kimi CLI 提供基于文件的输入/输出。
 
 ### install.md
-The `install` script for one-command Agentize installation. Documents installation flow (clone, worktree init, setup), command-line options (--dir, --repo, --help), post-install shell RC integration, and troubleshooting.
+用于一键安装 Agentize 的 `install` 脚本。文档涵盖安装流程（克隆、worktree 初始化、setup）、命令行选项（--dir、--repo、--help）、安装后 shell RC 集成以及故障排查。
 
-### Note on lol.md
-The `lol.md` documentation has been removed. See [docs/cli/lol.md](../../cli/lol.md) for the current `lol` command documentation. The `lol` command now provides: `lol upgrade` (installation upgrade), `lol project` (GitHub Projects integration), `lol usage` (token usage reporting), `lol claude-clean` (stale entry cleanup), and `lol version` (version information).
+### 关于 lol.md 的说明
+`lol.md` 文档已被移除。当前 `lol` 命令文档见 [docs/cli/lol.md](../../cli/lol.md)。`lol` 命令现在提供：`lol upgrade`（安装升级）、`lol project`（GitHub Projects 集成）、`lol usage`（token 用量报告）、`lol claude-clean`（过期条目清理）和 `lol version`（版本信息）。
 
 ### wt.md
-The `wt` command interface for git worktree management. Documents `wt init` (worktree initialization), `wt spawn` (issue-based worktree creation), `wt goto` (navigate to worktrees), `.agentize.yaml` metadata integration, and zsh completion support.
+用于 git worktree 管理的 `wt` 命令接口。文档涵盖 `wt init`（worktree 初始化）、`wt spawn`（基于 issue 的 worktree 创建）、`wt goto`（跳转到 worktree）、`.agentize.yaml` 元数据集成以及 zsh 补全支持。
 
-## Usage
+## 用法
 
-Quick reference:
-- `lol --help` - Display lol command help
-- `wt --help` - Display wt command help
+快速参考：
+- `lol --help` - 显示 lol 命令帮助
+- `wt --help` - 显示 wt 命令帮助
 
-For detailed documentation including examples and advanced usage, refer to the individual `.md` files.
+包含示例和高级用法的详细文档，请参阅各个 `.md` 文件。
 
-## Integration
+## 集成
 
-CLI documentation is referenced from:
-- Main [README.md](../README.md) under "CLI Reference"
-- Tutorial series in [docs/tutorial/](../tutorial/)
-- Skills and commands that invoke these CLI tools
+CLI 文档被以下位置引用：
+- 主 [README.md](../README.md) 的 "CLI Reference" 部分
+- [docs/tutorial/](../tutorial/) 中的教程系列
+- 调用这些 CLI 工具的 skills 和 commands
 
-## Troubleshooting
+## 故障排查
 
-### Zsh Tab Completion Not Working
+### Zsh Tab 补全不工作
 
-**Problem:** After running `make setup` and `source setup.sh`, tab completion doesn't work for `wt`, `lol`, or other commands.
+**问题：** 运行 `make setup` 和 `source setup.sh` 后，`wt`、`lol` 或其他命令的 Tab 补全不工作。
 
-**Cause:** Stale zsh completion cache from before completion files (`_wt`, `_lol`) were moved to `src/completion/`.
+**原因：** 补全文件（`_wt`、`_lol`）移动到 `src/completion/` 之前残留的过期 zsh 补全缓存。
 
-**Solution:**
+**解决方案：**
 ```bash
-# Delete the completion cache
+# 删除补全缓存
 rm -f ~/.zcompdump ~/.zcompdump.zwc
 
-# Restart your zsh session
+# 重启 zsh 会话
 exec zsh
 
-# Or just re-source setup.sh
+# 或者只是重新 source setup.sh
 source setup.sh
 ```
 
-After this one-time cleanup, tab completions should work normally.
+完成这次一次性清理后，Tab 补全应能正常工作。
 
-**Verify it's working:**
+**验证是否生效：**
 ```bash
-# Check if command is available
+# 检查命令是否可用
 which wt
 
-# Try tab completion
+# 尝试 Tab 补全
 wt <TAB>
 ```

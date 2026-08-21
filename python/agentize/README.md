@@ -1,58 +1,58 @@
-# Agentize Python Package
+# Agentize Python 包
 
-Python SDK for AI-powered software engineering workflows.
+面向 AI 驱动的软件工程工作流的 Python SDK。
 
-## Structure
+## 结构
 
 ```
 python/agentize/
-├── __init__.py           # Package root
-├── cli.py                # Python CLI entrypoint (python -m agentize.cli)
-├── cli.md                # CLI interface documentation
-├── shell.py              # Shared shell function invocation utilities
-├── usage.py              # Claude Code token usage statistics
-├── workflow/             # Python planner + impl workflow orchestration
-│   └── impl/             # Issue-to-implementation workflow (lol impl)
-└── server/               # Polling server module
-    └── __main__.py       # Server entry point (python -m agentize.server)
+├── __init__.py           # 包根目录
+├── cli.py                # Python CLI 入口（python -m agentize.cli）
+├── cli.md                # CLI 接口文档
+├── shell.py              # 共享的 shell 函数调用工具
+├── usage.py              # Claude Code token 用量统计
+├── workflow/             # Python planner + impl 工作流编排
+│   └── impl/             # issue 到实现的工作流（lol impl）
+└── server/               # 轮询服务器模块
+    └── __main__.py       # 服务器入口（python -m agentize.server）
 ```
 
-**Note**: Shared utilities (permission, workflow, telegram_utils, logger) have been consolidated into `.claude-plugin/lib/`. See [.claude-plugin/lib/README.md](../../.claude-plugin/lib/README.md) for details.
+**注意**：共享工具（permission、workflow、telegram_utils、logger）已合并至 `.claude-plugin/lib/`。详情请参阅 [.claude-plugin/lib/README.md](../../.claude-plugin/lib/README.md)。
 
-## Usage
+## 用法
 
-### CLI Entrypoint
+### CLI 入口
 
 ```bash
 python -m agentize.cli <command> [options]
 ```
 
-The Python CLI delegates to shell functions for most commands via the shared `shell.py` module with `AGENTIZE_HOME` set. The `impl` command runs the Python workflow implementation. See `cli.md` for interface details.
+Python CLI 通过共享的 `shell.py` 模块（已设置 `AGENTIZE_HOME`）将大多数命令委托给 shell 函数。`impl` 命令运行 Python 工作流实现。接口详情请参阅 `cli.md`。
 
-### Shell Utilities
+### Shell 工具
 
 ```python
 from agentize.shell import get_agentize_home, run_shell_function
 
-# Auto-detect AGENTIZE_HOME
+# 自动检测 AGENTIZE_HOME
 home = get_agentize_home()
 
-# Run shell functions with AGENTIZE_HOME set
+# 在已设置 AGENTIZE_HOME 的情况下运行 shell 函数
 result = run_shell_function("wt spawn 123", capture_output=True)
 print(result.returncode, result.stdout)
 ```
 
-The `shell.py` module provides a unified interface for invoking shell functions from Python. It handles `AGENTIZE_HOME` auto-detection and sources `setup.sh` before running commands.
+`shell.py` 模块为从 Python 调用 shell 函数提供了统一接口。它负责 `AGENTIZE_HOME` 的自动检测，并在运行命令前 source `setup.sh`。
 
-### Permission Module
+### Permission 模块
 
-The permission module has been moved to `.claude-plugin/lib/permission/`. See the lib README for usage:
+Permission 模块已迁移至 `.claude-plugin/lib/permission/`。用法请参阅 lib README：
 
 ```python
-# Import from lib (after adding .claude-plugin to sys.path)
+# 从 lib 导入（将 .claude-plugin 加入 sys.path 之后）
 from lib.permission import determine
 ```
 
-## Server Module
+## Server 模块
 
-The server module (`python -m agentize.server`) imports shared utilities from `.claude-plugin/lib/` for Telegram notifications.
+Server 模块（`python -m agentize.server`）从 `.claude-plugin/lib/` 导入共享工具，用于 Telegram 通知。

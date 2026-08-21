@@ -1,13 +1,13 @@
-# GitHub Projects v2 GraphQL Fixtures
+# GitHub Projects v2 GraphQL Fixture
 
-This directory contains mock GraphQL responses for testing `lol project` command without making live API calls.
+本目录包含用于测试 `lol project` 命令的模拟 GraphQL 响应，无需发起真实的 API 调用。
 
-## Files
+## 文件
 
 ### create-project-response.json
-Mock response for `createProjectV2` mutation. Used when testing `lol project --create`.
+`createProjectV2` mutation 的模拟响应。用于测试 `lol project --create`。
 
-**Query:**
+**查询：**
 ```graphql
 mutation {
   createProjectV2(input: {ownerId: "...", title: "..."}) {
@@ -22,9 +22,9 @@ mutation {
 ```
 
 ### lookup-owner-response.json
-Mock response for looking up an organization owner. Used to determine owner type before project lookup.
+查询组织 owner 的模拟响应。用于在项目查找之前确定 owner 类型。
 
-**Query:**
+**查询：**
 ```graphql
 query($owner: String!) {
   repositoryOwner(login: $owner) {
@@ -35,12 +35,12 @@ query($owner: String!) {
 ```
 
 ### lookup-owner-user-response.json
-Mock response for looking up a user owner. Used when `AGENTIZE_GH_OWNER_TYPE=user`.
+查询用户 owner 的模拟响应。用于 `AGENTIZE_GH_OWNER_TYPE=user` 的场景。
 
 ### lookup-project-response.json
-Mock response for looking up an existing organization project. Used when testing `lol project --associate`.
+查询已有组织项目的模拟响应。用于测试 `lol project --associate`。
 
-**Query:**
+**查询：**
 ```graphql
 query($owner: String!, $number: Int!) {
   repositoryOwner(login: $owner) {
@@ -51,15 +51,15 @@ query($owner: String!, $number: Int!) {
 ```
 
 ### lookup-project-user-response.json
-Mock response for looking up a user project. Used when `AGENTIZE_GH_OWNER_TYPE=user`.
+查询用户项目的模拟响应。用于 `AGENTIZE_GH_OWNER_TYPE=user` 的场景。
 
 ### create-project-user-response.json
-Mock response for creating a user project. Used when `AGENTIZE_GH_OWNER_TYPE=user`.
+创建用户项目的模拟响应。用于 `AGENTIZE_GH_OWNER_TYPE=user` 的场景。
 
 ### add-item-response.json
-Mock response for adding an issue or PR to a project. Used when testing optional `--add` functionality.
+向项目添加 issue 或 PR 的模拟响应。用于测试可选的 `--add` 功能。
 
-**Query:**
+**查询：**
 ```graphql
 mutation {
   addProjectV2ItemById(input: {projectId: "...", contentId: "..."}) {
@@ -71,9 +71,9 @@ mutation {
 ```
 
 ### get-issue-project-item-response.json
-Mock response for looking up an issue's project items. Used when testing `wt spawn` status claim functionality.
+查询 issue 项目条目的模拟响应。用于测试 `wt spawn` 状态认领功能。
 
-**Query:**
+**查询：**
 ```graphql
 query($owner:String!, $repo:String!, $number:Int!) {
   repository(owner:$owner, name:$repo) {
@@ -91,9 +91,9 @@ query($owner:String!, $repo:String!, $number:Int!) {
 ```
 
 ### update-field-response.json
-Mock response for updating a project field value. Used when testing `wt spawn` status claim functionality.
+更新项目字段值的模拟响应。用于测试 `wt spawn` 状态认领功能。
 
-**Query:**
+**查询：**
 ```graphql
 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
   updateProjectV2ItemFieldValue(input: {
@@ -105,22 +105,22 @@ mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
 }
 ```
 
-## Usage in Tests
+## 在测试中使用
 
-Tests should set `AGENTIZE_GH_API` environment variable to use fixtures instead of live API:
+测试应设置 `AGENTIZE_GH_API` 环境变量以使用 fixture 替代真实 API：
 
 ```bash
 export AGENTIZE_GH_API=fixture
 ```
 
-The `scripts/gh-graphql.sh` wrapper checks this variable and returns fixture data when set. Additionally, fixture mode bypasses the `gh auth status` preflight check in `scripts/agentize-project.sh`, allowing tests to run in CI environments without GitHub authentication.
+`scripts/gh-graphql.sh` wrapper 会检查该变量，并在设置时返回 fixture 数据。此外，fixture 模式会绕过 `scripts/agentize-project.sh` 中的 `gh auth status` 预检查，使测试可以在没有 GitHub 认证的 CI 环境中运行。
 
-## Owner Type Selection
+## Owner 类型选择
 
-By default, fixtures return organization-style responses. To test user-owned projects, set `AGENTIZE_GH_OWNER_TYPE`:
+默认情况下，fixture 返回组织风格的响应。要测试用户拥有的项目，请设置 `AGENTIZE_GH_OWNER_TYPE`：
 
 ```bash
 export AGENTIZE_GH_OWNER_TYPE=user
 ```
 
-This selects user-specific fixtures (`lookup-owner-user-response.json`, `lookup-project-user-response.json`, `create-project-user-response.json`) which return URLs with `/users/` path instead of `/orgs/`.
+这会选用用户专用的 fixture（`lookup-owner-user-response.json`、`lookup-project-user-response.json`、`create-project-user-response.json`），它们返回的 URL 使用 `/users/` 路径而非 `/orgs/`。

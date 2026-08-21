@@ -1,191 +1,190 @@
-# AI-powered SDK for Software Development
+# AI 驱动的软件开发 SDK
 
 [![Tests](https://github.com/SyntheSys-Lab/agentize/actions/workflows/test.yml/badge.svg)](https://github.com/SyntheSys-Lab/agentize/actions/workflows/test.yml)
 
-## Prerequisites
+## 前置要求
 
-### Required Tools
+### 必需工具
 
-- **Git** - Version control (checked during installation)
-- **Make** - Build automation (checked during installation)
-- **Bash** - Shell interpreter, version 3.2+ (checked during installation)
-- **GitHub CLI (`gh`)** or **GitLab CLI (`glab`)** - Required for forge integration features
-  - For GitHub: https://cli.github.com/ — authenticate with `gh auth login`
-  - For GitLab: https://gitlab.com/gitlab-org/cli — authenticate with `glab auth login`
-    - For self-hosted GitLab: `glab auth login --hostname gitlab.company.com`
-  - Used by: `/setup-viewboard`, `/open-issue`, `/open-pr`, `/open-mr`, workflow automation
-- **Python 3.10+** - Required for permission automation module, otherwise you can have infinite `yes` to prompt!
-  - Use Python `venv` or `anaconda` to manage a good Python release!
-  - Requires **PyYAML** (`pip install pyyaml`) for YAML configuration parsing
+- **Git** - 版本控制（安装时会检查）
+- **Make** - 构建自动化（安装时会检查）
+- **Bash** - Shell 解释器，版本 3.2+（安装时会检查）
+- **GitHub CLI（`gh`）** 或 **GitLab CLI（`glab`）** - 代码托管平台集成功能所需
+  - GitHub：https://cli.github.com/ — 使用 `gh auth login` 进行认证
+  - GitLab：https://gitlab.com/gitlab-org/cli — 使用 `glab auth login` 进行认证
+    - 自托管 GitLab：`glab auth login --hostname gitlab.company.com`
+  - 被以下功能使用：`/setup-viewboard`、`/open-issue`、`/open-pr`、`/open-mr`、工作流自动化
+- **Python 3.10+** - 权限自动化模块所需，否则你只能对着提示无限地输入 `yes`！
+  - 使用 Python `venv` 或 `anaconda` 来管理一个良好的 Python 发行版！
+  - 需要 **PyYAML**（`pip install pyyaml`）用于 YAML 配置解析
 
-### Windows Support
+### Windows 支持
 
-Agentize supports Windows 10 through **Git Bash** (included with [Git for Windows](https://git-scm.com/download/win)).
+Agentize 通过 **Git Bash**（随 [Git for Windows](https://git-scm.com/download/win) 附带）支持 Windows 10。
 
-**Windows prerequisites:**
-1. Install [Git for Windows](https://git-scm.com/download/win) (includes Git Bash)
-2. Open **Git Bash** and install `make`:
+**Windows 前置要求：**
+1. 安装 [Git for Windows](https://git-scm.com/download/win)（包含 Git Bash）
+2. 打开 **Git Bash** 并安装 `make`：
    ```bash
    pacman -S make
    ```
-3. Ensure `bash`, `git`, and `make` are available in Git Bash before running the installer.
+3. 在运行安装器之前，确保 `bash`、`git` 和 `make` 在 Git Bash 中可用。
 
-All Agentize commands (`wt`, `lol`) should be run inside Git Bash. Python modules automatically discover `bash.exe` from common Git for Windows install locations.
+所有 Agentize 命令（`wt`、`lol`）都应在 Git Bash 内运行。Python 模块会自动从常见的 Git for Windows 安装位置发现 `bash.exe`。
 
-### Recommended Libraries
+### 推荐库
 
-- **Anthropic Python Library** - For custom AI integrations (optional)
-  - Install: `pip install anthropic`
-  - Note: Not required for core SDK functionality, but recommended if you plan to extend or customize AI-powered features
+- **Anthropic Python Library** - 用于自定义 AI 集成（可选）
+  - 安装：`pip install anthropic`
+  - 注意：核心 SDK 功能不需要它，但如果你计划扩展或定制 AI 驱动的功能，建议安装
 
-### Verification
+### 验证
 
-After installing prerequisites, the installer will automatically verify `git`, `make`, and `bash` availability. Forge CLI authentication can be verified with:
+安装完前置要求后，安装器会自动验证 `git`、`make` 和 `bash` 的可用性。代码托管平台 CLI 的认证可以用以下命令验证：
 
 ```bash
 gh auth status      # GitHub
 glab auth status    # GitLab
 ```
 
-## Quick Start
+## 快速开始
 
-Agentize is an AI-powered SDK that helps you build your software projects
-using Claude Code powerfully. It is splitted into two main components:
+Agentize 是一个 AI 驱动的 SDK，帮助你借助 Claude Code 强大地构建软件项目。
+它分为两个主要组件：
 
-1. **Claude Code Plugin**: Automatically registered during installation when `claude` CLI is available.
-   See [Tutorial 00a: Claude UI Setup](./docs/tutorial/00a-claude-ui-setup.md) for details.
-2. **CLI Tool**: A source-first CLI tool to help you manage your projects using Agentize.
-   See [Tutorial 00: CLI Quickstart](./docs/tutorial/00-cli-quickstart.md) for the CLI workflow.
+1. **Claude Code 插件**：当 `claude` CLI 可用时，安装过程中自动注册。
+   详情请参见[教程 00a：Claude UI 设置](./docs/tutorial/00a-claude-ui-setup.md)。
+2. **CLI 工具**：一个 source 优先的 CLI 工具，帮助你使用 Agentize 管理项目。
+   CLI 工作流请参见[教程 00：CLI 快速上手](./docs/tutorial/00-cli-quickstart.md)。
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/SyntheSys-Lab/agentize/main/scripts/install | bash
 ```
 
-Then add to your shell RC file (`~/.bashrc`, `~/.zshrc`, etc.):
+然后添加到你的 shell RC 文件（`~/.bashrc`、`~/.zshrc` 等）：
 
 ```bash
 source $HOME/.agentize/setup.sh
 ```
 
-See [docs/feat/cli/install.md](./docs/feat/cli/install.md) for installation options and troubleshooting.
+安装选项与故障排查参见 [docs/feat/cli/install.md](./docs/feat/cli/install.md)。
 
-**Upgrade:** Run `lol upgrade` to pull the latest changes.
+**升级：** 运行 `lol upgrade` 拉取最新变更。
 
-## Your First 15 Minutes
+## 你的第一个 15 分钟
 
-After installation, the installer creates `~/.agentize.local.yaml` in your home folder. This file controls which AI backends are used for planning and implementation.
+安装完成后，安装器会在你的主目录创建 `~/.agentize.local.yaml`。该文件控制规划和实现使用哪些 AI 后端。
 
-### The 5-Step Agentize CLI Workflow
+### Agentize CLI 五步工作流
 
-1. **Configure** (already done) - confirm `~/.agentize.local.yaml` exists and adjust backends if needed
+1. **配置**（已完成）- 确认 `~/.agentize.local.yaml` 存在，并按需调整后端
 
-2. **Clone** with worktrees:
+2. 使用 worktree **克隆**：
    ```bash
    wt clone https://github.com/org/repo.git myproject.git
-   # or for GitLab:
+   # 或者 GitLab：
    wt clone https://gitlab.com/org/repo.git myproject.git
    ```
-   `wt clone` sets up a bare repository and leaves you in `trees/main`.
+   `wt clone` 会建立一个 bare 仓库，并让你停留在 `trees/main`。
 
-3. **Plan** your first feature:
+3. **规划**你的第一个功能：
    ```bash
    lol plan --editor
    ```
-   Review the GitHub issue it creates.
+   检查它创建的 GitHub issue。
 
-4. **Implement** the plan:
+4. **实现**该计划：
    ```bash
    lol impl <issue-number>
    ```
 
-5. **Navigate** between worktrees:
+5. 在 worktree 之间**导航**：
    ```bash
    wt goto <issue-number>
    wt goto main
    ```
 
-See [Tutorial 00: CLI Quickstart](./docs/tutorial/00-cli-quickstart.md) for a full walkthrough.
+完整演练请参见[教程 00：CLI 快速上手](./docs/tutorial/00-cli-quickstart.md)。
 
-## Troubleshoot
+## 故障排查
 
-If you encounter any issue during the usage. For example:
-1. It asks you for permission on a really simple operation.
-2. It fails to automatically continue on a session.
+如果你在使用过程中遇到任何问题，例如：
+1. 它对一个非常简单的操作请求权限。
+2. 它未能自动继续会话。
 
-Enable debug mode in your `.agentize.local.yaml`:
+在你的 `.agentize.local.yaml` 中启用调试模式：
 
 ```yaml
 handsoff:
   debug: true
 ```
 
-Then re-run the command. This will give you a detailed log in either
-- `/path/to/your/project/.tmp/handsoff-debug.log` or
+然后重新运行命令。这将在以下位置之一生成详细日志：
+- `/path/to/your/project/.tmp/handsoff-debug.log` 或
 - `$HOME/.agentize/.tmp/handsoff-debug.log`
-Paste your logs on issue for me (@were) to debug!
+请把你的日志粘贴到 issue 中让我（@were）来调试！
 
-For further help, please visit our [troubleshooting guide](./docs/troubleshoot.md).
+如需更多帮助，请访问我们的[故障排查指南](./docs/troubleshoot.md)。
 
-## Core Philosophy
+## 核心理念
 
-Minimizing human intervention by artifact centric.
-- Session-centric: People tell AI what to do, and wait until it ends.
-  Then give feedback until they are satisfied. Human looping in too much
-  limits the scalability.
-- Artifact-centric: People tell AI what to do, and AI produces a plan first.
-  Plan is the ONLY phase that human can intervene. After the plan is approved,
-  AI will execute the plan and produce the code merge for human to review.
+以产物为中心，最大限度地减少人工干预。
+- 以会话为中心：人告诉 AI 做什么，然后等到它结束。
+  再给出反馈，直到满意为止。人在环路中介入过多
+  限制了可扩展性。
+- 以产物为中心：人告诉 AI 做什么，AI 先产出一个计划。
+  计划是人唯一可以干预的阶段。计划被批准后，
+  AI 将执行计划并产出代码合并，供人评审。
 
-A clear separation between human, AI, and formal language.
-- Humans are for the intention of development, including providing feature requirements,
-  approving plans, and code merges.
-- AI is the worker of software development for both making the plan, and maintaining the codebase,
-  including tests, documentation, and code quality.
-- Formal language is for the coordination and orchestration between AI, and other systems,
-  e.g. Github Issues, Pull Requests, and CI/CD pipelines.
-  - I (@were) found that skills are promising for AI to synthesize fixed code to interact with such
-    systems, but these flows are more fixed and formal than I expected --- putting them in formal
-    language (e.g. Python scripts, or YAML configuration) is more transparent and faster to execute
-    the whole workflow.
+人、AI 和形式语言之间的清晰分离。
+- 人负责开发意图，包括提出功能需求、
+  批准计划和代码合并。
+- AI 是软件开发的工作者，既负责制定计划，也负责维护代码库，
+  包括测试、文档和代码质量。
+- 形式语言用于 AI 与其他系统之间的协调与编排，
+  例如 GitHub Issues、Pull Requests 和 CI/CD 管线。
+  - 我（@were）发现，skill 让 AI 合成固定代码与这些系统交互很有前途，
+    但这些流程比我预期的更加固定和形式化——把它们放在形式语言
+    （例如 Python 脚本或 YAML 配置）中，对整个工作流来说更透明、执行更快。
 
-### Workflow:
+### 工作流：
 
-See our detailed workflow diagrams:
+参见我们详细的工作流图：
 
-- [Ultra Planner Workflow](./docs/feat/core/ultra-planner.md) - Multi-agent debate-based planning
-- [Issue to Implementation Workflow](./docs/feat/core/issue-to-impl.md) - Complete development cycle
+- [Ultra Planner 工作流](./docs/feat/core/ultra-planner.md) - 基于多 agent 辩论的规划
+- [Issue 到实现工作流](./docs/feat/core/issue-to-impl.md) - 完整的开发周期
 
-**Legend**: Red boxes represent user interventions (providing requirements, approving/rejecting results, starting sessions). Blue boxes represent automated AI steps.
+**图例**：红框代表人工干预（提供需求、批准/拒绝结果、启动会话）。蓝框代表自动化的 AI 步骤。
 
-## Tutorials
+## 教程
 
-Learn Agentize in 15 minutes with our step-by-step tutorials (3-5 min each):
+通过我们的逐步教程在 15 分钟内学会 Agentize（每篇 3-5 分钟）：
 
-1. **[CLI Quickstart](./docs/tutorial/00-cli-quickstart.md)** - Learn the core CLI workflow in 15 minutes
-2. **[Claude UI Setup](./docs/tutorial/00a-claude-ui-setup.md)** - Set up the Claude Code plugin and slash commands
-3. **[Ultra Planner](./docs/tutorial/01-ultra-planner.md)** - Primary planning tutorial (recommended)
-4. **[Issue to Implementation](./docs/tutorial/02-issue-to-impl.md)** - Complete development cycle with `/issue-to-impl` and `/code-review`
-5. **[Advanced Usage](./docs/tutorial/03-advanced-usage.md)** - Scale up with parallel development workflows
+1. **[CLI 快速上手](./docs/tutorial/00-cli-quickstart.md)** - 在 15 分钟内学会核心 CLI 工作流
+2. **[Claude UI 设置](./docs/tutorial/00a-claude-ui-setup.md)** - 设置 Claude Code 插件和 slash command
+3. **[Ultra Planner](./docs/tutorial/01-ultra-planner.md)** - 主要的规划教程（推荐）
+4. **[Issue 到实现](./docs/tutorial/02-issue-to-impl.md)** - 使用 `/issue-to-impl` 和 `/code-review` 的完整开发周期
+5. **[高级用法](./docs/tutorial/03-advanced-usage.md)** - 通过并行开发工作流扩展规模
 
-## Project Organization
+## 项目组织
 
 ```plaintext
 agentize/
-├── .claude-plugin/         # Plugin root (use with --plugin-dir)
-│   ├── marketplace.json    # Plugin manifest
-│   ├── commands/           # Claude Code commands
-│   ├── skills/             # Claude Code skills
-│   ├── agents/             # Claude Code agents
-│   └── hooks/              # Claude Code hooks
-├── python/                 # Python modules (agentize.*)
-├── docs/                   # Documentation
-│   └── git-msg-tags.md     # Commit message conventions
-├── src/cli/                # Source-first CLI libraries
-│   ├── wt.sh               # Worktree CLI library
-│   └── lol.sh              # SDK CLI library
-├── scripts/                # Shell scripts and wrapper entrypoints
-├── templates/              # Templates for SDK generation
-├── tests/                  # Test cases
-├── Makefile                # Build targets for testing and setup
-└── README.md               # This readme file
+├── .claude-plugin/         # 插件根目录（与 --plugin-dir 一起使用）
+│   ├── marketplace.json    # 插件清单
+│   ├── commands/           # Claude Code 命令
+│   ├── skills/             # Claude Code 技能
+│   ├── agents/             # Claude Code 智能体
+│   └── hooks/              # Claude Code 钩子
+├── python/                 # Python 模块（agentize.*）
+├── docs/                   # 文档
+│   └── git-msg-tags.md     # 提交消息规范
+├── src/cli/                # Source 优先的 CLI 库
+│   ├── wt.sh               # Worktree CLI 库
+│   └── lol.sh              # SDK CLI 库
+├── scripts/                # Shell 脚本与封装入口
+├── templates/              # SDK 生成模板
+├── tests/                  # 测试用例
+├── Makefile                # 用于测试和设置的构建目标
+└── README.md               # 本 README 文件
 ```

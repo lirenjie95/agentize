@@ -1,36 +1,36 @@
-# Cursor Configuration
+# Cursor 配置
 
-This directory contains configuration files for Cursor IDE integration.
+本目录包含 Cursor IDE 集成的配置文件。
 
-## Hooks Support
+## Hooks 支持
 
-**Important**: Cursor hooks are only supported in the **UI (IDE) version**, not in the CLI version.
+**重要**：Cursor hooks 仅在 **UI（IDE）版本**中受支持，CLI 版本不支持。
 
-### UI Support
+### UI 支持
 
-The Cursor IDE supports hooks through `.cursor/hooks.json`. These hooks execute at specific lifecycle events in the Cursor IDE workflow:
+Cursor IDE 通过 `.cursor/hooks.json` 支持 hook。这些 hook 在 Cursor IDE 工作流的特定生命周期事件时执行：
 
-- **Event**: `beforeSubmitPrompt` - Executes before a prompt is submitted to Cursor
-- **Configuration**: Defined in `.cursor/hooks.json`
-- **Implementation**: See [hooks/README.md](hooks/README.md) for details
+- **事件**：`beforeSubmitPrompt` - 在提示词提交给 Cursor 之前执行
+- **配置**：在 `.cursor/hooks.json` 中定义
+- **实现**：详情请参阅 [hooks/README.md](hooks/README.md)
 
-### CLI Limitation
+### CLI 限制
 
-The Cursor CLI does **not** support hooks. If you need hook functionality in a CLI environment, use Claude Code CLI instead, which supports hooks through `.claude-plugin/hooks/hooks.json`.
+Cursor CLI **不**支持 hook。如果你需要在 CLI 环境中使用 hook 功能，请改用 Claude Code CLI，它通过 `.claude-plugin/hooks/hooks.json` 支持 hook。
 
-## Directory Structure
+## 目录结构
 
-- `hooks.json` - Hook configuration for Cursor IDE
-- `hooks/` - Hook implementation scripts
-  - `before-prompt-submit.py` - Handles workflow initialization
-  - `logger.py` - Shared logging utility
+- `hooks.json` - Cursor IDE 的 hook 配置
+- `hooks/` - hook 实现脚本
+  - `before-prompt-submit.py` - 处理工作流初始化
+  - `logger.py` - 共享日志工具
 
-## Relationship to Claude Code
+## 与 Claude Code 的关系
 
-This directory provides Cursor IDE-specific hooks that replicate functionality available in Claude Code CLI hooks (located at `.claude-plugin/hooks/`). Both implementations:
+本目录提供 Cursor IDE 专属的 hook，复刻了 Claude Code CLI hook（位于 `.claude-plugin/hooks/`）中的功能。两个实现：
 
-- Use the same session state file format
-- Support the same workflow commands (`/ultra-planner`, `/issue-to-impl`)
-- Create session state files in the same location (`${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/`)
+- 使用相同的会话状态文件格式
+- 支持相同的工作流命令（`/ultra-planner`、`/issue-to-impl`）
+- 在相同位置创建会话状态文件（`${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/`）
 
-The main difference is that Cursor hooks only work in the IDE, while Claude Code hooks work in the CLI.
+主要区别在于 Cursor hook 仅在 IDE 中工作，而 Claude Code hook 在 CLI 中工作。

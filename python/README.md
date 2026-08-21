@@ -1,20 +1,20 @@
-# Python Packages
+# Python 包
 
-This directory contains Python packages for the Agentize SDK.
+本目录包含 Agentize SDK 的 Python 包。
 
-## Packages
+## 包
 
-- `agentize/` - Core SDK package (see `agentize/README.md`)
+- `agentize/` - 核心 SDK 包（参阅 `agentize/README.md`）
 
-## Usage
+## 用法
 
-The packages are automatically available when using `sys.path.insert()` from hook scripts,
-or by setting `PYTHONPATH` via `make setup`.
+从 hook 脚本中使用 `sys.path.insert()` 时这些包会自动可用，
+或通过 `make setup` 设置 `PYTHONPATH`。
 
 ```bash
-# Option 1: Source setup.sh (sets PYTHONPATH automatically)
+# 方式 1：source setup.sh（自动设置 PYTHONPATH）
 source setup.sh
 
-# Option 2: Set PYTHONPATH manually
+# 方式 2：手动设置 PYTHONPATH
 export PYTHONPATH="$PWD/python:$PYTHONPATH"
 ```

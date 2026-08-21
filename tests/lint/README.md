@@ -1,71 +1,71 @@
-# Validation and Linting Tests
+# 校验与 Lint 测试
 
-## Purpose
+## 目的
 
-Static validation tests ensuring project structure integrity, linter correctness, and makefile consistency without executing full workflows.
+静态校验测试，确保项目结构完整性、linter 正确性和 makefile 一致性，无需执行完整工作流。
 
-## Contents
+## 内容
 
-### Makefile Validation Tests (`test-makefile-*`)
+### Makefile 校验测试（`test-makefile-*`）
 
-Tests for makefile target correctness and parameter validation:
+makefile 目标正确性和参数校验的测试：
 
-- `test-makefile-init-invalid-lang.sh` - Tests `make init` rejects invalid languages
-- `test-makefile-init-without-lang.sh` - Tests `make init` behavior without language parameter
-- `test-makefile-update-creates-git-tags.sh` - Tests `make update` creates git tag documentation
-- `test-makefile-update-infers-lang.sh` - Tests `make update` auto-detects language
-- `test-makefile-update-preserves-git-tags.sh` - Tests `make update` preserves existing git tags
-- `test-makefile-update-without-lang.sh` - Tests `make update` behavior without explicit language
-- `test-makefile-setup-zsh-completion.sh` - Tests `make setup` generates zsh completion scripts
+- `test-makefile-init-invalid-lang.sh` - 测试 `make init` 拒绝无效语言
+- `test-makefile-init-without-lang.sh` - 测试 `make init` 在无语言参数时的行为
+- `test-makefile-update-creates-git-tags.sh` - 测试 `make update` 创建 git tag 文档
+- `test-makefile-update-infers-lang.sh` - 测试 `make update` 自动检测语言
+- `test-makefile-update-preserves-git-tags.sh` - 测试 `make update` 保留已有 git tag
+- `test-makefile-update-without-lang.sh` - 测试 `make update` 在未显式指定语言时的行为
+- `test-makefile-setup-zsh-completion.sh` - 测试 `make setup` 生成 zsh 补全脚本
 
-### Shell Completion Tests (`test-*-zsh-completion-file.sh`)
+### Shell 补全测试（`test-*-zsh-completion-file.sh`）
 
-Tests for shell completion script generation and correctness:
+shell 补全脚本生成和正确性的测试：
 
-- `test-lol-zsh-completion-file.sh` - Validates `lol` zsh completion script structure
-- `test-wt-zsh-completion-file.sh` - Validates `wt` zsh completion script structure
+- `test-lol-zsh-completion-file.sh` - 验证 `lol` zsh 补全脚本结构
+- `test-wt-zsh-completion-file.sh` - 验证 `wt` zsh 补全脚本结构
 
-## Usage
+## 用法
 
-Run all linting tests:
+运行所有 lint 测试：
 ```bash
 make test-lint
 # or
 bash tests/test-all.sh --category lint
 ```
 
-Run a specific linting test:
+运行特定的 lint 测试：
 ```bash
 bash tests/lint/test-makefile-update-creates-git-tags.sh
 ```
 
-Run linting tests under multiple shells:
+在多个 shell 下运行 lint 测试：
 ```bash
 TEST_SHELLS="bash zsh" bash tests/lint/test-lol-zsh-completion-file.sh
 ```
 
-## Test Characteristics
+## 测试特征
 
-Linting tests are distinct from other test categories:
+Lint 测试与其他测试类别的区别：
 
-- **Fast execution**: No external dependencies, no workflows
-- **Static validation**: Check files, structure, and patterns without execution
-- **Precondition checks**: Validate assumptions before runtime
-- **Build-time safety**: Catch configuration errors early
+- **执行快速**：无外部依赖，无工作流
+- **静态校验**：不执行即检查文件、结构和模式
+- **前置条件检查**：在运行前验证假设
+- **构建期安全**：尽早捕获配置错误
 
-Linting tests use `tests/helpers-makefile-validation.sh` for shared makefile testing patterns.
+Lint 测试使用 `tests/helpers-makefile-validation.sh` 实现共享的 makefile 测试模式。
 
-## Test Strategy
+## 测试策略
 
-Linting tests focus on:
+Lint 测试聚焦于：
 
-1. **Parameter validation**: Ensure makefile targets reject invalid inputs
-2. **File generation**: Verify generated files have correct structure
-3. **Shell compatibility**: Validate completion scripts for bash/zsh
+1. **参数校验**：确保 makefile 目标拒绝无效输入
+2. **文件生成**：验证生成的文件具有正确的结构
+3. **Shell 兼容性**：验证 bash/zsh 的补全脚本
 
-## Related Documentation
+## 相关文档
 
-- [scripts/lint-documentation.sh](../../scripts/lint-documentation.sh) - Documentation linter implementation
-- [tests/e2e/test-lint-documentation.sh](../e2e/test-lint-documentation.sh) - E2E linter integration test
-- [tests/helpers-makefile-validation.sh](../helpers-makefile-validation.sh) - Makefile test helpers
-- [tests/README.md](../README.md) - Test suite overview
+- [scripts/lint-documentation.sh](../../scripts/lint-documentation.sh) - 文档 linter 实现
+- [tests/e2e/test-lint-documentation.sh](../e2e/test-lint-documentation.sh) - E2E linter 集成测试
+- [tests/helpers-makefile-validation.sh](../helpers-makefile-validation.sh) - Makefile 测试辅助函数
+- [tests/README.md](../README.md) - 测试套件概览

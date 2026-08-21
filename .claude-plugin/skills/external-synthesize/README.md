@@ -1,5 +1,5 @@
 # External Synthesize Skill
 
-Synthesize implementation plan(s) from multi-agent debate with dual proposers using external AI review.
+使用外部 AI 评审，从带有双提案者的多 agent 辩论中合成实现计划。
 
-See [SKILL.md](SKILL.md) for complete documentation.
+完整文档请参阅 [SKILL.md](SKILL.md)。

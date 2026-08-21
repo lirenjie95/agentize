@@ -1,13 +1,13 @@
-# Playwright Soft Tests
+# Playwright 软性测试
 
-This folder contains Playwright-based soft UI flow scripts for the VS Code webview.
+本文件夹包含基于 Playwright 的 VS Code webview 软性 UI 流程脚本。
 
-## Organization
+## 组织结构
 
-- `test-session-append.js`: simulates Plan -> Refine append flow and dumps deterministic screenshots into worktree `.tmp`.
-- `test-session-append.md`: documents the script behavior, flow contract, and runtime prerequisites.
+- `test-session-append.js`：模拟 Plan -> Refine 追加流程，并将确定性截图输出到 worktree 的 `.tmp`。
+- `test-session-append.md`：记录脚本行为、流程契约和运行时前置条件。
 
-## Scope
+## 范围
 
-These scripts are designed for visual behavior validation with screenshot artifacts and soft checks.
-They intentionally avoid strict pixel assertions so humans can inspect UI intent.
+这些脚本用于带截图产物和软性检查的视觉行为验证。
+它们有意避免严格的像素断言，以便人工检查 UI 意图。

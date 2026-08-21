@@ -1,172 +1,172 @@
-# Project Metadata File (.agentize.yaml)
+# 项目元数据文件（.agentize.yaml）
 
-The `.agentize.yaml` file provides canonical project configuration for agentize-based projects.
+`.agentize.yaml` 文件为基于 agentize 的项目提供规范的项目配置。
 
-## Configuration Files Overview
+## 配置文件概览
 
-Agentize uses two configuration files with distinct purposes:
+Agentize 使用两个用途不同的配置文件：
 
-| File | Purpose | Committed? |
+| 文件 | 用途 | 是否提交？ |
 |------|---------|------------|
-| `.agentize.yaml` | Project metadata (org, project ID, language) | Yes |
-| `.agentize.local.yaml` | Developer settings (handsoff, Telegram, server, workflows) | No |
+| `.agentize.yaml` | 项目元数据（org、项目 ID、语言） | 是 |
+| `.agentize.local.yaml` | 开发者设置（handsoff、Telegram、server、workflows） | 否 |
 
-**Separation rationale:**
-- `.agentize.yaml` contains project-level configuration that should be shared across all developers
-- `.agentize.local.yaml` contains deployment-specific settings (secrets, machine-specific tuning) that vary per environment
+**分离的理由：**
+- `.agentize.yaml` 包含应在所有开发者之间共享的项目级配置
+- `.agentize.local.yaml` 包含随环境而异的部署相关设置（密钥、机器相关的调优）
 
-**`.agentize.local.yaml` scope:**
-- Handsoff mode settings (`handsoff.*`)
-- Telegram approval settings (`telegram.*`)
-- Server runtime settings (`server.*`)
-- Workflow model assignments (`workflows.*`)
+**`.agentize.local.yaml` 的范围：**
+- Handsoff 模式设置（`handsoff.*`）
+- Telegram 审批设置（`telegram.*`）
+- Server 运行时设置（`server.*`）
+- 工作流模型分配（`workflows.*`）
 
-**Precedence order:** `.agentize.local.yaml` > defaults
+**优先级顺序：** `.agentize.local.yaml` > 默认值
 
-**YAML search order for `.agentize.local.yaml`:**
-1. Project root `.agentize.local.yaml`
+**`.agentize.local.yaml` 的 YAML 查找顺序：**
+1. 项目根目录的 `.agentize.local.yaml`
 2. `$AGENTIZE_HOME/.agentize.local.yaml`
-3. `$HOME/.agentize.local.yaml` (user-wide, created by installer)
+3. `$HOME/.agentize.local.yaml`（用户级，由安装器创建）
 
-For the complete configuration schema and environment variable mapping, see [Configuration Reference](../envvar.md).
+完整的配置模式和环境变量映射，参见[配置参考](../envvar.md)。
 
-## Settings UI
+## 设置界面
 
-The VS Code extension includes a Settings UI that surfaces these files for backend
-configuration. It presents `.agentize.yaml` as read-only metadata and lets you edit
-`planner.backend` values in the repo and user scopes. See
-[`docs/vscode/settings-ui.md`](../vscode/settings-ui.md) for usage details.
+VS Code 扩展包含一个设置界面（Settings UI），将这些文件呈现出来用于后端
+配置。它将 `.agentize.yaml` 展示为只读元数据，并允许你在仓库和用户
+作用域中编辑 `planner.backend` 的值。用法详情参见
+[`docs/vscode/settings-ui.md`](../vscode/settings-ui.md)。
 
-## Location
+## 位置
 
-The metadata file is located at the project root:
-- Standard layout: `<project-root>/.agentize.yaml`
-- Worktree layout: `<repo-root>/trees/main/.agentize.yaml`
+元数据文件位于项目根目录：
+- 标准布局：`<project-root>/.agentize.yaml`
+- Worktree 布局：`<repo-root>/trees/main/.agentize.yaml`
 
-The `wt` command automatically searches both locations.
+`wt` 命令会自动搜索这两个位置。
 
-## Schema
+## 模式（Schema）
 
 ```yaml
 project:
-  name: project-name           # Project identifier
-  lang: python|bash|c|cxx      # Primary programming language
-  source: src                  # Source code directory (optional)
-  org: organization-name       # GitHub organization (optional, for Projects v2)
-  id: 3                        # GitHub project number (optional, for Projects v2)
+  name: project-name           # 项目标识符
+  lang: python|bash|c|cxx      # 主要编程语言
+  source: src                  # 源代码目录（可选）
+  org: organization-name       # GitHub 组织（可选，用于 Projects v2）
+  id: 3                        # GitHub 项目编号（可选，用于 Projects v2）
 
 git:
-  remote_url: https://github.com/org/repo  # Git remote URL (optional)
-  default_branch: main         # Default branch (main, master, trunk, etc.)
+  remote_url: https://github.com/org/repo  # Git 远程 URL（可选）
+  default_branch: main         # 默认分支（main、master、trunk 等）
 
 agentize:
-  commit: abc123...            # Agentize commit hash from last update (optional)
+  commit: abc123...            # 上次更新的 Agentize 提交哈希（可选）
 
 worktree:
-  trees_dir: trees            # Worktree directory (optional, defaults to "trees")
+  trees_dir: trees            # Worktree 目录（可选，默认为 "trees"）
 
 pre_commit:
-  enabled: true               # Enable pre-commit hook installation (optional, defaults to true)
+  enabled: true               # 启用 pre-commit 钩子安装（可选，默认为 true）
 
-permissions:                  # User-configurable permission rules (optional)
+permissions:                  # 用户可配置的权限规则（可选）
   allow:
-    - "^npm run build"        # Simple string (Bash tool implied)
+    - "^npm run build"        # 简单字符串（隐含 Bash 工具）
     - pattern: "^cat .*\\.md$"
-      tool: Read              # Extended format with explicit tool
+      tool: Read              # 带显式工具的扩展格式
   deny:
     - "^rm -rf /tmp"
 ```
 
-## Fields
+## 字段
 
-### project.name (required)
-Project identifier used in templates and documentation.
+### project.name（必填）
+用于模板和文档中的项目标识符。
 
-**Example:** `agentize`, `my-project`
+**示例：** `agentize`、`my-project`
 
-### project.lang (required)
-Primary programming language of the project.
+### project.lang（必填）
+项目的主要编程语言。
 
-**Supported values:**
-- `python` - Python projects
-- `bash` - Bash script projects
-- `c` - C language projects
-- `cxx` - C++ projects
+**支持的值：**
+- `python` - Python 项目
+- `bash` - Bash 脚本项目
+- `c` - C 语言项目
+- `cxx` - C++ 项目
 
-**Usage:** Determines language-specific defaults and tooling behavior.
+**用途：** 决定语言相关的默认值和工具行为。
 
-### project.source (optional)
-Path to source code directory relative to project root.
+### project.source（可选）
+相对于项目根目录的源代码目录路径。
 
-**Default:** Language-specific defaults (`src` for Python, `scripts` for Bash)
+**默认值：** 语言相关的默认值（Python 为 `src`，Bash 为 `scripts`）
 
-**Example:** `lib`, `src`, `custom/path`
+**示例：** `lib`、`src`、`custom/path`
 
-### git.remote_url (optional)
-Git remote repository URL.
+### git.remote_url（可选）
+Git 远程仓库 URL。
 
-**Example:** `https://github.com/synthesys-lab/agentize`
+**示例：** `https://github.com/synthesys-lab/agentize`
 
-**Usage:** Documentation and tooling reference. The server uses this to generate GitHub issue links in worker assignment Telegram notifications.
+**用途：** 文档和工具引用。server 使用它在 worker 分配的 Telegram 通知中生成 GitHub issue 链接。
 
-### git.default_branch (optional but recommended)
-Default branch name for creating worktrees.
+### git.default_branch（可选但推荐）
+用于创建 worktree 的默认分支名。
 
-**Default:** Auto-detected (tries `main`, then `master`)
+**默认值：** 自动检测（先尝试 `main`，再尝试 `master`）
 
-**Example:** `main`, `master`, `trunk`, `develop`
+**示例：** `main`、`master`、`trunk`、`develop`
 
-**Why specify:** Required for non-standard branch names (e.g., `trunk`). When absent, `wt` falls back to auto-detection and shows a hint.
+**为什么要指定：** 非标准分支名（例如 `trunk`）时必需。缺省时，`wt` 会回退到自动检测并显示提示。
 
-### worktree.trees_dir (optional)
-Directory where worktrees are created.
+### worktree.trees_dir（可选）
+创建 worktree 的目录。
 
-**Default:** `trees`
+**默认值：** `trees`
 
-**Example:** `worktrees`, `branches`, `trees`
+**示例：** `worktrees`、`branches`、`trees`
 
-**Usage:** Allows customizing worktree organization.
+**用途：** 允许自定义 worktree 的组织方式。
 
-### project.org (optional)
-GitHub owner (organization or personal user login) for Projects v2 integration.
+### project.org（可选）
+用于 Projects v2 集成的 GitHub 所有者（组织或个人用户登录名）。
 
-**Example:** `Synthesys-Lab`, `my-org`, `my-username`
+**示例：** `Synthesys-Lab`、`my-org`、`my-username`
 
-**Usage:** Set by `lol project --create` or `lol project --associate` to store the owner associated with the GitHub Projects v2 board. This can be an organization login or a personal user login, enabling Projects v2 integration for both organization-owned and user-owned repositories.
+**用途：** 由 `lol project --create` 或 `lol project --associate` 设置，用于存储与 GitHub Projects v2 看板关联的所有者。可以是组织登录名或个人用户登录名，从而使组织所有和用户所有的仓库都能使用 Projects v2 集成。
 
-### project.id (optional)
-GitHub Projects v2 board number (the numeric ID visible in the project URL).
+### project.id（可选）
+GitHub Projects v2 看板编号（项目 URL 中可见的数字 ID）。
 
-**Example:** `3`, `42`
+**示例：** `3`、`42`
 
-**Usage:** Set by `lol project --create` or `lol project --associate` to store the project number. This is the project number shown in URLs like `https://github.com/orgs/my-org/projects/3` (for organizations) or `https://github.com/users/my-username/projects/1` (for personal accounts), NOT the GraphQL node_id.
+**用途：** 由 `lol project --create` 或 `lol project --associate` 设置，用于存储项目编号。这是显示在诸如 `https://github.com/orgs/my-org/projects/3`（组织）或 `https://github.com/users/my-username/projects/1`（个人账户）这类 URL 中的项目编号，而不是 GraphQL 的 node_id。
 
-**Note:** The `project.org` and `project.id` fields work together to uniquely identify a GitHub Projects v2 board. The URL path (`orgs/` vs `users/`) is determined dynamically based on the owner type.
+**注意：** `project.org` 和 `project.id` 字段共同唯一标识一个 GitHub Projects v2 看板。URL 路径（`orgs/` 还是 `users/`）根据所有者类型动态确定。
 
-### agentize.commit (optional)
-Records the agentize installation commit hash.
+### agentize.commit（可选）
+记录 agentize 安装的提交哈希。
 
-**Example:** `e3eab9a1234567890abcdef1234567890abcdef`
+**示例：** `e3eab9a1234567890abcdef1234567890abcdef`
 
-**Usage:** Records which agentize version is being used. This enables version tracking via `lol version` for troubleshooting and compatibility checks.
+**用途：** 记录正在使用的 agentize 版本。这使得可以通过 `lol version` 进行版本跟踪，以便故障排查和兼容性检查。
 
-**Note:** Only recorded when `AGENTIZE_HOME` is a valid git repository. If git is not available or `AGENTIZE_HOME` is not a git repo, this field is omitted without causing errors.
+**注意：** 仅当 `AGENTIZE_HOME` 是有效的 git 仓库时才会记录。如果 git 不可用或 `AGENTIZE_HOME` 不是 git 仓库，此字段会被省略而不会导致错误。
 
-### pre_commit.enabled (optional)
-Controls automatic installation of the pre-commit hook during SDK and worktree initialization.
+### pre_commit.enabled（可选）
+控制 SDK 和 worktree 初始化期间 pre-commit 钩子的自动安装。
 
-**Default:** `true` (hook is installed when missing)
+**默认值：** `true`（钩子缺失时会安装）
 
-**Example:** `true`, `false`
+**示例：** `true`、`false`
 
-**Usage:** Set to `false` to prevent automatic hook installation. When `true` or unset, `wt init` and `wt spawn` will install `scripts/pre-commit` into `.git/hooks/pre-commit` if the hook script exists and no custom hook is already present.
+**用途：** 设为 `false` 可阻止自动安装钩子。当为 `true` 或未设置时，如果钩子脚本存在且尚无自定义钩子，`wt init` 和 `wt spawn` 会将 `scripts/pre-commit` 安装到 `.git/hooks/pre-commit`。
 
-**Note:** Hook installation is also skipped when Git hooks are globally disabled via `core.hooksPath` (e.g., `core.hooksPath=/dev/null`). This ensures the commands respect user intent to disable hooks system-wide.
+**注意：** 当通过 `core.hooksPath` 全局禁用 Git 钩子时（例如 `core.hooksPath=/dev/null`），也会跳过钩子安装。这确保命令尊重用户在系统范围内禁用钩子的意图。
 
-### permissions (optional)
-User-configurable permission rules for tool access control.
+### permissions（可选）
+用户可配置的工具访问控制权限规则。
 
-**Example:**
+**示例：**
 ```yaml
 permissions:
   allow:
@@ -177,17 +177,17 @@ permissions:
     - "^rm -rf /tmp"
 ```
 
-**Format:** Arrays of strings or dicts. String items default to `Bash` tool. Dict items require `pattern` field and optional `tool` field (defaults to `Bash`).
+**格式：** 字符串或字典的数组。字符串项默认为 `Bash` 工具。字典项要求 `pattern` 字段，`tool` 字段可选（默认为 `Bash`）。
 
-**Merge order:** Project rules (`.agentize.yaml`) are evaluated first, then local rules (`.agentize.local.yaml`) can add additional patterns. Hardcoded deny rules in `rules.py` always take precedence over YAML allows.
+**合并顺序：** 项目规则（`.agentize.yaml`）首先被评估，然后本地规则（`.agentize.local.yaml`）可以添加额外的模式。`rules.py` 中硬编码的 deny 规则始终优先于 YAML 的 allow。
 
-**Usage:** Enables per-project and per-developer customization of permission rules without modifying core code.
+**用途：** 无需修改核心代码即可实现按项目和按开发者定制权限规则。
 
-## Creation
+## 创建
 
-### Manual Creation
+### 手动创建
 
-Create `.agentize.yaml` manually:
+手动创建 `.agentize.yaml`：
 
 ```bash
 cat > .agentize.yaml <<EOF
@@ -200,28 +200,28 @@ git:
 EOF
 ```
 
-This enables worktree operations (`wt` command) and project management features.
+这将启用 worktree 操作（`wt` 命令）和项目管理功能。
 
-## Usage
+## 使用
 
-### Worktree Configuration
+### Worktree 配置
 
-The `wt` command reads metadata for worktree operations:
+`wt` 命令读取元数据进行 worktree 操作：
 
 ```bash
-# Uses git.default_branch from .agentize.yaml
+# 使用 .agentize.yaml 中的 git.default_branch
 wt spawn 42
 
-# Uses worktree.trees_dir from .agentize.yaml
+# 使用 .agentize.yaml 中的 worktree.trees_dir
 wt list
 ```
 
-**Fallback behavior:** When `.agentize.yaml` is missing, `wt` falls back to:
-- Auto-detect `main` or `master` branch
-- Use `trees` directory
-- Display hint to create `.agentize.yaml` manually
+**回退行为：** 当 `.agentize.yaml` 缺失时，`wt` 会回退到：
+- 自动检测 `main` 或 `master` 分支
+- 使用 `trees` 目录
+- 显示手动创建 `.agentize.yaml` 的提示
 
-## Example: Agentize Project
+## 示例：Agentize 项目
 
 ```yaml
 project:
@@ -239,9 +239,9 @@ worktree:
   trees_dir: trees
 ```
 
-## Example: Non-Standard Branch
+## 示例：非标准分支
 
-For projects using `trunk` instead of `main`:
+对于使用 `trunk` 而不是 `main` 的项目：
 
 ```yaml
 project:
@@ -251,15 +251,15 @@ git:
   default_branch: trunk
 ```
 
-This enables `wt spawn` to correctly fork from `trunk`.
+这使得 `wt spawn` 能正确地从 `trunk` 分叉。
 
-## Preservation
+## 保留
 
-**Editing:** Safe to edit manually. The file uses standard YAML format. User modifications are safe.
+**编辑：** 可以安全地手动编辑。该文件使用标准 YAML 格式。用户的修改是安全的。
 
-## Notes
+## 备注
 
-- Minimal YAML parser used (no external dependencies)
-- Supports only the documented fields
-- Comments allowed (lines starting with `#`)
-- Whitespace-insensitive (standard YAML indentation)
+- 使用极简 YAML 解析器（无外部依赖）
+- 仅支持文档中记录的字段
+- 允许注释（以 `#` 开头的行）
+- 对空白不敏感（标准 YAML 缩进）

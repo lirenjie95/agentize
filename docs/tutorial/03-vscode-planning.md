@@ -1,58 +1,56 @@
-# Tutorial 03: VS Code Planning
+# 教程 03：VS Code 规划
 
-**Read time: 4 minutes**
+**阅读时间：4 分钟**
 
-Use the VS Code Plan Activity Bar view to create a plan and launch implementation with a
-single click.
+使用 VS Code 的 Plan Activity Bar 视图创建规划，并一键启动实现。
 
-## What You Will Do
+## 你将完成什么
 
-- Load the Agentize Plan extension in VS Code
-- Run a plan in the Plan Activity Bar panel
-- Launch implementation from the Implement button
-- Review plan and implementation logs separately
+- 在 VS Code 中加载 Agentize Plan 扩展
+- 在 Plan Activity Bar 面板中运行规划
+- 通过 Implement 按钮启动实现
+- 分别查看规划日志和实现日志
 
-## Step 1: Load the Extension
+## 步骤 1：加载扩展
 
-From the repository root, install dependencies and compile the extension:
+在仓库根目录下，安装依赖并编译扩展：
 
 ```bash
 npm --prefix vscode install
 npm --prefix vscode run compile
 ```
 
-Then open the extension in VS Code:
+然后在 VS Code 中打开扩展：
 
 ```bash
 code --extensionDevelopmentPath ./vscode
 ```
 
-## Step 2: Open a Workspace
+## 步骤 2：打开工作区
 
-Open a workspace that contains an Agentize worktree. The extension looks for
-`trees/main` first and falls back to the workspace root when it already contains the
-Agentize CLI.
+打开一个包含 Agentize worktree 的工作区。扩展会先查找 `trees/main`，
+当工作区根目录本身已包含 Agentize CLI 时则回退到工作区根目录。
 
-## Step 3: Run a Plan
+## 步骤 3：运行规划
 
-1. Open the Plan view in the Activity Bar.
-2. Click **New Plan**.
-3. Enter a short prompt and click **Run Plan**.
+1. 打开 Activity Bar 中的 Plan 视图。
+2. 点击 **New Plan**。
+3. 输入一段简短的 prompt，然后点击 **Run Plan**。
 
-The plan output streams into the Raw Console Log panel. When the planner creates a
-placeholder issue, the extension captures the issue number from the output.
+规划输出会流入 Raw Console Log 面板。当规划器创建占位 issue 时，
+扩展会从输出中捕获 issue 编号。
 
-## Step 4: Implement the Plan
+## 步骤 4：实现该规划
 
-After the plan finishes successfully, the session header shows an **Implement** button.
-Click it to run `lol impl <issue-number>`.
+规划成功完成后，会话头部会显示一个 **Implement** 按钮。
+点击它即可运行 `lol impl <issue-number>`。
 
-The implementation output appears in a separate **Implementation Log** panel, and the
-button is disabled while the implementation run is active.
+实现输出会显示在一个独立的 **Implementation Log** 面板中，
+并且在实现运行期间该按钮会被禁用。
 
-Both logs render canonical GitHub issue and PR URLs as clickable links.
+两个日志都会把规范的 GitHub issue 和 PR URL 渲染为可点击链接。
 
-## Next Steps
+## 下一步
 
-- [Tutorial 02: Issue to Implementation](./02-issue-to-impl.md) for the CLI flow
-- [Tutorial 03: Advanced Usage](./03-advanced-usage.md) for parallel workflows
+- [教程 02：从 Issue 到实现](./02-issue-to-impl.md) 了解 CLI 流程
+- [教程 03：进阶用法](./03-advanced-usage.md) 了解并行工作流

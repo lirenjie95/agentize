@@ -1,9 +1,9 @@
-# Commands Documentation
+# Commands 文档
 
-User-facing documentation for Claude Code commands.
+面向用户的 Claude Code 命令文档。
 
-Command definitions live in `.claude-plugin/commands/`; this folder provides detailed user guides with examples and reference information.
+命令定义位于 `.claude-plugin/commands/`；本文件夹提供带有示例和参考信息的详细用户指南。
 
-## Contents
+## 内容
 
-- [setup-viewboard.md](./setup-viewboard.md) - Set up GitHub Projects v2 boards
+- [setup-viewboard.md](./setup-viewboard.md) - 设置 GitHub Projects v2 看板

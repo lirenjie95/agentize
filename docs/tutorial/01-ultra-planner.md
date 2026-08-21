@@ -1,100 +1,100 @@
-# Tutorial 01: CLI Planning with `lol plan`
+# 教程 01：使用 `lol plan` 进行 CLI 规划
 
-**Primary planning tutorial**: Use this as the default entry point for planning features.
+**主要规划教程**：将本教程作为功能规划的默认入口。
 
-**Read time: 5 minutes**
+**阅读时间：5 分钟**
 
-Learn how to use multi-agent debate-based planning with `lol plan --editor` (CLI-first). If you prefer the Claude UI, `/ultra-planner` provides auto-routing and `--force-full` (see `docs/feat/core/ultra-planner.md`).
+学习如何使用 `lol plan --editor`（CLI 优先）进行多智能体辩论式规划。如果你偏好 Claude UI，`/ultra-planner` 提供自动路由和 `--force-full`（参见 `docs/feat/core/ultra-planner.md`）。
 
-## What is `lol plan`?
+## 什么是 `lol plan`？
 
-`lol plan` runs the multi-agent debate pipeline to produce a consensus implementation plan. It is the preferred CLI entrypoint for planning and is documented in `docs/cli/lol.md` and `docs/cli/planner.md`.
+`lol plan` 运行多智能体辩论流水线，产出一份共识实现方案。它是推荐的 CLI 规划入口，文档见 `docs/cli/lol.md` 和 `docs/cli/planner.md`。
 
-### Basic usage
+### 基本用法
 
-Compose the feature description in your editor:
+在你的编辑器中编写功能描述：
 
 ```
 lol plan --editor
 ```
 
-`--editor` opens `$EDITOR`. If `$EDITOR` is not set, pass the description directly:
+`--editor` 会打开 `$EDITOR`。如果未设置 `$EDITOR`，则直接传入描述：
 
 ```
 lol plan "Add user authentication with JWT tokens and role-based access control"
 ```
 
-### Refinement with `--refine`
+### 使用 `--refine` 进行改进
 
-Improve an existing plan issue by running the debate again:
+通过再次运行辩论来改进已有的规划 issue：
 
 ```
 lol plan --refine 42
 ```
 
-Optional refinement focus:
+可选的改进重点：
 
 ```
 lol plan --refine 42 "Focus on reducing complexity"
 ```
 
-## Claude UI Equivalent: `/ultra-planner`
+## Claude UI 等价命令：`/ultra-planner`
 
-`/ultra-planner` is the Claude UI interface for planning. It uses auto-routing and supports `--force-full`. See `docs/feat/core/ultra-planner.md` for full behavior details.
+`/ultra-planner` 是 Claude UI 的规划接口。它使用自动路由并支持 `--force-full`。完整行为细节见 `docs/feat/core/ultra-planner.md`。
 
-### Automatic Routing
+### 自动路由
 
-After the **Understander** agent gathers codebase context, it checks lite conditions:
+在 **Understander** 智能体收集代码库上下文之后，它会检查 lite 条件：
 
-- **Lite path** (when ALL met): Single-agent planner (1-2 min)
-  - All knowledge within repo (no internet research needed)
-  - < 5 files affected
-  - < 150 LOC total
-- **Full path** (otherwise): Multi-agent debate with web research (6-12 min)
+- **Lite 路径**（全部满足时）：单智能体规划器（1-2 分钟）
+  - 所有知识都在仓库内（无需联网调研）
+  - 受影响文件 < 5 个
+  - 总行数 < 150 LOC
+- **Full 路径**（其他情况）：带联网调研的多智能体辩论（6-12 分钟）
 
-### Full Debate (for complex features)
+### 完整辩论（用于复杂功能）
 
-The full path uses **three AI agents** in a serial debate workflow:
+Full 路径使用**三个 AI 智能体**进行串行辩论工作流：
 
-1. **Bold Proposer**: Researches SOTA solutions and proposes innovative approaches
-2. **Proposal Critique**: Validates assumptions and identifies technical risks
-3. **Proposal Reducer**: Simplifies following "less is more" philosophy
+1. **Bold Proposer**：调研 SOTA 解决方案并提出创新方案
+2. **Proposal Critique**：验证假设并识别技术风险
+3. **Proposal Reducer**：遵循"少即是多"的哲学进行简化
 
-Bold-proposer runs first to generate a concrete proposal, then Critique and Reducer both analyze that proposal (running in parallel with each other). An external reviewer (Codex/Claude Opus) synthesizes all three perspectives into a consensus plan.
+Bold-proposer 首先运行以生成具体提案，然后 Critique 和 Reducer 都分析该提案（彼此之间并行运行）。一个外部评审者（Codex/Claude Opus）将三个视角综合为一份共识方案。
 
-## When to Use It?
+## 何时使用？
 
-**Use `lol plan`** for all feature planning in the CLI. It always runs the multi-agent pipeline documented in `docs/cli/lol.md`.
+**使用 `lol plan`** 处理 CLI 中的所有功能规划。它始终运行 `docs/cli/lol.md` 中记录的多智能体流水线。
 
-**Use `/ultra-planner`** when you want Claude UI convenience or auto-routing.
+**使用 `/ultra-planner`**：当你想要 Claude UI 的便利性或自动路由时。
 
-**Use `/ultra-planner --force-full`** when:
-- You want thorough multi-perspective analysis even for simple changes
-- The feature needs SOTA research even if LOC is low
+**使用 `/ultra-planner --force-full`** 的场景：
+- 即使是简单的改动，你也想要彻底的多视角分析
+- 即使 LOC 很低，该功能也需要 SOTA 调研
 
-**Use `/plan-to-issue`** as a standalone alternative:
-- When you have an existing plan and want to convert it to a GitHub issue
-- For time-sensitive planning with known scope
+**使用 `/plan-to-issue`** 作为独立的替代方案：
+- 当你已有现成的方案，想将其转换为 GitHub issue
+- 用于范围明确的时间敏感型规划
 
-## Workflow Example
+## 工作流示例
 
-**1. Invoke the command:**
+**1. 调用命令：**
 ```
 lol plan "Add user authentication with JWT tokens and role-based access control"
 ```
 
-**2. Bold-proposer generates proposal (1-2 minutes):**
+**2. Bold-proposer 生成提案（1-2 分钟）：**
 ```
 BOLD PROPOSER: OAuth2 + JWT + RBAC (~450 LOC)
 ```
 
-**3. Critique and Reducer analyze Bold's proposal (2-3 minutes):**
+**3. Critique 和 Reducer 分析 Bold 的提案（2-3 分钟）：**
 ```
 CRITIQUE: Medium feasibility, 2 critical risks (token storage, complexity)
 REDUCER: Simple JWT only (~180 LOC, 60% reduction)
 ```
 
-**4. External consensus synthesizes:**
+**4. 外部共识综合：**
 ```
 Consensus: JWT + basic roles (~280 LOC)
 - From Bold: JWT tokens + role-based access
@@ -107,7 +107,7 @@ Documentation Planning:
 - src/middleware/auth.js — add interface documentation
 ```
 
-**5. Plan issue auto-updated:**
+**5. 规划 issue 自动更新：**
 ```
 Plan issue #42 updated with consensus plan.
 URL: https://github.com/user/repo/issues/42
@@ -117,88 +117,88 @@ To refine (Claude UI): /ultra-planner --refine 42
 To implement (CLI): lol impl 42
 ```
 
-## Label-Based Auto Refinement
+## 基于标签的自动改进
 
-When running with `lol serve`, you can trigger refinement without invoking the command manually:
+在使用 `lol serve` 运行时，你可以触发改进而无需手动调用命令：
 
-1. Ensure the issue is in `Proposed` status (not `Plan Accepted`)
-2. Add the `agentize:refine` label via GitHub UI or CLI:
+1. 确保 issue 处于 `Proposed` 状态（而非 `Plan Accepted`）
+2. 通过 GitHub UI 或 CLI 添加 `agentize:refine` 标签：
    ```bash
    gh issue edit 42 --add-label agentize:refine
    ```
-3. The server will pick up the issue on the next poll and run `/ultra-planner --refine` (current server behavior per `docs/cli/lol.md`)
-4. After refinement completes, the label is removed and status stays `Proposed`
+3. 服务器将在下一次轮询时拾取该 issue 并运行 `/ultra-planner --refine`（当前服务器行为见 `docs/cli/lol.md`）
+4. 改进完成后，标签被移除，状态保持为 `Proposed`
 
-This enables stakeholders to request plan improvements without CLI access.
+这使利益相关者无需 CLI 访问权限即可请求方案改进。
 
-## Tips
+## 提示
 
-1. **Provide context**: "Add JWT auth for API access" (not just "Add auth")
-2. **Right-size features**: Don't use for trivial changes, do use for complex ones
-3. **Review all perspectives**: Bold shows innovation, Critique shows risks, Reducer shows simplicity
-4. **Refine when needed**: First consensus not perfect? Use `lol plan --refine`
-5. **Choose your interface**: `lol plan` for CLI, `/ultra-planner` for auto-routing in Claude UI
+1. **提供上下文**：写"Add JWT auth for API access"（而不是只写"Add auth"）
+2. **合理确定功能规模**：琐碎的改动不要用，复杂的功能一定要用
+3. **审阅所有视角**：Bold 展示创新，Critique 展示风险，Reducer 展示简洁
+4. **需要时就改进**：第一次共识不完美？使用 `lol plan --refine`
+5. **选择你的界面**：CLI 用 `lol plan`，Claude UI 自动路由用 `/ultra-planner`
 
-## Dry-Run Mode
+## Dry-Run 模式
 
-Preview what would be created without making GitHub changes:
+预览将要创建的内容而不对 GitHub 做任何改动：
 
 ```
 lol plan --dry-run "Add user authentication with JWT tokens"
 ```
 
-**What happens:**
-- Full debate workflow runs (understander → bold-proposer → critique/reducer → consensus)
-- Plan files saved to `.tmp/` for review
-- Prints summary of what issue would be created
+**会发生的：**
+- 完整辩论工作流运行（understander → bold-proposer → critique/reducer → consensus）
+- 方案文件保存到 `.tmp/` 供审阅
+- 打印将要创建的 issue 摘要
 
-**What doesn't happen:**
-- No placeholder issue created
-- No issue body updated
-- No labels added
+**不会发生的：**
+- 不创建占位 issue
+- 不更新 issue 正文
+- 不添加标签
 
-**Cost note:** Token costs are similar to regular runs since agents still execute. Use `--dry-run` when you want to review the plan before committing to GitHub.
+**成本说明：** token 成本与常规运行相近，因为智能体仍会执行。当你想在提交到 GitHub 之前审阅方案时使用 `--dry-run`。
 
-## Cost & Time (Claude UI Auto-Routing)
+## 成本与时间（Claude UI 自动路由）
 
-**With automatic routing in `/ultra-planner`:**
+**`/ultra-planner` 的自动路由：**
 
-| Path | Conditions | Time | Cost |
+| 路径 | 条件 | 时间 | 成本 |
 |------|------------|------|------|
-| Lite | repo-only, <5 files, <150 LOC | 1-2 min | ~$0.30-0.80 |
-| Full | needs research or complex | 6-12 min | ~$2.50-6 |
+| Lite | 仅仓库内、<5 个文件、<150 LOC | 1-2 分钟 | ~$0.30-0.80 |
+| Full | 需要调研或较复杂 | 6-12 分钟 | ~$2.50-6 |
 
-**Why lite is cheaper**: No external consensus step (single agent, nothing to synthesize)
+**为什么 lite 更便宜**：没有外部共识步骤（单智能体，无需综合）
 
-**Value of full path**: Multiple perspectives, thorough validation, balanced plans
+**full 路径的价值**：多视角、彻底验证、均衡的方案
 
-## Plan → Impl (End-to-End)
+## 规划 → 实现（端到端）
 
-After `lol plan` creates your GitHub issue, continue with `lol impl <issue-number>` (see `docs/tutorial/02-issue-to-impl.md`).
+`lol plan` 创建你的 GitHub issue 之后，继续使用 `lol impl <issue-number>`（参见 `docs/tutorial/02-issue-to-impl.md`）。
 
-### Backend Configuration
+### 后端配置
 
-Configure planner backends in `.agentize.local.yaml`:
+在 `.agentize.local.yaml` 中配置规划器后端：
 
 ```yaml
 planner:
-  backend: claude:opus             # Default backend for all stages
-  understander: claude:sonnet      # Override understander stage
-  bold: claude:opus                # Override bold-proposer stage
-  critique: claude:opus            # Override critique stage
-  reducer: claude:opus             # Override reducer stage
+  backend: claude:opus             # 所有阶段的默认后端
+  understander: claude:sonnet      # 覆盖 understander 阶段
+  bold: claude:opus                # 覆盖 bold-proposer 阶段
+  critique: claude:opus            # 覆盖 critique 阶段
+  reducer: claude:opus             # 覆盖 reducer 阶段
 
 workflows:
   impl:
-    model: opus                    # Default model for lol impl
+    model: opus                    # lol impl 的默认模型
 ```
 
-**Note:** `lol impl --backend <provider:model>` overrides `.agentize.local.yaml` `impl.model` for a single run (see `docs/cli/lol.md`).
+**注意：** `lol impl --backend <provider:model>` 会在单次运行中覆盖 `.agentize.local.yaml` 的 `impl.model`（参见 `docs/cli/lol.md`）。
 
-## Next Steps
+## 下一步
 
-1. Review the plan issue on GitHub
-2. Run `lol impl <issue-number>` to start implementation (Tutorial 02)
-3. Use `lol plan --refine <issue>` if the plan needs adjustments
+1. 在 GitHub 上审阅规划 issue
+2. 运行 `lol impl <issue-number>` 开始实现（教程 02）
+3. 如果方案需要调整，使用 `lol plan --refine <issue>`
 
-**When in doubt**: Use `lol plan` - it keeps planning CLI-first while the Claude UI remains available.
+**拿不准时**：使用 `lol plan`——它让规划保持 CLI 优先，同时 Claude UI 仍然可用。

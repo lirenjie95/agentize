@@ -1,25 +1,25 @@
-# Troubleshoot
+# 故障排查
 
-## Agentize failed to handsoff Claude Code session
+## Agentize 未能 handsoff Claude Code 会话
 
-Agentize is supposed to automatically execute all the `agentize:workflow`s,
-including `/ultra-planner`, `/issue-to-impl`, `/sync-master`, etc.
-However, if it sometimes fails to do so, including asking for permission
-or not continuing the session automatically, you can enable debug logs
-to help diagnose the issue.
+Agentize 应当自动执行所有 `agentize:workflow`，
+包括 `/ultra-planner`、`/issue-to-impl`、`/sync-master` 等。
+然而，如果它有时未能做到——包括反复请求权限
+或不自动继续会话——你可以启用调试日志
+来帮助诊断问题。
 
-Set `handsoff.debug: true` in `.agentize.local.yaml`:
+在 `.agentize.local.yaml` 中设置 `handsoff.debug: true`：
 
 ```yaml
 handsoff:
   debug: true
 ```
 
-Then re-run the command to replicate the error. This will give you a detailed log in either
-- `/path/to/your/project/.tmp/handsoff-debug.log` or
+然后重新运行命令以复现错误。这将在以下位置之一生成详细日志：
+- `/path/to/your/project/.tmp/handsoff-debug.log` 或
 - `$HOME/.agentize/.tmp/handsoff-debug.log`
 
-If you CANNOT fix the bug without modifying Agentize code, please paste your logs on issue for me (@were) to debug!
+如果你不修改 Agentize 代码就无法修复该 bug，请把你的日志粘贴到 issue 中让我（@were）来调试！
 
-This depends on whether you both installed Agentize on Claude Code Plugin Marketplace
-and our `install` script for CLI helpers.
+这取决于你是否既从 Claude Code Plugin Marketplace 安装了 Agentize，
+又运行了我们的 `install` 脚本来安装 CLI 辅助工具。

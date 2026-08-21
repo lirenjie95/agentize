@@ -1,24 +1,24 @@
-# SDK Template Tests
+# SDK 模板测试
 
-## Purpose
+## 目的
 
-This directory previously contained unit tests for SDK template generation. The SDK template tests have been removed along with the `lol apply` command.
+本目录之前包含 SDK 模板生成的单元测试。SDK 模板测试已随 `lol apply` 命令一同移除。
 
-## Historical Context
+## 历史背景
 
-The SDK template tests validated:
-- C, C++, and Python project template generation
-- Correct project structure and build configuration
-- File generation and substitution correctness
+SDK 模板测试曾验证：
+- C、C++ 和 Python 项目模板生成
+- 正确的项目结构和构建配置
+- 文件生成和替换的正确性
 
-## Current Status
+## 当前状态
 
-The `lol apply --init` and `lol apply --update` commands have been removed. SDK projects are now set up by copying the `.claude/` directory directly from the Agentize installation.
+`lol apply --init` 和 `lol apply --update` 命令已被移除。SDK 项目现在通过直接从 Agentize 安装目录复制 `.claude/` 目录来设置。
 
-See [docs/architecture/sdk.md](../../docs/architecture/sdk.md) for the current SDK setup workflow.
+当前 SDK 设置工作流请参见 [docs/architecture/sdk.md](../../docs/architecture/sdk.md)。
 
-## Related Documentation
+## 相关文档
 
-- [templates/](../../templates/) - SDK template source files (for reference)
-- [docs/architecture/sdk.md](../../docs/architecture/sdk.md) - SDK structure documentation
-- [tests/README.md](../README.md) - Test suite overview
+- [templates/](../../templates/) - SDK 模板源文件（供参考）
+- [docs/architecture/sdk.md](../../docs/architecture/sdk.md) - SDK 结构文档
+- [tests/README.md](../README.md) - 测试套件概览

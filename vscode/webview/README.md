@@ -1,9 +1,9 @@
-# Plan Webview Assets
+# Plan Webview 资源
 
-This folder contains webview assets for the VS Code Activity Bar views.
+本文件夹包含 VS Code Activity Bar 视图的 webview 资源。
 
-## Organization
+## 组织结构
 
-- `plan/` holds the Plan tab UI script and styles.
-- `worktree/` holds the Worktree placeholder UI script and styles.
-- `settings/` holds the Settings placeholder UI script and styles.
+- `plan/` 存放 Plan 标签页 UI 脚本和样式。
+- `worktree/` 存放 Worktree 占位 UI 脚本和样式。
+- `settings/` 存放 Settings 占位 UI 脚本和样式。

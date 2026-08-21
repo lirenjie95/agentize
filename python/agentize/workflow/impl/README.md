@@ -1,11 +1,10 @@
-# `python/agentize/workflow/impl/` — `lol impl` Python Implementation
+# `python/agentize/workflow/impl/` — `lol impl` Python 实现
 
-This directory contains the Python implementation of the `lol impl` workflow for
-translating GitHub issues into implementation PRs.
+本目录包含 `lol impl` 工作流的 Python 实现，用于将 GitHub issue 转化为实现 PR。
 
-## Architecture
+## 架构
 
-The implementation follows a modular kernel-based architecture:
+该实现遵循模块化的基于内核（kernel）的架构：
 
 ```mermaid
 flowchart TB
@@ -43,43 +42,43 @@ flowchart TB
     Orchestrator --> Legacy
 ```
 
-### Module Organization
+### 模块组织
 
-| File | Purpose |
+| 文件 | 用途 |
 |------|---------|
-| `impl.py` | Main orchestrator with state machine and backward-compatible interface |
-| `kernels.py` | Kernel functions for each workflow stage (impl, review, pr, rebase) |
-| `checkpoint.py` | Serializable state management for workflow resumption |
-| `state.py` | FSM stage/event contracts and shared workflow context types |
-| `transition.py` | Transition table and fail-fast transition validators |
-| `orchestrator.py` | Flat loop FSM executor using stage handlers and transitions |
-| `__main__.py` | CLI entrypoint with argument parsing |
-| `__init__.py` | Public exports |
-| `continue-prompt.md` | Prompt template for implementation iterations |
+| `impl.py` | 主编排器，包含状态机和向后兼容接口 |
+| `kernels.py` | 各工作流阶段的内核函数（impl、review、pr、rebase） |
+| `checkpoint.py` | 用于工作流恢复的可序列化状态管理 |
+| `state.py` | FSM 阶段/事件契约和共享工作流上下文类型 |
+| `transition.py` | 转移表和快速失败的转移校验器 |
+| `orchestrator.py` | 使用阶段处理器和转移的扁平循环 FSM 执行器 |
+| `__main__.py` | 带参数解析的 CLI 入口 |
+| `__init__.py` | 公共导出 |
+| `continue-prompt.md` | 实现迭代的提示词模板 |
 
-### FSM Dispatch Architecture
+### FSM 调度架构
 
-Production execution is driven by `run_fsm_orchestrator()` in `orchestrator.py`.
-The orchestrator reads the current stage, calls the corresponding kernel from
-`KERNELS` in `kernels.py`, receives a `StageResult` with an event, and resolves
-the next stage via the `TRANSITIONS` table in `transition.py`.
+生产执行由 `orchestrator.py` 中的 `run_fsm_orchestrator()` 驱动。
+编排器读取当前阶段，从 `kernels.py` 中的 `KERNELS` 调用对应的内核，
+接收带有事件的 `StageResult`，并通过 `transition.py` 中的 `TRANSITIONS`
+表解析出下一个阶段。
 
-`ImplState` from `checkpoint.py` is packed into `WorkflowContext.data["impl_state"]`
-and serves as the authoritative workflow state. Stage kernels mutate `ImplState`
-directly for iteration tracking, history, and checkpoint data. The orchestrator's
-`pre_step_hook` saves checkpoints before each stage dispatch.
+来自 `checkpoint.py` 的 `ImplState` 被打包进 `WorkflowContext.data["impl_state"]`，
+并作为权威的工作流状态。阶段内核直接修改 `ImplState`
+以进行迭代跟踪、历史记录和检查点数据。编排器的
+`pre_step_hook` 在每次阶段调度前保存检查点。
 
-## Quick Start
+## 快速上手
 
-### Basic Usage
+### 基本用法
 
 ```python
 from agentize.workflow.impl import run_impl_workflow
 
-# Simple implementation
+# 简单实现
 run_impl_workflow(42)
 
-# With options
+# 带选项
 run_impl_workflow(
     42,
     impl_model="codex:gpt-5.2-codex",
@@ -88,16 +87,16 @@ run_impl_workflow(
 )
 ```
 
-### Resuming from Checkpoint
+### 从检查点恢复
 
 ```python
 from agentize.workflow.impl import run_impl_workflow
 
-# Resume interrupted workflow
+# 恢复中断的工作流
 run_impl_workflow(42, resume=True)
 ```
 
-### Using Individual Kernels
+### 使用单个内核
 
 ```python
 from agentize.workflow.impl.checkpoint import create_initial_state
@@ -115,17 +114,17 @@ passed, feedback, score = review_kernel(
 )
 ```
 
-## Workflow Stages
+## 工作流阶段
 
-The implementation follows these stages:
+实现遵循以下阶段：
 
-1. **Setup**: Resolve worktree, sync branch, prefetch issue
-2. **Impl** (`impl_kernel`): Generate implementation using AI
-3. **Review** (`review_kernel`): Validate quality (optional, experimental)
-4. **PR** (`pr_kernel`): Create pull request with explicit outcome events
-5. **Rebase** (`rebase_kernel`): Recover from rebase-required PR failures
+1. **Setup**：解析 worktree、同步分支、预取 issue
+2. **Impl**（`impl_kernel`）：使用 AI 生成实现
+3. **Review**（`review_kernel`）：质量校验（可选，实验性）
+4. **PR**（`pr_kernel`）：创建带有明确结果事件的 pull request
+5. **Rebase**（`rebase_kernel`）：从需要 rebase 的 PR 失败中恢复
 
-### State Machine
+### 状态机
 
 ```mermaid
 flowchart LR
@@ -139,97 +138,97 @@ flowchart LR
     rebase -->|rebase_conflict| fatal[fatal]
 ```
 
-## Checkpointing
+## 检查点
 
-State is automatically saved after each stage to `.tmp/impl-checkpoint.json`:
+每个阶段之后状态会自动保存到 `.tmp/impl-checkpoint.json`：
 
 ```python
 from agentize.workflow.impl import ImplState, load_checkpoint
 
-# Load checkpoint
+# 加载检查点
 state = load_checkpoint(Path(".tmp/impl-checkpoint.json"))
 print(f"Current stage: {state.current_stage}")
 print(f"Iteration: {state.iteration}")
 ```
 
-Checkpoint format includes:
-- `version`: Format version for migration
-- `timestamp`: When checkpoint was saved
-- `state`: Complete `ImplState` with history
+检查点格式包括：
+- `version`：用于迁移的格式版本
+- `timestamp`：检查点保存时间
+- `state`：包含历史记录的完整 `ImplState`
 
-## CLI Usage
+## CLI 用法
 
 ```bash
-# Basic usage
+# 基本用法
 python -m agentize.workflow.impl 42
 
-# With new flags
+# 使用新标志
 python -m agentize.workflow.impl 42 \
     --impl-model codex:gpt-5.2-codex \
     --max-iter 15 \
     --enable-review \
     --resume
 
-# Deprecated flags still work
+# 已弃用的标志仍然有效
 python -m agentize.workflow.impl 42 \
     --backend codex:gpt-5.2-codex \
     --max-iterations 10
 ```
 
-## Backward Compatibility
+## 向后兼容性
 
-The refactored implementation maintains full backward compatibility:
+重构后的实现保持完全的向后兼容：
 
-- `_validate_pr_title()` remains at original location for imports
-- `--backend` and `--max-iterations` CLI args work with deprecation warnings
-- Default behavior unchanged (review stage disabled by default)
-- Rebase/fatal branches are explicit and deterministic when review is enabled
-- All existing tests pass without modification
+- `_validate_pr_title()` 保留在原位置以供导入
+- `--backend` 和 `--max-iterations` CLI 参数仍可用（带弃用警告）
+- 默认行为不变（review 阶段默认禁用）
+- 启用 review 时，rebase/fatal 分支是显式且确定性的
+- 所有现有测试无需修改即可通过
 
-## Testing
+## 测试
 
 ```bash
-# Run all impl-related tests
+# 运行所有 impl 相关测试
 python -m pytest python/tests/test_impl_*.py -v
 
-# Specific test modules
+# 特定测试模块
 python -m pytest python/tests/test_impl_checkpoint.py
 python -m pytest python/tests/test_impl_kernels.py
 python -m pytest python/tests/test_impl_review.py
 python -m pytest python/tests/test_impl_pr_title.py
 ```
 
-## Documentation
+## 文档
 
-- `impl.md` — Main implementation documentation
-- `kernels.md` — Kernel function signatures and behaviors
-- `checkpoint.md` — State format and checkpoint API
-- `state.md` — FSM stage/event contracts and workflow context model
-- `transition.md` — Transition mapping and fail-fast validation rules
-- `orchestrator.md` — FSM execution loop and stage logging contract
-- `__init__.md` — Public interface
-- `__main__.md` — CLI documentation
+- `impl.md` — 主要实现文档
+- `kernels.md` — 内核函数签名和行为
+- `checkpoint.md` — 状态格式和检查点 API
+- `state.md` — FSM 阶段/事件契约和工作流上下文模型
+- `transition.md` — 转移映射和快速失败校验规则
+- `orchestrator.md` — FSM 执行循环和阶段日志契约
+- `__init__.md` — 公共接口
+- `__main__.md` — CLI 文档
 
-## Extending
+## 扩展
 
-### Adding a New Kernel
+### 添加新内核
 
-1. Add function to `kernels.py` following the signature pattern
-2. Document in `kernels.md`
-3. Add tests in `python/tests/test_impl_kernels.py`
-4. Update orchestrator in `impl.py` to call the kernel
+1. 按照签名模式向 `kernels.py` 添加函数
+2. 在 `kernels.md` 中编写文档
+3. 在 `python/tests/test_impl_kernels.py` 中添加测试
+4. 更新 `impl.py` 中的编排器以调用该内核
 
-### Adding a New Stage
+### 添加新阶段
 
-1. Add stage/event constants to `state.py`
-2. Add transition edges to `transition.py` and update `required_pairs`
-3. Implement stage kernel in `kernels.py` and register in `KERNELS`
-4. Add stage name to `ImplState.current_stage` Literal type if needed
-5. Update checkpoint documentation
+1. 向 `state.py` 添加阶段/事件常量
+2. 向 `transition.py` 添加转移边并更新 `required_pairs`
+3. 在 `kernels.py` 中实现阶段内核并注册到 `KERNELS`
+4. 如有需要，将阶段名称添加到 `ImplState.current_stage` 的 Literal 类型中
+5. 更新检查点文档
 
-## Future Work
+## 未来工作
 
-- Enable review stage by default after further testing
-- Extract robust runner with format-fixing retry to `workflow.api`
-- Add more sophisticated review criteria configuration
-- Support parallel review with multiple models
+- 进一步测试后默认启用 review 阶段
+- 将带格式修复重试的健壮运行器抽取到 `workflow.api`
+- 添加更精细的 review 标准配置
+- 支持多模型并行 review

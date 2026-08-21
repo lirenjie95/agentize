@@ -1,30 +1,30 @@
-# Handsoff Mode
+# Handsoff 模式
 
-Handsoff mode enables automatic continuation of `/ultra-planner`, `/issue-to-impl`, and `/plan-to-issue` workflows without manual user intervention between Claude Code stops.
+Handsoff 模式使 `/ultra-planner`、`/issue-to-impl` 和 `/plan-to-issue` 工作流能够在 Claude Code 停止后自动继续，无需人工干预。
 
-## Overview
+## 概述
 
-When handsoff mode is enabled (via `handsoff.enabled: true` in `.agentize.local.yaml`), specific workflows automatically resume after each Claude Code stop until completion or a continuation limit is reached. This allows long-running planning and implementation workflows to proceed autonomously.
+启用 handsoff 模式（在 `.agentize.local.yaml` 中设置 `handsoff.enabled: true`）后，特定工作流会在每次 Claude Code 停止后自动恢复，直到完成或达到继续次数上限。这使得长时间运行的规划和实现工作流能够自主推进。
 
-**Supported workflows:**
-- `/ultra-planner` - Multi-agent debate-based planning (see [ultra-planner.md](ultra-planner.md))
-- `/issue-to-impl` - Complete development cycle from issue to PR (see [../tutorial/02-issue-to-impl.md](../tutorial/02-issue-to-impl.md))
-- `/plan-to-issue` - Create GitHub [plan] issues from user-provided plans
-- `/setup-viewboard` - GitHub Projects v2 board setup (see [../commands/setup-viewboard.md](../commands/setup-viewboard.md))
+**支持的工作流：**
+- `/ultra-planner` - 基于多智能体辩论的规划（见 [ultra-planner.md](ultra-planner.md)）
+- `/issue-to-impl` - 从 issue 到 PR 的完整开发周期（见 [../tutorial/02-issue-to-impl.md](../tutorial/02-issue-to-impl.md)）
+- `/plan-to-issue` - 从用户提供的计划创建 GitHub [plan] issue
+- `/setup-viewboard` - GitHub Projects v2 看板设置（见 [../commands/setup-viewboard.md](../commands/setup-viewboard.md)）
 
-## How It Works
+## 工作原理
 
-### Session State Management
+### 会话状态管理
 
-When a supported workflow command is invoked, the `UserPromptSubmit` hook creates a session state file:
+当调用受支持的工作流命令时，`UserPromptSubmit` hook 会创建一个会话状态文件：
 
 ```
 ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/{session_id}.json
 ```
 
-When `AGENTIZE_HOME` is set, session files are stored centrally, enabling cross-worktree visibility. When unset, files fall back to the current working directory (`./.tmp/hooked-sessions/`).
+当设置了 `AGENTIZE_HOME` 时，会话文件集中存储，实现跨 worktree 可见性。未设置时，文件回退到当前工作目录（`./.tmp/hooked-sessions/`）。
 
-**Initial state structure:**
+**初始状态结构：**
 ```json
 {
   "workflow": "ultra-planner",
@@ -35,17 +35,17 @@ When `AGENTIZE_HOME` is set, session files are stored centrally, enabling cross-
 }
 ```
 
-The `pr_number` field is optional and populated by the `open-pr` skill after a PR is created. When present, the server includes a clickable PR link in completion notifications.
+`pr_number` 字段是可选的，由 `open-pr` skill 在 PR 创建后填充。存在时，server 会在完成通知中包含可点击的 PR 链接。
 
-### Issue Index Files
+### Issue 索引文件
 
-When a workflow is invoked with an issue number (e.g., `/issue-to-impl 42`, `/ultra-planner --refine 42`, or `/ultra-planner --from-issue 42`), the `UserPromptSubmit` hook also creates an issue index file:
+当工作流带 issue 号调用时（例如 `/issue-to-impl 42`、`/ultra-planner --refine 42` 或 `/ultra-planner --from-issue 42`），`UserPromptSubmit` hook 还会创建 issue 索引文件：
 
 ```
 ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/by-issue/{issue_no}.json
 ```
 
-**Index file structure:**
+**索引文件结构：**
 ```json
 {
   "session_id": "<session_id>",
@@ -53,9 +53,9 @@ ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/by-issue/{issue_no}.json
 }
 ```
 
-This index enables the server to look up which session is handling a given issue, supporting completion notifications when workers finish.
+该索引使 server 能够查找哪个会话正在处理某个 issue，从而在 worker 完成时支持完成通知。
 
-### Auto-Continuation Flow
+### 自动继续流程
 
 ```
 User invokes: /ultra-planner <feature>
@@ -81,70 +81,70 @@ Claude Code automatically resumes with continuation prompt
 (Repeat until workflow completes or max continuations reached)
 ```
 
-## Configuration
+## 配置
 
-Configure handsoff mode in `.agentize.local.yaml`:
+在 `.agentize.local.yaml` 中配置 handsoff 模式：
 
 ```yaml
 handsoff:
-  enabled: true                    # Enable handsoff auto-continuation
-  max_continuations: 10            # Maximum auto-continuations per workflow
-  auto_permission: true            # Enable Haiku LLM-based auto-permission
-  debug: false                     # Enable debug logging
+  enabled: true                    # 启用 handsoff 自动继续
+  max_continuations: 10            # 每个工作流的最大自动继续次数
+  auto_permission: true            # 启用基于 Haiku LLM 的自动权限
+  debug: false                     # 启用调试日志
   supervisor:
-    provider: claude               # AI provider (none, claude, codex, cursor, opencode)
-    model: opus                    # Model for supervisor
-    flags: ""                      # Extra flags for acw
+    provider: claude               # AI 提供方（none、claude、codex、cursor、opencode）
+    model: opus                    # supervisor 使用的模型
+    flags: ""                      # acw 的额外标志
 ```
 
-**YAML search order:**
-1. Project root `.agentize.local.yaml`
+**YAML 查找顺序：**
+1. 项目根目录 `.agentize.local.yaml`
 2. `$AGENTIZE_HOME/.agentize.local.yaml`
-3. `$HOME/.agentize.local.yaml` (user-wide, created by installer)
+3. `$HOME/.agentize.local.yaml`（用户级，由安装脚本创建）
 
-### Settings Reference
+### 设置参考
 
-| YAML Path | Type | Default | Description |
+| YAML 路径 | 类型 | 默认值 | 描述 |
 |-----------|------|---------|-------------|
-| `handsoff.enabled` | bool | `true` | Enable handsoff auto-continuation |
-| `handsoff.max_continuations` | int | `10` | Maximum auto-continuations per workflow |
-| `handsoff.auto_permission` | bool | `true` | Enable Haiku LLM-based auto-permission |
-| `handsoff.debug` | bool | `false` | Enable debug logging |
-| `handsoff.supervisor.provider` | string | `none` | AI provider (none, claude, codex, cursor, opencode) |
-| `handsoff.supervisor.model` | string | provider-specific | Model for supervisor |
-| `handsoff.supervisor.flags` | string | `""` | Extra flags for acw |
+| `handsoff.enabled` | bool | `true` | 启用 handsoff 自动继续 |
+| `handsoff.max_continuations` | int | `10` | 每个工作流的最大自动继续次数 |
+| `handsoff.auto_permission` | bool | `true` | 启用基于 Haiku LLM 的自动权限 |
+| `handsoff.debug` | bool | `false` | 启用调试日志 |
+| `handsoff.supervisor.provider` | string | `none` | AI 提供方（none、claude、codex、cursor、opencode） |
+| `handsoff.supervisor.model` | string | 视提供方而定 | supervisor 使用的模型 |
+| `handsoff.supervisor.flags` | string | `""` | acw 的额外标志 |
 
-**Debug log file:** `${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/permission.txt` (unified permission log)
+**调试日志文件：** `${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/permission.txt`（统一权限日志）
 
-### Telegram Approval (Optional)
+### Telegram 审批（可选）
 
-When configured, enables remote approval of tool usage via Telegram. When a PreToolUse decision is `ask`, the hook sends a Telegram message allowing you to approve or deny from your phone.
+配置后，可通过 Telegram 远程审批工具使用。当 PreToolUse 决策为 `ask` 时，hook 会发送 Telegram 消息，让你可以从手机上批准或拒绝。
 
 ```yaml
 telegram:
   enabled: true
-  token: "123456:ABC-DEF..."       # Bot token from @BotFather
-  chat_id: "12345678"              # Chat/channel ID
-  timeout_sec: 60                  # Approval timeout (max: 7200)
-  poll_interval_sec: 5             # Poll interval
-  allowed_user_ids: "123,456"      # Allowed user IDs (CSV, optional)
+  token: "123456:ABC-DEF..."       # 来自 @BotFather 的 Bot token
+  chat_id: "12345678"              # 聊天/频道 ID
+  timeout_sec: 60                  # 审批超时时间（最大：7200）
+  poll_interval_sec: 5             # 轮询间隔
+  allowed_user_ids: "123,456"      # 允许的用户 ID（CSV，可选）
 ```
 
-**Behavior:**
-- When Telegram is enabled and configured, `ask` decisions are sent to Telegram
-- Approval messages display inline keyboard buttons (`[✅ Allow]` and `[❌ Deny]`) for one-tap approval
-- Button presses provide immediate acknowledgment and update the original message
-- On timeout, the original message is edited to show "⏰ Timed Out" status with buttons removed
-- On API error, falls back to `ask` (prompts local user)
-- Missing configuration logs a warning and falls back to `ask`
+**行为：**
+- 当 Telegram 启用并配置好后，`ask` 决策会发送到 Telegram
+- 审批消息显示内联键盘按钮（`[✅ Allow]` 和 `[❌ Deny]`），支持一键审批
+- 按钮点击会立即确认并更新原始消息
+- 超时时，原始消息会被编辑为显示 "⏰ Timed Out" 状态，按钮被移除
+- API 出错时，回退到 `ask`（提示本地用户）
+- 缺少配置时记录警告并回退到 `ask`
 
-## Workflow-Specific Behavior
+## 各工作流的行为
 
-### `/ultra-planner` Workflow
+### `/ultra-planner` 工作流
 
-**Goal:** Create a comprehensive implementation plan and post it to GitHub Issue.
+**目标：** 创建全面的实现计划并发布到 GitHub Issue。
 
-**Auto-continuation prompt (injected by Stop hook):**
+**自动继续提示词（由 Stop hook 注入）：**
 ```
 This is an auto-continuation prompt for handsoff mode, it is currently {N}/{MAX} continuations.
 The ultimate goal of this workflow is to create a comprehensive plan and post it on GitHub Issue. Have you delivered this?
@@ -155,15 +155,15 @@ The ultimate goal of this workflow is to create a comprehensive plan and post it
    and leave a comment on the GitHub Issue for human collaborators to take over.
 ```
 
-**Completion criteria:** Plan issue created/updated on GitHub.
+**完成标准：** 计划 issue 已在 GitHub 上创建/更新。
 
-### `/issue-to-impl` Workflow
+### `/issue-to-impl` 工作流
 
-**Goal:** Deliver a PR on GitHub that implements the corresponding issue.
+**目标：** 在 GitHub 上交付实现对应 issue 的 PR。
 
-**Plan caching:** During Step 4 (Read Implementation Plan), the workflow caches the extracted "Proposed Solution" section to `.tmp/plan-of-issue-{N}.md`. This cached plan is included in continuation prompts to provide drift awareness and easier resumption during autonomous workflows.
+**计划缓存：** 在步骤 4（读取实现计划）期间，工作流将提取的 "Proposed Solution" 部分缓存到 `.tmp/plan-of-issue-{N}.md`。该缓存计划会包含在继续提示词中，为自主工作流提供偏差感知和更易恢复的能力。
 
-**Auto-continuation prompt (injected by Stop hook):**
+**自动继续提示词（由 Stop hook 注入）：**
 ```
 This is an auto-continuation prompt for handsoff mode, it is currently {N}/{MAX} continuations.
 The ultimate goal of this workflow is to deliver a PR on GitHub that implements the corresponding issue. Did you have this delivered?
@@ -181,13 +181,13 @@ The ultimate goal of this workflow is to deliver a PR on GitHub that implements 
 4. If the PR is successfully created, manually stop further continuations.
 ```
 
-**Completion criteria:** Pull request created on GitHub with all tests passing.
+**完成标准：** PR 已在 GitHub 上创建且所有测试通过。
 
-### `/plan-to-issue` Workflow
+### `/plan-to-issue` 工作流
 
-**Goal:** Create a GitHub [plan] issue from a user-provided plan.
+**目标：** 从用户提供的计划创建 GitHub [plan] issue。
 
-**Auto-continuation prompt (injected by Stop hook):**
+**自动继续提示词（由 Stop hook 注入）：**
 ```
 This is an auto-continuation prompt for handsoff mode, it is currently {N}/{MAX} continuations.
 The ultimate goal of this workflow is to create a GitHub [plan] issue from the user-provided plan.
@@ -204,13 +204,13 @@ The ultimate goal of this workflow is to create a GitHub [plan] issue from the u
    - Include the session ID for human intervention.
 ```
 
-**Completion criteria:** GitHub [plan] issue successfully created.
+**完成标准：** GitHub [plan] issue 创建成功。
 
-### `/setup-viewboard` Workflow
+### `/setup-viewboard` 工作流
 
-**Goal:** Set up a GitHub Projects v2 board with agentize-compatible configuration.
+**目标：** 设置具有 agentize 兼容配置的 GitHub Projects v2 看板。
 
-**Auto-continuation prompt (injected by Stop hook):**
+**自动继续提示词（由 Stop hook 注入）：**
 ```
 This is an auto-continuation prompt for handsoff mode, it is currently {N}/{MAX} continuations.
 The ultimate goal of this workflow is to set up a GitHub Projects v2 board. Have you completed all steps?
@@ -218,27 +218,27 @@ The ultimate goal of this workflow is to set up a GitHub Projects v2 board. Have
 2. If setup is complete, manually stop further continuations.
 ```
 
-**Completion criteria:** Project board created with Status field options and labels configured.
+**完成标准：** 项目看板已创建，Status 字段选项和标签已配置。
 
-**Automatic permissions:** When this workflow is active, the following `gh` CLI commands are automatically allowed:
-- `gh auth status` - Authentication verification
-- `gh repo view --json owner -q ...` - Repository owner lookup
-- `gh api graphql` - Project creation and configuration
-- `gh label create --force` - Label creation
+**自动权限：** 当此工作流激活时，以下 `gh` CLI 命令会被自动允许：
+- `gh auth status` - 认证验证
+- `gh repo view --json owner -q ...` - 仓库所有者查询
+- `gh api graphql` - 项目创建和配置
+- `gh label create --force` - 标签创建
 
-These permissions apply **only during the setup-viewboard workflow** and do not affect global permission rules.
+这些权限**仅在 setup-viewboard 工作流期间**生效，不影响全局权限规则。
 
-## Debugging
+## 调试
 
-### Check Session State
+### 检查会话状态
 
-View the current session state file:
+查看当前会话状态文件：
 
 ```bash
 cat ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/{session_id}.json
 ```
 
-**Example output:**
+**示例输出：**
 ```json
 {
   "workflow": "issue-to-impl",
@@ -248,124 +248,124 @@ cat ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/{session_id}.json
 }
 ```
 
-The `issue_no` field is only present when the workflow was invoked with an issue number argument (e.g., `/issue-to-impl 42` or `/ultra-planner --refine 42`).
+`issue_no` 字段仅在工作流带 issue 号参数调用时存在（例如 `/issue-to-impl 42` 或 `/ultra-planner --refine 42`）。
 
-### View Debug Logs
+### 查看调试日志
 
-Enable debug logging by setting `handsoff.debug: true` in `.agentize.local.yaml`, then view logs:
+在 `.agentize.local.yaml` 中设置 `handsoff.debug: true` 启用调试日志，然后查看日志：
 
 ```bash
 tail -f ${AGENTIZE_HOME:-.}/.tmp/hook-debug.log
 ```
 
-**Example log entries:**
+**示例日志条目：**
 ```
 [2026-01-07T10:15:23] [abc123] Writing state: {'workflow': 'ultra-planner', 'state': 'initial', 'continuation_count': 0}
 [2026-01-07T10:20:45] [abc123] Found existing state file: $AGENTIZE_HOME/.tmp/hooked-sessions/abc123.json
 [2026-01-07T10:20:45] [abc123] Updating state for continuation: {'workflow': 'ultra-planner', 'state': 'initial', 'continuation_count': 1}
 ```
 
-### Manual Stop Auto-Continuation
+### 手动停止自动继续
 
-To stop auto-continuation before reaching max limit:
+在达到上限之前停止自动继续：
 
-1. Find the session ID from the continuation prompt or logs
-2. Edit the session state file:
+1. 从继续提示词或日志中找到会话 ID
+2. 编辑会话状态文件：
    ```bash
-   # Set continuation_count to max value
+   # 将 continuation_count 设置为最大值
    echo '{"workflow": "issue-to-impl", "state": "initial", "continuation_count": 10}' > ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/{session_id}.json
    ```
 
-3. Or delete the session state file entirely:
+3. 或直接删除会话状态文件：
    ```bash
    rm ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/{session_id}.json
    ```
 
-### Resume Session with Human Intervention
+### 通过人工干预恢复会话
 
-If Claude Code leaves a comment on the issue requesting human intervention:
+如果 Claude Code 在 issue 上留下了请求人工干预的评论：
 
 ```bash
-# Resume the session by session ID
+# 通过会话 ID 恢复会话
 claude -r {session_id}
 ```
 
-This allows you to review progress, provide guidance, and manually continue the workflow.
+这允许你查看进度、提供指导并手动继续工作流。
 
-## Hook Implementation
+## Hook 实现
 
-Handsoff mode is implemented via three Claude Code hooks (see [.claude/hooks/README.md](../../.claude/hooks/README.md)):
+Handsoff 模式通过三个 Claude Code hook 实现（见 [.claude/hooks/README.md](../../.claude/hooks/README.md)）：
 
 ### `pre-tool-use.py`
-- **Event:** `PreToolUse` (before tool execution)
-- **Purpose:** Thin wrapper delegating to `.claude-plugin/lib/permission/` module
-- **Location:** `.claude-plugin/hooks/pre-tool-use.py`
+- **事件：** `PreToolUse`（工具执行前）
+- **用途：** 委托给 `.claude-plugin/lib/permission/` 模块的轻量封装
+- **位置：** `.claude-plugin/hooks/pre-tool-use.py`
 
-**Key logic:**
-- Imports and calls `lib.permission.determine()` for all permission decisions
-- Rules are sourced from `.claude-plugin/lib/permission/rules.py` (canonical location)
-- Evaluation order: Global rules → Workflow auto-allow → Haiku LLM → Telegram (single final escalation)
-- Returns `allow/deny/ask` decision to Claude Code
-- Logs tool usage when `handsoff.debug: true` is set in `.agentize.local.yaml`
-- Falls back to `ask` on any import/execution errors
+**关键逻辑：**
+- 导入并调用 `lib.permission.determine()` 处理所有权限决策
+- 规则来源为 `.claude-plugin/lib/permission/rules.py`（规范位置）
+- 评估顺序：全局规则 → 工作流自动允许 → Haiku LLM → Telegram（单一最终升级路径）
+- 向 Claude Code 返回 `allow/deny/ask` 决策
+- 当 `.agentize.local.yaml` 中设置 `handsoff.debug: true` 时记录工具使用
+- 任何导入/执行错误时回退到 `ask`
 
-**Architecture notes:**
-- The hook is a minimal wrapper (~15 LOC) that delegates to the permission module
-- Permission rules are defined in Python code instead of `.claude/settings.json`
-- Single source of truth: `.claude-plugin/lib/permission/rules.py`
-- Fail-safe behavior: returns `ask` on any errors
+**架构说明：**
+- 该 hook 是最小化封装（约 15 行代码），委托给权限模块
+- 权限规则定义在 Python 代码中，而非 `.claude/settings.json`
+- 单一事实来源：`.claude-plugin/lib/permission/rules.py`
+- 故障安全行为：任何错误时返回 `ask`
 
-See [.claude-plugin/hooks/pre-tool-use.md](../../.claude-plugin/hooks/pre-tool-use.md) for interface details.
+接口细节见 [.claude-plugin/hooks/pre-tool-use.md](../../.claude-plugin/hooks/pre-tool-use.md)。
 
-### `user-prompt-submit.py` (Claude Code)
-- **Event:** `UserPromptSubmit` (before prompt is sent to Claude Code)
-- **Purpose:** Initialize session state for supported workflows
-- **Location:** `.claude-plugin/hooks/user-prompt-submit.py`
+### `user-prompt-submit.py`（Claude Code）
+- **事件：** `UserPromptSubmit`（提示词发送到 Claude Code 之前）
+- **用途：** 为受支持的工作流初始化会话状态
+- **位置：** `.claude-plugin/hooks/user-prompt-submit.py`
 
-**Key logic:**
-- Detects workflow commands: `/ultra-planner`, `/issue-to-impl`, `/plan-to-issue`, `/setup-viewboard`
-- Creates `$AGENTIZE_HOME/.tmp/hooked-sessions/{session_id}.json` with initial state (falls back to worktree-local `.tmp/` if `AGENTIZE_HOME` is unset)
-- Sets `continuation_count = 0`
-- When issue number is present, creates issue index file at `$AGENTIZE_HOME/.tmp/hooked-sessions/by-issue/{issue_no}.json`
-- Note: `/plan-to-issue` and `/setup-viewboard` do not accept issue number arguments
+**关键逻辑：**
+- 检测工作流命令：`/ultra-planner`、`/issue-to-impl`、`/plan-to-issue`、`/setup-viewboard`
+- 创建 `$AGENTIZE_HOME/.tmp/hooked-sessions/{session_id}.json` 并写入初始状态（若未设置 `AGENTIZE_HOME` 则回退到 worktree 本地的 `.tmp/`）
+- 设置 `continuation_count = 0`
+- 存在 issue 号时，在 `$AGENTIZE_HOME/.tmp/hooked-sessions/by-issue/{issue_no}.json` 创建 issue 索引文件
+- 注意：`/plan-to-issue` 和 `/setup-viewboard` 不接受 issue 号参数
 
-### `before-prompt-submit.py` (Cursor IDE)
-- **Event:** `beforeSubmitPrompt` (before prompt is sent to Cursor)
-- **Purpose:** Initialize session state for supported workflows
-- **Location:** `.cursor/hooks/before-prompt-submit.py`
+### `before-prompt-submit.py`（Cursor IDE）
+- **事件：** `beforeSubmitPrompt`（提示词发送到 Cursor 之前）
+- **用途：** 为受支持的工作流初始化会话状态
+- **位置：** `.cursor/hooks/before-prompt-submit.py`
 
-**Key logic:**
-- Detects workflow commands: `/ultra-planner`, `/issue-to-impl`, `/plan-to-issue`, `/setup-viewboard`
-- Creates `$AGENTIZE_HOME/.tmp/hooked-sessions/{session_id}.json` with initial state (falls back to worktree-local `.tmp/` if `AGENTIZE_HOME` is unset)
-- Sets `continuation_count = 0`
-- When issue number is present, creates issue index file at `$AGENTIZE_HOME/.tmp/hooked-sessions/by-issue/{issue_no}.json`
+**关键逻辑：**
+- 检测工作流命令：`/ultra-planner`、`/issue-to-impl`、`/plan-to-issue`、`/setup-viewboard`
+- 创建 `$AGENTIZE_HOME/.tmp/hooked-sessions/{session_id}.json` 并写入初始状态（若未设置 `AGENTIZE_HOME` 则回退到 worktree 本地的 `.tmp/`）
+- 设置 `continuation_count = 0`
+- 存在 issue 号时，在 `$AGENTIZE_HOME/.tmp/hooked-sessions/by-issue/{issue_no}.json` 创建 issue 索引文件
 
-**Note:** The Cursor hook replicates the functionality of the Claude hook, enabling handsoff mode workflows in Cursor IDE. Both hooks use the same session state file format and support the same workflow commands.
+**注意：** Cursor hook 复刻了 Claude hook 的功能，使 handsoff 模式工作流能在 Cursor IDE 中使用。两个 hook 使用相同的会话状态文件格式并支持相同的工作流命令。
 
 ### `stop.py`
-- **Event:** `Stop` (before Claude Code stops execution)
-- **Purpose:** Auto-continue workflow with workflow-specific prompts
-- **Location:** `.claude/hooks/stop.py`
+- **事件：** `Stop`（Claude Code 停止执行前）
+- **用途：** 使用工作流特定的提示词自动继续工作流
+- **位置：** `.claude/hooks/stop.py`
 
-**Key logic:**
-- Reads session state from `$AGENTIZE_HOME/.tmp/hooked-sessions/{session_id}.json` (falls back to worktree-local `.tmp/` if `AGENTIZE_HOME` is unset)
-- Checks `continuation_count < HANDSOFF_MAX_CONTINUATIONS`
-- Increments `continuation_count`
-- Injects workflow-specific continuation prompt
-- Blocks stop and triggers auto-resume
+**关键逻辑：**
+- 从 `$AGENTIZE_HOME/.tmp/hooked-sessions/{session_id}.json` 读取会话状态（若未设置 `AGENTIZE_HOME` 则回退到 worktree 本地的 `.tmp/`）
+- 检查 `continuation_count < HANDSOFF_MAX_CONTINUATIONS`
+- 递增 `continuation_count`
+- 注入工作流特定的继续提示词
+- 阻止停止并触发自动恢复
 
-**Source of truth:** Workflow definitions are centralized in `python/agentize/workflow.py`. The hooks import from this module for workflow detection, issue extraction, and continuation prompts.
+**事实来源：** 工作流定义集中在 `python/agentize/workflow.py` 中。各 hook 从该模块导入工作流检测、issue 提取和继续提示词。
 
-## Adding New Workflows
+## 添加新工作流
 
-To add a new workflow to handsoff mode, edit only `python/agentize/workflow.py`:
+要向 handsoff 模式添加新工作流，只需编辑 `python/agentize/workflow.py`：
 
-1. **Add workflow constant** in the `# Workflow name constants` section:
+1. **添加工作流常量**，在 `# Workflow name constants` 部分：
    ```python
    MY_WORKFLOW = 'my-workflow'
    ```
 
-2. **Add command mapping** in `WORKFLOW_COMMANDS`:
+2. **添加命令映射**，在 `WORKFLOW_COMMANDS` 中：
    ```python
    WORKFLOW_COMMANDS = {
        ...
@@ -373,7 +373,7 @@ To add a new workflow to handsoff mode, edit only `python/agentize/workflow.py`:
    }
    ```
 
-3. **Add continuation prompt** in `_CONTINUATION_PROMPTS`:
+3. **添加继续提示词**，在 `_CONTINUATION_PROMPTS` 中：
    ```python
    _CONTINUATION_PROMPTS = {
        ...
@@ -383,35 +383,35 @@ To add a new workflow to handsoff mode, edit only `python/agentize/workflow.py`:
    }
    ```
 
-The hooks will automatically pick up the new workflow—no changes needed to `.claude-plugin/hooks/` or `.cursor/hooks/`.
+各 hook 会自动识别新工作流——无需修改 `.claude-plugin/hooks/` 或 `.cursor/hooks/`。
 
-## Limitations
+## 限制
 
-- **Non-workflow prompts:** Regular Claude Code usage (not `/ultra-planner`, `/issue-to-impl`, `/plan-to-issue`, or `/setup-viewboard`) is unaffected
-- **Session isolation:** Each session has independent state; switching sessions resets continuation tracking
-- **Max continuations:** Workflows stop after reaching `handsoff.max_continuations` (default: 10)
-- **Error recovery:** If Claude Code encounters critical errors, manual intervention may be required
-- **No cross-session state:** Session state is not preserved across Claude Code restarts
+- **非工作流提示词：** 常规 Claude Code 使用（非 `/ultra-planner`、`/issue-to-impl`、`/plan-to-issue` 或 `/setup-viewboard`）不受影响
+- **会话隔离：** 每个会话有独立状态；切换会话会重置继续追踪
+- **最大继续次数：** 工作流在达到 `handsoff.max_continuations` 后停止（默认：10）
+- **错误恢复：** 如果 Claude Code 遇到严重错误，可能需要人工干预
+- **无跨会话状态：** 会话状态不会在 Claude Code 重启后保留
 
-## Best Practices
+## 最佳实践
 
-1. **Set appropriate limits:** Adjust `handsoff.max_continuations` based on workflow complexity
-   - `/ultra-planner`: 5-10 continuations typically sufficient
-   - `/issue-to-impl`: 10-20 continuations for complex features
+1. **设置适当的上限：** 根据工作流复杂度调整 `handsoff.max_continuations`
+   - `/ultra-planner`：通常 5-10 次继续足够
+   - `/issue-to-impl`：复杂功能需要 10-20 次继续
 
-2. **Monitor progress:** Check debug logs or session state periodically for long-running workflows
+2. **监控进度：** 对长时间运行的工作流，定期检查调试日志或会话状态
 
-3. **Human checkpoints:** For critical features, consider manual intervention after key milestones rather than full handsoff mode
+3. **人工检查点：** 对关键功能，考虑在关键里程碑后进行人工干预，而非完全 handsoff 模式
 
-4. **Clean up state files:** Periodically clean `${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/` to remove old session states:
+4. **清理状态文件：** 定期清理 `${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/` 以移除旧会话状态：
    ```bash
    rm ${AGENTIZE_HOME:-.}/.tmp/hooked-sessions/*.json
    ```
 
-5. **Enable debug logging:** Set `handsoff.debug: true` during initial handsoff setup to understand behavior
+5. **启用调试日志：** 在初始 handsoff 设置期间设置 `handsoff.debug: true` 以了解行为
 
-## See Also
+## 另请参阅
 
-- [Ultra-Planner Workflow](ultra-planner.md) - Multi-agent planning details
-- [Issue-to-Impl Tutorial](../tutorial/02-issue-to-impl.md) - Complete development cycle
-- [Hooks README](../../.claude/hooks/README.md) - Hook system overview
+- [Ultra-Planner 工作流](ultra-planner.md) - 多智能体规划细节
+- [Issue-to-Impl 教程](../tutorial/02-issue-to-impl.md) - 完整开发周期
+- [Hooks README](../../.claude/hooks/README.md) - Hook 系统概述

@@ -1,37 +1,37 @@
-# wt CLI Modules
+# wt CLI 模块
 
-## Purpose
+## 目的
 
-Modular implementation of the `wt` git worktree helper. These files are sourced by `wt.sh` in order to provide the complete `wt` command functionality.
+`wt` git worktree 辅助工具的模块化实现。这些文件由 `wt.sh` 按顺序 source，以提供完整的 `wt` 命令功能。
 
-## Module Map
+## 模块映射
 
-| File | Description | Exports |
+| 文件 | 描述 | 导出 |
 |------|-------------|---------|
-| `helpers.sh` | Repository detection and path resolution | `wt_common`, `wt_is_bare_repo`, `wt_get_default_branch`, `wt_configure_origin_tracking`, `wt_resolve_worktree`, `wt_claim_issue_status`, `wt_invoke_claude` |
-| `completion.sh` | Shell-agnostic completion helper | `wt_complete` |
-| `commands.sh` | Command implementations | `cmd_common`, `cmd_init`, `cmd_clone`, `cmd_goto`, `cmd_list`, `cmd_remove`, `cmd_prune`, `cmd_purge`, `cmd_spawn`, `cmd_rebase`, `cmd_help` |
-| `dispatch.sh` | Main dispatcher and entry point | `wt` |
+| `helpers.sh` | 仓库检测和路径解析 | `wt_common`、`wt_is_bare_repo`、`wt_get_default_branch`、`wt_configure_origin_tracking`、`wt_resolve_worktree`、`wt_claim_issue_status`、`wt_invoke_claude` |
+| `completion.sh` | Shell 无关的补全辅助函数 | `wt_complete` |
+| `commands.sh` | 命令实现 | `cmd_common`、`cmd_init`、`cmd_clone`、`cmd_goto`、`cmd_list`、`cmd_remove`、`cmd_prune`、`cmd_purge`、`cmd_spawn`、`cmd_rebase`、`cmd_help` |
+| `dispatch.sh` | 主调度器和入口点 | `wt` |
 
-## Load Order
+## 加载顺序
 
-The parent `wt.sh` sources modules in this order:
+父级 `wt.sh` 按以下顺序 source 各模块：
 
-1. `helpers.sh` - No dependencies
-2. `completion.sh` - No dependencies
-3. `commands.sh` - Depends on helpers
-4. `dispatch.sh` - Depends on all above
+1. `helpers.sh` - 无依赖
+2. `completion.sh` - 无依赖
+3. `commands.sh` - 依赖 helpers
+4. `dispatch.sh` - 依赖以上所有
 
-## Design Principles
+## 设计原则
 
-- Each module is self-contained with clearly defined exports
-- All functions use the `wt_` or `cmd_` prefix to avoid namespace collisions
-- Helper functions (`wt_*`) provide reusable utilities for path resolution and repo detection
-- Command implementations (`cmd_*`) map directly to subcommands
-- The dispatcher handles top-level routing and delegates to command implementations
+- 每个模块都是自包含的，具有明确定义的导出
+- 所有函数使用 `wt_` 或 `cmd_` 前缀以避免命名空间冲突
+- 辅助函数（`wt_*`）为路径解析和仓库检测提供可复用的实用工具
+- 命令实现（`cmd_*`）直接映射到子命令
+- 调度器处理顶层路由并委托给命令实现
 
-## Related Documentation
+## 相关文档
 
-- `../wt.md` - Interface documentation
-- `../../docs/cli/wt.md` - User documentation
-- `../../docs/feat/cli/wt.md` - Detailed flag reference
+- `../wt.md` - 接口文档
+- `../../docs/cli/wt.md` - 用户文档
+- `../../docs/feat/cli/wt.md` - 详细标志参考

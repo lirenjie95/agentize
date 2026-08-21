@@ -1,8 +1,8 @@
-# Plan State
+# Plan 状态
 
-This folder defines the Plan Activity Bar state models and persistence helpers.
+本文件夹定义 Plan Activity Bar 的状态模型和持久化辅助函数。
 
-## Organization
+## 组织结构
 
-- `types.ts` defines the Plan state interfaces used by the extension and UI.
-- `sessionStore.ts` manages session CRUD, log limits, and workspace persistence.
+- `types.ts` 定义扩展和 UI 使用的 Plan 状态接口。
+- `sessionStore.ts` 管理会话 CRUD、日志限制和工作区持久化。

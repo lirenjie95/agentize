@@ -1,7 +1,7 @@
 # Webview Provider
 
-This folder implements the unified webview provider that renders the Activity Bar view.
+本文件夹实现渲染 Activity Bar 视图的统一 webview provider。
 
-## Organization
+## 组织结构
 
-- `unifiedViewProvider.ts` renders the tabbed Plan/Worktree/Settings experience and routes messages.
+- `unifiedViewProvider.ts` 渲染带标签页的 Plan/Worktree/Settings 体验并路由消息。

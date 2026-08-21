@@ -1,8 +1,7 @@
-# Workflows
+# 工作流
 
-This directory contains workflow documentation that describes how Agentize features are
-used across interfaces and tools.
+本目录包含描述 Agentize 功能如何跨界面和工具使用的工作流文档。
 
-## Organization
+## 组织
 
-- `vscode-extension.md` describes the Plan-to-Implement flow in the VS Code extension.
+- `vscode-extension.md` 描述 VS Code 扩展中的"规划到实现"流程。

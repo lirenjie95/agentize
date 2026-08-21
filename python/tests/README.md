@@ -1,68 +1,68 @@
-# Python Tests
+# Python 测试
 
-This directory contains pytest tests for `agentize.server` modules and `.claude-plugin/lib` modules.
+本目录包含针对 `agentize.server` 模块和 `.claude-plugin/lib` 模块的 pytest 测试。
 
-## Purpose
+## 用途
 
-These tests validate server-side functionality and plugin library modules including:
-- Worker status file operations
-- GitHub API filtering and discovery functions
-- Runtime configuration loading
-- Telegram notification formatting
-- Session lookup utilities
-- Module exports and imports
-- Workflow detection and continuation prompts (`.claude-plugin/lib/workflow.py`)
-- Session utilities (`.claude-plugin/lib/session_utils.py`)
+这些测试验证服务器端功能和插件库模块，包括：
+- Worker 状态文件操作
+- GitHub API 过滤和发现函数
+- 运行时配置加载
+- Telegram 通知格式化
+- 会话查找工具
+- 模块导出和导入
+- 工作流检测和续接提示词（`.claude-plugin/lib/workflow.py`）
+- 会话工具（`.claude-plugin/lib/session_utils.py`）
 
-## Running Tests
+## 运行测试
 
-**Install dependencies:**
+**安装依赖：**
 ```bash
 python -m pip install -r python/requirements-dev.txt
 ```
 
-**Run all pytest tests:**
+**运行所有 pytest 测试：**
 ```bash
 pytest python/tests
 ```
 
-**Run with verbose output:**
+**以详细输出运行：**
 ```bash
 pytest python/tests -v
 ```
 
-**Run a specific test file:**
+**运行特定测试文件：**
 ```bash
 pytest python/tests/test_workers.py
 ```
 
-Tests are also run automatically via `make test` and `make test-fast`.
+测试也会通过 `make test` 和 `make test-fast` 自动运行。
 
-## Test Organization
+## 测试组织
 
-| File | Coverage |
+| 文件 | 覆盖范围 |
 |------|----------|
-| `test_workers.py` | Worker status operations, dead PID cleanup |
-| `test_github_filtering.py` | Issue/PR filtering, ready state checks |
-| `test_github_discovery.py` | Candidate discovery, status queries |
-| `test_runtime_config.py` | Config loading, precedence resolution, handsoff section |
-| `test_local_config.py` | YAML config lookup, env override, type coercion |
-| `test_notify.py` | Telegram message formatting |
-| `test_session.py` | Session lookup and state retrieval |
-| `test_module_exports.py` | Module imports and re-exports |
-| `test_workflow.py` | Workflow detection, issue extraction, continuation prompts, supervisor config |
-| `test_permission_determine.py` | Permission helper functions (_escape_html, inline keyboard, callback parsing, Telegram guard) |
+| `test_workers.py` | Worker 状态操作、失效 PID 清理 |
+| `test_github_filtering.py` | Issue/PR 过滤、就绪状态检查 |
+| `test_github_discovery.py` | 候选发现、状态查询 |
+| `test_runtime_config.py` | 配置加载、优先级解析、handsoff 配置段 |
+| `test_local_config.py` | YAML 配置查找、环境变量覆盖、类型强制转换 |
+| `test_notify.py` | Telegram 消息格式化 |
+| `test_session.py` | 会话查找和状态获取 |
+| `test_module_exports.py` | 模块导入和再导出 |
+| `test_workflow.py` | 工作流检测、issue 提取、续接提示词、supervisor 配置 |
+| `test_permission_determine.py` | 权限辅助函数（_escape_html、inline keyboard、回调解析、Telegram 守卫） |
 
 ## Fixtures
 
-The `conftest.py` file provides:
-- `project_root`: Path to the repository root
-- `set_agentize_home`: Set `AGENTIZE_HOME` to a temporary directory for isolated tests
-- Automatic `PYTHONPATH` setup for `python/` and `.claude-plugin` imports
+`conftest.py` 文件提供：
+- `project_root`：仓库根目录路径
+- `set_agentize_home`：将 `AGENTIZE_HOME` 设置为临时目录以隔离测试
+- 为 `python/` 和 `.claude-plugin` 导入自动设置 `PYTHONPATH`
 
-## Writing Tests
+## 编写测试
 
-1. Create test files matching `test_*.py`
-2. Use `unittest.mock` for mocking subprocess and external calls
-3. Use pytest fixtures (`tmp_path`, `monkeypatch`, `capfd`) as needed
-4. Follow existing test patterns for consistency
+1. 创建匹配 `test_*.py` 的测试文件
+2. 使用 `unittest.mock` 模拟子进程和外部调用
+3. 按需使用 pytest fixtures（`tmp_path`、`monkeypatch`、`capfd`）
+4. 遵循现有测试模式以保持一致性

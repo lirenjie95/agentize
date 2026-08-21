@@ -1,119 +1,119 @@
-# Tests Directory
+# 测试目录
 
-This directory contains test suites for validating Agentize SDK functionality and commands.
+本目录包含用于验证 Agentize SDK 功能和命令的测试套件。
 
-## Purpose
+## 目的
 
-Automated test scripts verify that SDK templates, CLI tools, and infrastructure components work correctly across different programming languages and environments.
+自动化测试脚本验证 SDK 模板、CLI 工具和基础设施组件在不同编程语言和环境下是否正确工作。
 
-## Test Organization
+## 测试组织
 
-### Test Infrastructure
+### 测试基础设施
 
-- `test-all.sh` - Master test runner that executes all test suites and reports summary
-- `common.sh` - Shared test helper providing `PROJECT_ROOT`, test result helpers, and resource management
-- `helpers-worktree.sh` - Shared worktree test setup/cleanup helpers
-- `helpers-gh-mock.sh` - Shared gh mock helpers for issue/PR tests
-- `helpers-makefile-validation.sh` - Shared helpers for makefile validation tests
+- `test-all.sh` - 主测试运行器，执行所有测试套件并报告摘要
+- `common.sh` - 共享测试辅助脚本，提供 `PROJECT_ROOT`、测试结果辅助函数和资源管理
+- `helpers-worktree.sh` - 共享的 worktree 测试设置/清理辅助函数
+- `helpers-gh-mock.sh` - 用于 issue/PR 测试的共享 gh 模拟辅助函数
+- `helpers-makefile-validation.sh` - makefile 校验测试的共享辅助函数
 
-### Test Organization Pattern
+### 测试组织模式
 
-Each test script follows the naming pattern `test-<feature>-<case>.sh` and represents a **single test case**. All test scripts source `common.sh` for shared functionality and maintain shell-neutral compatibility.
+每个测试脚本遵循命名模式 `test-<feature>-<case>.sh`，代表一个**单独的测试用例**。所有测试脚本都会加载 `common.sh` 以获得共享功能，并保持 shell 中立兼容性。
 
-Test files are organized into categorical subdirectories:
-- **`tests/sdk/`** - SDK template tests (fast unit tests for SDK generation)
-- **`tests/cli/`** - CLI command and tool tests (unit tests for CLI tools)
-- **`tests/lint/`** - Validation and linting tests (static checks and makefile validation)
-- **`tests/e2e/`** - End-to-end integration tests (slower tests with full workflows)
+测试文件组织在分类子目录中：
+- **`tests/sdk/`** - SDK 模板测试（SDK 生成的快速单元测试）
+- **`tests/cli/`** - CLI 命令和工具测试（CLI 工具的单元测试）
+- **`tests/lint/`** - 校验与 lint 测试（静态检查和 makefile 校验）
+- **`tests/e2e/`** - 端到端集成测试（含完整工作流的较慢测试）
 
-### Test Fixtures
+### 测试 Fixture
 
-- `fixtures/` - Test data and mock files used by tests
+- `fixtures/` - 测试使用的测试数据和模拟文件
 
-## Running Tests
+## 运行测试
 
-Run all tests (bash only):
+运行所有测试（仅 bash）：
 ```bash
 make test
 # or
 bash tests/test-all.sh
 ```
 
-Run all tests under multiple shells (bash and zsh):
+在多个 shell（bash 和 zsh）下运行所有测试：
 ```bash
 make test-shells
 # or
 TEST_SHELLS="bash zsh" tests/test-all.sh
 ```
 
-Run tests by category:
+按类别运行测试：
 ```bash
-make test-sdk        # Fast SDK unit tests
-make test-cli        # CLI tool tests
-make test-lint       # Validation and linting tests
-make test-e2e        # End-to-end integration tests
-make test-fast       # Alias for sdk + cli + lint
+make test-sdk        # 快速 SDK 单元测试
+make test-cli        # CLI 工具测试
+make test-lint       # 校验与 lint 测试
+make test-e2e        # 端到端集成测试
+make test-fast       # sdk + cli + lint 的别名
 ```
 
-Run a specific test suite:
+运行特定的测试套件：
 ```bash
 bash tests/sdk/test-c-sdk.sh
 bash tests/e2e/test-worktree.sh
 ```
 
-Run a specific test under zsh:
+在 zsh 下运行特定测试：
 ```bash
 zsh tests/sdk/test-c-sdk.sh
 ```
 
-## Test Structure
+## 测试结构
 
-Each test script represents a single test case and follows this pattern:
+每个测试脚本代表一个单独的测试用例，遵循以下模式：
 
-1. Source the shared test helper: `source "$(dirname "$0")/common.sh"`
-2. Set up test environment (temporary directories via `make_temp_dir`)
-3. Execute the functionality being tested
-4. Validate expected outcomes (using `test_pass` or `test_fail`)
-5. Clean up test artifacts (using `cleanup_dir` or implicit cleanup)
-6. Exit with status code (0 = pass, 1 = fail)
+1. 加载共享测试辅助脚本：`source "$(dirname "$0")/common.sh"`
+2. 设置测试环境（通过 `make_temp_dir` 创建临时目录）
+3. 执行被测功能
+4. 验证预期结果（使用 `test_pass` 或 `test_fail`）
+5. 清理测试产物（使用 `cleanup_dir` 或隐式清理）
+6. 以状态码退出（0 = 通过，1 = 失败）
 
-The shared helper `tests/common.sh` provides:
-- `PROJECT_ROOT` and `TESTS_DIR` variables
-- Color constants for terminal output
-- Test result helpers: `test_pass`, `test_fail`, `test_info`
-- Resource management: `make_temp_dir`, `cleanup_dir`
+共享辅助脚本 `tests/common.sh` 提供：
+- `PROJECT_ROOT` 和 `TESTS_DIR` 变量
+- 终端输出的颜色常量
+- 测试结果辅助函数：`test_pass`、`test_fail`、`test_info`
+- 资源管理：`make_temp_dir`、`cleanup_dir`
 
-## Adding New Tests
+## 添加新测试
 
-### Shell Tests
+### Shell 测试
 
-All shell tests must live in a categorized subdirectory under `tests/`. Do not create tests under `.claude/*/tests/` or other locations.
+所有 shell 测试必须位于 `tests/` 下的分类子目录中。不要在 `.claude/*/tests/` 或其他位置创建测试。
 
-1. Choose the appropriate category directory:
-   - `tests/sdk/` for SDK template tests
-   - `tests/cli/` for CLI command tests
-   - `tests/lint/` for validation tests
-   - `tests/e2e/` for end-to-end integration tests
-2. Create a new test script: `tests/<category>/test-<feature>-<case>.sh`
-3. Source the common helper: `source "$(dirname "$0")/../common.sh"`
-4. Source feature-specific helpers if needed: `source "$(dirname "$0")/../helpers-*.sh"`
-5. Implement a single test case with clear assertions
-6. Use helper functions from `common.sh` or feature-specific helpers
-7. The test will be automatically discovered by `test-all.sh` (no manual registration required)
-8. Update `.claude/settings.local.json` to allow execution without permission prompts (see `tests/CLAUDE.md`)
+1. 选择合适的类别目录：
+   - `tests/sdk/` 用于 SDK 模板测试
+   - `tests/cli/` 用于 CLI 命令测试
+   - `tests/lint/` 用于校验测试
+   - `tests/e2e/` 用于端到端集成测试
+2. 创建新的测试脚本：`tests/<category>/test-<feature>-<case>.sh`
+3. 加载通用辅助脚本：`source "$(dirname "$0")/../common.sh"`
+4. 如有需要，加载特定功能的辅助脚本：`source "$(dirname "$0")/../helpers-*.sh"`
+5. 实现一个带清晰断言的单独测试用例
+6. 使用 `common.sh` 或特定功能辅助脚本中的辅助函数
+7. 测试将被 `test-all.sh` 自动发现（无需手动注册）
+8. 更新 `.claude/settings.local.json` 以允许无需权限提示的执行（参见 `tests/CLAUDE.md`）
 
-### Python Tests (pytest)
+### Python 测试（pytest）
 
-Python unit tests for server modules live in `python/tests/`:
+服务器模块的 Python 单元测试位于 `python/tests/`：
 
-1. Create test files: `python/tests/test_<module>.py`
-2. Tests are automatically discovered by pytest (files matching `test_*.py`)
-3. Use `conftest.py` fixtures for path setup (`PROJECT_ROOT`, `PYTHONPATH`)
-4. Use `unittest.mock` for mocking subprocess calls and external dependencies
-5. Run with: `pytest python/tests` or via `make test`/`make test-fast`
+1. 创建测试文件：`python/tests/test_<module>.py`
+2. 测试会被 pytest 自动发现（匹配 `test_*.py` 的文件）
+3. 使用 `conftest.py` fixture 进行路径设置（`PROJECT_ROOT`、`PYTHONPATH`）
+4. 使用 `unittest.mock` 模拟子进程调用和外部依赖
+5. 运行方式：`pytest python/tests` 或通过 `make test`/`make test-fast`
 
-## Integration
+## 集成
 
-Test documentation is tracked in:
-- [docs/test/workflow.md](../docs/test/workflow.md) - Dogfooding validation status
-- [docs/test/agents.md](../docs/test/agents.md) - Agent infrastructure test coverage
+测试文档在以下位置跟踪：
+- [docs/test/workflow.md](../docs/test/workflow.md) - Dogfooding 验证状态
+- [docs/test/agents.md](../docs/test/agents.md) - Agent 基础设施测试覆盖

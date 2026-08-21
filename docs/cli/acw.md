@@ -1,8 +1,8 @@
 # acw - Agent CLI Wrapper
 
-Unified file-based interface for invoking multiple AI CLI tools.
+用于调用多种 AI CLI 工具的统一文件式接口。
 
-## Synopsis
+## 概要
 
 ```bash
 acw [--chat [session-id]] [--editor] [--stdout] <cli-name> <model-name> [<input-file>] [<output-file>] [cli-options...]
@@ -11,111 +11,111 @@ acw --complete <topic>
 acw --help
 ```
 
-## Description
+## 描述
 
-`acw` provides a consistent interface for invoking different AI CLI tools (claude, codex, opencode, cursor/agent, kimi) with file-based input/output. Optional flags allow editor-based input and stdout output while preserving the default file-based workflow. Python workflows wrap `acw` through `agentize.workflow.api.acw` to preserve the same invocation semantics and timing logs.
+`acw` 为调用不同的 AI CLI 工具（claude、codex、opencode、cursor/agent、kimi）提供一致的接口，输入/输出均基于文件。可选标志允许使用编辑器输入和 stdout 输出，同时保留默认的基于文件的工作流。Python 工作流通过 `agentize.workflow.api.acw` 包装 `acw`，以保持相同的调用语义和计时日志。
 
-## Arguments
+## 参数
 
-| Argument | Required | Description |
+| 参数 | 是否必需 | 描述 |
 |----------|----------|-------------|
-| `cli-name` | Yes | Provider name: `claude`, `codex`, `opencode`, `cursor`, `kimi`, `gemini` |
-| `model-name` | Yes | Model identifier passed to the provider (Kimi ignores this and uses its default model) |
-| `input-file` | Conditional | Path to file containing the prompt (required unless `--editor` is used) |
-| `output-file` | Conditional | Path where response will be written (required unless `--stdout` is used) |
-| `cli-options` | No | Additional options passed to the provider CLI |
+| `cli-name` | 是 | 提供方名称：`claude`、`codex`、`opencode`、`cursor`、`kimi`、`gemini` |
+| `model-name` | 是 | 传递给提供方的模型标识符（Kimi 会忽略此参数并使用其默认模型） |
+| `input-file` | 条件必需 | 包含提示词的文件路径（除非使用 `--editor`，否则必需） |
+| `output-file` | 条件必需 | 响应写入的文件路径（除非使用 `--stdout`，否则必需） |
+| `cli-options` | 否 | 传递给提供方 CLI 的附加选项 |
 
-## Options
+## 选项
 
-| Option | Description |
+| 选项 | 描述 |
 |--------|-------------|
-| `--chat [session-id]` | Start or continue a chat session. Creates new session if no ID provided. |
-| `--chat-list` | List available chat sessions and exit. |
-| `--editor` | Use `$EDITOR` to create the input content (mutually exclusive with `input-file`) |
-| `--stdout` | Write output to stdout (mutually exclusive with `output-file`). When not combined with `--chat`, merges provider stderr into stdout. When combined with `--chat`, provider stderr is written to `<session-id>.stderr` sidecar file, and `--editor` echoes the prompt to stdout when stdout is a TTY. |
-| `--complete <topic>` | Print completion values for the given topic |
-| `--help` | Show help text |
+| `--chat [session-id]` | 开始或继续一个聊天会话。若未提供 ID 则创建新会话。 |
+| `--chat-list` | 列出可用的聊天会话并退出。 |
+| `--editor` | 使用 `$EDITOR` 创建输入内容（与 `input-file` 互斥） |
+| `--stdout` | 将输出写入 stdout（与 `output-file` 互斥）。不与 `--chat` 组合时，将提供方的 stderr 合并进 stdout。与 `--chat` 组合时，提供方的 stderr 会写入 `<session-id>.stderr` 附属文件，且当 stdout 是 TTY 时 `--editor` 会将提示词回显到 stdout。 |
+| `--complete <topic>` | 打印给定主题的补全值 |
+| `--help` | 显示帮助文本 |
 
-## Supported Providers
+## 支持的提供方
 
-| Provider | CLI Binary | Status |
+| 提供方 | CLI 二进制 | 状态 |
 |----------|------------|--------|
-| `claude` | `claude` | Full support |
-| `codex` | `codex` | Full support |
-| `opencode` | `opencode` | Best-effort |
-| `cursor` | `agent` | Best-effort |
-| `kimi` | `kimi` | Best-effort |
-| `gemini` | `gemini` | Best-effort |
+| `claude` | `claude` | 完整支持 |
+| `codex` | `codex` | 完整支持 |
+| `opencode` | `opencode` | 尽力支持 |
+| `cursor` | `agent` | 尽力支持 |
+| `kimi` | `kimi` | 尽力支持 |
+| `gemini` | `gemini` | 尽力支持 |
 
-## Exit Codes
+## 退出码
 
-| Code | Description |
+| 退出码 | 描述 |
 |------|-------------|
-| 0 | Success |
-| 1 | Missing required arguments |
-| 2 | Unknown provider |
-| 3 | Input file not found or not readable |
-| 4 | Provider CLI binary not found |
-| 5 | Chat session error (invalid ID, missing file, or format error) |
-| 127 | Provider execution failed |
+| 0 | 成功 |
+| 1 | 缺少必需参数 |
+| 2 | 未知的提供方 |
+| 3 | 输入文件不存在或不可读 |
+| 4 | 提供方 CLI 二进制文件未找到 |
+| 5 | 聊天会话错误（ID 无效、文件缺失或格式错误） |
+| 127 | 提供方执行失败 |
 
-## Examples
+## 示例
 
-### Basic Usage
+### 基本用法
 
 ```bash
-# Invoke Claude with a prompt file
+# 使用提示词文件调用 Claude
 acw claude claude-sonnet-4-20250514 prompt.txt response.txt
-# Provider stderr is written to response.txt.stderr in file mode
+# 文件模式下，提供方的 stderr 会写入 response.txt.stderr
 
-# Invoke Codex
+# 调用 Codex
 acw codex gpt-4o prompt.txt response.txt
 
-# Invoke Kimi (model-name is ignored; Kimi uses its default)
+# 调用 Kimi（model-name 会被忽略；Kimi 使用其默认模型）
 acw kimi default prompt.txt response.txt
 
-# Invoke Gemini (model-name is ignored; Gemini uses its default)
+# 调用 Gemini（model-name 会被忽略；Gemini 使用其默认模型）
 acw gemini default prompt.txt response.txt
 
-# Pass additional options to the provider
+# 向提供方传递附加选项
 acw claude claude-sonnet-4-20250514 prompt.txt response.txt --max-tokens 4096
 
-# Compose a prompt in your editor
+# 在编辑器中编写提示词
 acw --editor claude claude-sonnet-4-20250514 response.txt
 
-# Stream output to stdout (merged with provider stderr)
+# 将输出流式输出到 stdout（与提供方 stderr 合并）
 acw --stdout claude claude-sonnet-4-20250514 prompt.txt
 
-# Start a new chat session (prints session ID)
+# 开始新的聊天会话（打印会话 ID）
 acw --chat claude claude-sonnet-4-20250514 prompt.txt response.txt
 
-# Continue an existing chat session
+# 继续已有的聊天会话
 acw --chat abc12345 claude claude-sonnet-4-20250514 prompt.txt response.txt
 
-# List all chat sessions
+# 列出所有聊天会话
 acw --chat-list
 ```
 
-### Script Integration
+### 脚本集成
 
 ```bash
 #!/usr/bin/env bash
 source "$AGENTIZE_HOME/src/cli/acw.sh"
 
-# Use acw in your script
+# 在你的脚本中使用 acw
 acw claude claude-sonnet-4-20250514 /tmp/prompt.txt /tmp/response.txt
 if [ $? -eq 0 ]; then
     echo "Response written to /tmp/response.txt"
 fi
 ```
 
-## Chat Sessions
+## 聊天会话
 
-Chat sessions enable multi-turn conversations by persisting history as markdown files.
+聊天会话通过将历史记录持久化为 markdown 文件来支持多轮对话。
 
-### Session Storage
+### 会话存储
 
-Sessions are stored under `$AGENTIZE_HOME/.tmp/acw-sessions/` as markdown files with YAML front matter:
+会话以带有 YAML front matter 的 markdown 文件形式存储在 `$AGENTIZE_HOME/.tmp/acw-sessions/` 下：
 
 ```markdown
 ---
@@ -131,65 +131,65 @@ What is the capital of France?
 The capital of France is Paris.
 ```
 
-### Session IDs
+### 会话 ID
 
-- Format: 8-character base62 string (a-z, A-Z, 0-9)
-- Generated automatically when `--chat` is used without an ID
-- Printed to stderr when a new session is created
+- 格式：8 字符的 base62 字符串（a-z、A-Z、0-9）
+- 当使用 `--chat` 且未提供 ID 时自动生成
+- 创建新会话时打印到 stderr
 
-### Chat Flow
+### 聊天流程
 
-1. **New session**: `acw --chat` creates a session file, prints its ID, and runs the first turn.
-2. **Continue session**: `acw --chat <id>` prepends the session history to the current input and appends the new turn after the provider responds.
-3. **List sessions**: `acw --chat-list` lists session IDs with provider, model label, and creation date. Kimi sessions store `model: default` to reflect provider defaults.
+1. **新会话**：`acw --chat` 创建会话文件、打印其 ID，并运行第一轮对话。
+2. **继续会话**：`acw --chat <id>` 将会话历史前置于当前输入，并在提供方响应后追加新的一轮。
+3. **列出会话**：`acw --chat-list` 列出会话 ID 及其提供方、模型标签和创建日期。Kimi 会话存储 `model: default` 以反映提供方默认值。
 
-## Environment Variables
+## 环境变量
 
-| Variable | Description |
+| 变量 | 描述 |
 |----------|-------------|
-| `AGENTIZE_HOME` | Required. Path to agentize installation. |
-| `EDITOR` | Required when using `--editor`. Command used to compose the prompt. |
+| `AGENTIZE_HOME` | 必需。agentize 安装路径。 |
+| `EDITOR` | 使用 `--editor` 时必需。用于编写提示词的命令。 |
 
-## Shell Completion
+## Shell 补全
 
-`acw` supports shell autocompletion for zsh. The completion is provided by `src/completion/_acw`.
+`acw` 支持 zsh 的 shell 自动补全。补全功能由 `src/completion/_acw` 提供。
 
-### Completion Topics
+### 补全主题
 
-Use `acw --complete <topic>` to get completion values programmatically:
+使用 `acw --complete <topic>` 以编程方式获取补全值：
 
-| Topic | Description |
+| 主题 | 描述 |
 |-------|-------------|
-| `providers` | List of supported providers (claude, codex, opencode, cursor, kimi, gemini) |
-| `cli-options` | Common CLI options (e.g., --help, --editor, --stdout, --model, --max-tokens, --yolo) |
+| `providers` | 支持的提供方列表（claude、codex、opencode、cursor、kimi、gemini） |
+| `cli-options` | 常用 CLI 选项（例如 --help、--editor、--stdout、--model、--max-tokens、--yolo） |
 
-Kimi ignores `<model-name>`, so provider completions still include `--model` for other CLIs while Kimi uses its default model.
+Kimi 会忽略 `<model-name>`，因此提供方补全中仍为其他 CLI 包含 `--model`，而 Kimi 使用其默认模型。
 
-### Setup
+### 配置
 
-For zsh, add the completion directory to your `fpath`:
+对于 zsh，将补全目录添加到你的 `fpath`：
 
 ```bash
 fpath=($AGENTIZE_HOME/src/completion $fpath)
 autoload -Uz compinit && compinit
 ```
 
-## Notes
+## 注意事项
 
-- The output directory is created automatically if it doesn't exist (skipped when `--stdout` is used)
-- Provider-specific options are passed through unchanged, except `--yolo` is normalized to Claude's `--dangerously-skip-permissions` and Codex's `--full-auto`
-- The wrapper returns the provider's exit code on successful execution
-- Best-effort providers (opencode, cursor, kimi) may have limited functionality
-- Only `acw` is the public function; all helper functions (provider invocation, completion, validation) are internal (prefixed with `_acw_`) and won't appear in tab completion
-- `acw` flags must appear before `cli-name`. Use `--` to pass provider options that collide with `acw` flags.
-- `--stdout` behavior:
-  - Without `--chat`: merges provider stderr into stdout so progress and output can be piped together.
-  - With `--chat`: provider stderr is appended to `.tmp/acw-sessions/<session-id>.stderr` to keep stdout clean for piping. Empty sidecar files created by `acw` are automatically removed.
-  - With `--chat --editor`: when stdout is a TTY, the user prompt is echoed immediately before provider invocation, followed by a `Response:` header before assistant output.
-- In file mode (no `--stdout`), provider stderr is written to `<output-file>.stderr`. Empty sidecar files are removed after the provider exits.
-- Kimi output is forced to `--output-format stream-json` and stripped to plain assistant text. In non-chat `--stdout` mode, merged stderr lines that are not JSON may be dropped during stripping.
+- 输出目录不存在时会自动创建（使用 `--stdout` 时跳过）
+- 提供方特定选项会原样透传，但 `--yolo` 会被规范化为 Claude 的 `--dangerously-skip-permissions` 和 Codex 的 `--full-auto`
+- 包装器在成功执行时返回提供方的退出码
+- 尽力支持的提供方（opencode、cursor、kimi）功能可能受限
+- 只有 `acw` 是公开函数；所有辅助函数（提供方调用、补全、校验）都是内部的（以 `_acw_` 为前缀），不会出现在 tab 补全中
+- `acw` 的标志必须出现在 `cli-name` 之前。使用 `--` 传递与 `acw` 标志冲突的提供方选项。
+- `--stdout` 行为：
+  - 不带 `--chat`：将提供方 stderr 合并进 stdout，以便进度和输出可以一起通过管道传输。
+  - 带 `--chat`：提供方 stderr 被追加到 `.tmp/acw-sessions/<session-id>.stderr`，以保持 stdout 干净便于管道传输。由 `acw` 创建的空附属文件会被自动删除。
+  - 带 `--chat --editor`：当 stdout 是 TTY 时，用户提示词会在提供方调用前立即回显，随后在助手输出前打印 `Response:` 头。
+- 在文件模式（无 `--stdout`）下，提供方 stderr 写入 `<output-file>.stderr`。提供方退出后，空的附属文件会被删除。
+- Kimi 输出被强制为 `--output-format stream-json`，并被剥离为纯助手文本。在非聊天 `--stdout` 模式下，合并的 stderr 中非 JSON 的行可能会在剥离过程中被丢弃。
 
-## See Also
+## 另请参阅
 
-- `src/cli/acw.md` - Interface documentation
-- `src/cli/acw/README.md` - Module architecture
+- `src/cli/acw.md` - 接口文档
+- `src/cli/acw/README.md` - 模块架构

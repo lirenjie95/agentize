@@ -1,39 +1,39 @@
-# Commands
+# Commands（命令）
 
-This document describes the command definitions for Claude Code. Commands are shortcuts that can be invoked to execute specific workflows or skills.
+本文档介绍 Claude Code 的 command 定义。Command 是可以被调用来执行特定工作流或 skill 的快捷方式。
 
-## Purpose
+## 目的
 
-Commands provide a simple interface to invoke complex workflows or skills. Each command is defined in a markdown file with frontmatter metadata in the `.claude-plugin/commands/` directory.
+Command 提供调用复杂工作流或 skill 的简单接口。每个 command 定义为 `.claude-plugin/commands/` 目录下一个带 frontmatter 元数据的 markdown 文件。
 
-## Configuration
+## 配置
 
-Command files include:
-- `name`: The command name (used for invocation)
-- `description`: Brief description of what the command does
-- Instructions on how to use the command and which skills it invokes
+Command 文件包含：
+- `name`：命令名（用于调用）
+- `description`：命令功能的简要描述
+- 关于如何使用该命令以及它调用哪些 skill 的说明
 
-## Available Commands
+## 可用 Commands
 
-### Git & GitHub
+### Git 与 GitHub
 
-- `git-commit`: Invokes the commit-msg skill to create commits with meaningful messages following project standards
-- `pull-request`: Review code changes and optionally create a pull request with --open flag
-- `sync-master`: Synchronizes local main/master branch with upstream (or origin) using rebase
+- `git-commit`：调用 commit-msg skill，按照项目标准创建带有有意义信息的提交
+- `pull-request`：评审代码变更，并可通过 --open 标志创建 pull request
+- `sync-master`：使用 rebase 将本地 main/master 分支与 upstream（或 origin）同步
 
-### Code Review
+### 代码评审
 
-- `agent-review`: Review code changes via agent with isolated context and Opus model
-- `code-review`: Review code changes from current HEAD to main/HEAD following review standards
-- `resolve-review`: Fetch unresolved PR review threads and apply fixes automatically; auto-detects PR from current branch if not specified (automation-friendly, invoked by server)
+- `agent-review`：通过具有独立上下文和 Opus 模型的 agent 评审代码变更
+- `code-review`：按照评审标准评审从当前 HEAD 到 main/HEAD 的代码变更
+- `resolve-review`：获取未解决的 PR 评审线程并自动应用修复；未指定时自动从当前分支检测 PR（对自动化友好，由 server 调用）
 
-### Planning & Implementation
+### 规划与实现
 
-- `make-a-plan`: Creates comprehensive implementation plans following design-first TDD approach
-- `plan-to-issue`: Create GitHub [plan] issues from implementation plans with proper formatting
-- `issue-to-impl`: Orchestrates full implementation workflow from issue to completion (creates branch, docs, tests, and first milestone); supports `--dry-run` for preview
-- `ultra-planner`: Multi-agent debate-based planning with /ultra-planner command (supports `--refine` for iterative improvement and `--dry-run` for preview without GitHub changes)
+- `make-a-plan`：遵循设计优先的 TDD 方法创建全面的实现计划
+- `plan-to-issue`：以实现计划创建格式规范的 GitHub [plan] issue
+- `issue-to-impl`：编排从 issue 到完成的完整实现工作流（创建分支、文档、测试和第一个里程碑）；支持 `--dry-run` 预览
+- `ultra-planner`：基于多 agent 辩论的规划，通过 /ultra-planner 命令调用（支持 `--refine` 迭代改进，支持 `--dry-run` 在不改动 GitHub 的情况下预览）
 
-### Project Setup
+### 项目设置
 
-- `setup-viewboard`: Set up a GitHub Projects v2 board with agentize-compatible Status fields, labels, and automation workflows
+- `setup-viewboard`：设置带有 agentize 兼容的 Status 字段、标签和自动化工作流的 GitHub Projects v2 看板

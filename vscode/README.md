@@ -1,72 +1,71 @@
-# VS Code Agentize Extension
+# VS Code Agentize 扩展
 
-This directory contains a VS Code Activity Bar extension that wraps the Agentize CLI
-planning workflow and surfaces it alongside Worktree and Settings panels.
+本目录包含一个 VS Code Activity Bar 扩展，它封装了 Agentize CLI 的规划工作流，
+并将其与 Worktree 和 Settings 面板一起呈现。
 
-## Organization
+## 组织结构
 
-- `src/` contains extension backend code (state, runner, and view wiring).
-- `webview/` contains the Plan, Worktree, and Settings tab UI assets rendered in the Activity Bar webviews.
-- `resources/` contains icons for the Activity Bar container and each tab.
-- `bin/` contains helper executables used by the extension runtime.
+- `src/` 包含扩展后端代码（state、runner 和 view 接线）。
+- `webview/` 包含在 Activity Bar webview 中渲染的 Plan、Worktree 和 Settings 标签页 UI 资源。
+- `resources/` 包含 Activity Bar 容器和各个标签页的图标。
+- `bin/` 包含扩展运行时使用的辅助可执行文件。
 
-## Plan to Implementation Flow
+## 从规划到实现的流程
 
-When a plan finishes successfully and the planner creates a placeholder GitHub issue, the
-Plan tab surfaces an Implement button. Clicking it launches `lol impl <issue-number>` in a
-separate Implementation Log panel so plan and implementation output stay distinct.
+当规划成功完成且规划器创建了占位 GitHub issue 后，
+Plan 标签页会显示一个 Implement 按钮。点击它会在单独的
+Implementation Log 面板中启动 `lol impl <issue-number>`，
+从而使规划输出和实现输出保持分离。
 
 ## Settings UI
 
-The Settings tab provides a backend configuration UI for Agentize workflows. It shows
-`.agentize.yaml` (read-only) plus editable repo and global `.agentize.local.yaml` scopes.
-Backend selections are stored as `planner.backend` values in `provider:model` format and
-are used by the extension when running implementation workflows.
+Settings 标签页为 Agentize 工作流提供后端配置 UI。它显示
+`.agentize.yaml`（只读）以及可编辑的仓库级和全局 `.agentize.local.yaml` 作用域。
+后端选择以 `provider:model` 格式存储为 `planner.backend` 值，
+扩展在运行实现工作流时会使用这些值。
 
-## Prerequisites
+## 前置条件
 
-- Node.js + npm (for compiling the extension TypeScript).
-- Bash (used by the `lol` wrapper).
-- A generated `setup.sh` in the repository root (run `make setup` from the repo
-  root that contains `vscode/`).
+- Node.js + npm（用于编译扩展的 TypeScript）。
+- Bash（由 `lol` wrapper 使用）。
+- 仓库根目录中生成的 `setup.sh`（在包含 `vscode/` 的仓库根目录下运行 `make setup`）。
 
-## Build
+## 构建
 
 ```bash
 npm --prefix vscode install
 npm --prefix vscode run compile
 ```
 
-For development watch mode:
+开发监视模式：
 
 ```bash
 npm --prefix vscode run watch
 ```
 
-## Load in VS Code
+## 在 VS Code 中加载
 
-- Command line: `code --extensionDevelopmentPath ./vscode`
-- Or use the VS Code command palette: "Developer: Install Extension from
-  Location..." and choose the `vscode/` folder.
+- 命令行：`code --extensionDevelopmentPath ./vscode`
+- 或使用 VS Code 命令面板："Developer: Install Extension from
+  Location..."，然后选择 `vscode/` 文件夹。
 
-## Workspace Requirement
+## 工作区要求
 
-The Plan runner needs a working directory where the Agentize CLI is available.
-It resolves the planning working directory with the following rules:
+Plan runner 需要一个 Agentize CLI 可用的工作目录。
+它按以下规则解析规划工作目录：
 
-- If any opened workspace folder contains `trees/main` (created by `wt init` or
-  `wt clone`), the runner uses `<workspace>/trees/main`.
-- Otherwise, it falls back to the workspace folder root (useful when you open a
-  single worktree like `trees/issue-866` directly).
+- 如果任何已打开的工作区文件夹包含 `trees/main`（由 `wt init` 或
+  `wt clone` 创建），runner 使用 `<workspace>/trees/main`。
+- 否则，回退到工作区文件夹根目录（适用于直接打开单个 worktree
+  如 `trees/issue-866` 的情况）。
 
-## Refining Plans
+## 细化规划
 
-When a plan session completes (success or error), a Refine button appears on the
-session card.
+当规划会话完成（成功或出错）时，会话卡片上会出现一个 Refine 按钮。
 
-1. Click Refine on the completed session.
-1. An inline textbox appears inside the session (expand the session if needed).
-1. Type the refinement focus or instructions, then press Cmd+Enter / Ctrl+Enter.
+1. 在已完成的会话上点击 Refine。
+1. 会话内会出现一个内联文本框（如有需要请展开会话）。
+1. 输入细化重点或指令，然后按 Cmd+Enter / Ctrl+Enter。
 
-The extension runs `lol plan --refine <issue> "<focus>"` and streams the
-refinement session in the plan view like any other run.
+扩展会运行 `lol plan --refine <issue> "<focus>"`，
+并像其他运行一样在规划视图中流式输出细化会话。

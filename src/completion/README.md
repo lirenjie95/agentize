@@ -1,35 +1,35 @@
-# Shell Completion Scripts
+# Shell 补全脚本
 
-This directory contains shell completion scripts for Agentize CLI commands.
+本目录包含 Agentize CLI 命令的 shell 补全脚本。
 
-## Purpose
+## 目的
 
-Provides interactive tab-completion support for CLI commands, improving user experience by:
-- Suggesting available subcommands and flags
-- Offering context-aware value completion (e.g., language values, file paths)
-- Reducing typing and preventing errors through autocomplete
+为 CLI 命令提供交互式 tab 补全支持，通过以下方式改善用户体验：
+- 提示可用的子命令和标志
+- 提供上下文感知的值补全（例如语言值、文件路径）
+- 通过自动补全减少输入并防止错误
 
-## File Organization
+## 文件组织
 
-Completion scripts follow the naming pattern `_<command>` for zsh completions:
+补全脚本遵循 zsh 补全的 `_<command>` 命名模式：
 
-- `_wt` - Completion for the `wt` (worktree) command
-- `_lol` - Completion for the `lol` (SDK CLI) command
-- `_acw` - Completion for the `acw` (Agent CLI Wrapper) command
+- `_wt` - `wt`（worktree）命令的补全
+- `_lol` - `lol`（SDK CLI）命令的补全
+- `_acw` - `acw`（Agent CLI Wrapper）命令的补全
 
-## How Completions Are Loaded
+## 补全如何加载
 
-Completions are automatically enabled when users run `make setup` and source the generated `setup.sh`:
+当用户运行 `make setup` 并 source 生成的 `setup.sh` 时，补全自动启用：
 
-1. `make setup` generates `setup.sh` which adds `src/completion/` to zsh's `fpath`
-2. When user sources `setup.sh`, zsh's completion system (`compinit`) discovers completion files
-3. Tab-completion becomes available for all commands with `_<command>` files in this directory
+1. `make setup` 生成 `setup.sh`，它会将 `src/completion/` 添加到 zsh 的 `fpath`
+2. 当用户 source `setup.sh` 时，zsh 的补全系统（`compinit`）会发现补全文件
+3. 本目录中所有具有 `_<command>` 文件的命令都可使用 tab 补全
 
-## Adding New Completion Scripts
+## 添加新的补全脚本
 
-To add completion support for a new command:
+为新命令添加补全支持：
 
-1. **Add completion helper to the command script** (e.g., `scripts/new-command-cli.sh`):
+1. **在命令脚本中添加补全辅助函数**（例如 `scripts/new-command-cli.sh`）：
    ```bash
    new_command_complete() {
        local topic="$1"
@@ -38,7 +38,7 @@ To add completion support for a new command:
                echo "subcommand1"
                echo "subcommand2"
                ;;
-           # ... additional topics
+           # ... 其他主题
        esac
    }
 
@@ -47,50 +47,50 @@ To add completion support for a new command:
            new_command_complete "$2"
            return 0
        fi
-       # ... rest of command implementation
+       # ... 命令实现的其余部分
    }
    ```
 
-2. **Create zsh completion script** `src/completion/_new_command`:
+2. **创建 zsh 补全脚本** `src/completion/_new_command`：
    ```zsh
    #compdef new_command
 
    _new_command() {
-       # Use new_command --complete for dynamic completion
-       # with fallback to static lists
-       # ... implementation following _wt or _lol pattern
+       # 使用 new_command --complete 进行动态补全
+       # 并回退到静态列表
+       # ... 遵循 _wt 或 _lol 模式实现
    }
 
    _new_command "$@"
    ```
 
-3. **Add tests** in `tests/cli/` and `tests/lint/`:
-   - `test-new-command-complete-commands.sh` - Test command completion
-   - `test-new-command-complete-flags.sh` - Test flag completion
-   - `tests/lint/test-new-command-zsh-completion-file.sh` - Verify file exists
+3. **添加测试**，位于 `tests/cli/` 和 `tests/lint/`：
+   - `test-new-command-complete-commands.sh` - 测试命令补全
+   - `test-new-command-complete-flags.sh` - 测试标志补全
+   - `tests/lint/test-new-command-zsh-completion-file.sh` - 验证文件存在
 
-4. **Document in command documentation** (e.g., `docs/cli/new-command.md`):
-   - Add "Shell Completion (zsh)" section with setup instructions
-   - Add "Completion Helper Interface" section documenting topics
+4. **在命令文档中记录**（例如 `docs/cli/new-command.md`）：
+   - 添加 "Shell Completion (zsh)" 章节及设置说明
+   - 添加 "Completion Helper Interface" 章节记录各主题
 
-## Design Pattern
+## 设计模式
 
-All completion scripts follow a consistent pattern:
+所有补全脚本遵循一致的模式：
 
-**Shell-agnostic helper** (`<command> --complete <topic>`):
-- Returns newline-delimited tokens
-- No shell-specific syntax
-- Testable independently
-- Works before full environment setup
+**Shell 无关的辅助函数**（`<command> --complete <topic>`）：
+- 返回换行符分隔的 token
+- 不含 shell 特定语法
+- 可独立测试
+- 在完整环境设置之前即可工作
 
-**Zsh completion script** (`_<command>`):
-- Attempts dynamic fetch via `<command> --complete`
-- Falls back to static lists if command unavailable
-- Adds descriptions for better UX
-- Handles subcommand-specific completions
+**Zsh 补全脚本**（`_<command>`）：
+- 尝试通过 `<command> --complete` 动态获取
+- 命令不可用时回退到静态列表
+- 添加描述以获得更好的用户体验
+- 处理子命令特定的补全
 
-This two-tier approach ensures:
-- Completions work even when command isn't in PATH
-- Easy testing of completion logic
-- Future extensibility to other shells (bash, fish)
-- Single source of truth for command structure
+这种两层方案确保：
+- 即使命令不在 PATH 中，补全也能工作
+- 补全逻辑易于测试
+- 未来可扩展到其他 shell（bash、fish）
+- 命令结构有唯一的权威来源

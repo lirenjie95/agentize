@@ -1,136 +1,136 @@
-# Scripts Directory
+# Scripts 目录
 
-This directory contains utility scripts, git hooks, and wrapper entrypoints for the project.
+本目录包含本项目的实用脚本、git hooks 和包装器入口。
 
-**Canonical CLI sources:** The primary CLI implementations live in `src/cli/`. Scripts in this directory are either standalone utilities or thin wrappers that delegate to `src/cli/` libraries.
+**规范 CLI 源：** 主要的 CLI 实现位于 `src/cli/`。本目录中的脚本要么是独立的实用工具，要么是委托给 `src/cli/` 库的薄包装器。
 
-## Files
+## 文件
 
-### Installer
-- `install` - One-command Agentize installer script
-  - Usage: `curl -fsSL https://raw.githubusercontent.com/SyntheSys-Lab/agentize/main/scripts/install | bash`
-  - Options:
-    - `--dir <path>` - Installation directory (default: `$HOME/.agentize`)
-    - `--repo <url-or-path>` - Git repository URL or local path (default: official GitHub repo)
-    - `--help` - Display help and exit
-  - Behavior:
-    - Validates dependencies (`git`, `make`, `bash`)
-    - Clones repository to install directory (or copies from local path)
-    - Runs `make setup` to generate `setup.sh`
-    - Registers local Claude Code plugin marketplace and installs plugin (if `claude` is available)
-    - Prints shell RC integration instructions
-  - Safety features:
-    - No automatic RC file modification
-    - Fails if install directory exists (prevents overwrites)
-  - Exit codes: 0 (success), 1 (error)
-  - See [docs/feat/cli/install.md](../docs/feat/cli/install.md) for detailed documentation
+### 安装器
+- `install` - 一条命令即可完成安装的 Agentize 安装脚本
+  - 用法：`curl -fsSL https://raw.githubusercontent.com/SyntheSys-Lab/agentize/main/scripts/install | bash`
+  - 选项：
+    - `--dir <path>` - 安装目录（默认：`$HOME/.agentize`）
+    - `--repo <url-or-path>` - Git 仓库 URL 或本地路径（默认：官方 GitHub 仓库）
+    - `--help` - 显示帮助并退出
+  - 行为：
+    - 验证依赖（`git`、`make`、`bash`）
+    - 将仓库克隆到安装目录（或从本地路径复制）
+    - 运行 `make setup` 生成 `setup.sh`
+    - 注册本地 Claude Code 插件 marketplace 并安装插件（如果 `claude` 可用）
+    - 打印 shell RC 集成说明
+  - 安全特性：
+    - 不自动修改 RC 文件
+    - 如果安装目录已存在则失败（防止覆盖）
+  - 退出码：0（成功），1（错误）
+  - 详细文档请参阅 [docs/feat/cli/install.md](../docs/feat/cli/install.md)
 
 ### Pre-commit Hook
-- `pre-commit` - Git pre-commit hook script
-  - Runs documentation linter before tests
-  - Executes all test suites via `tests/test-all.sh`
-  - Can be bypassed with `--no-verify` for milestone commits
+- `pre-commit` - Git pre-commit hook 脚本
+  - 在测试之前运行文档 linter
+  - 通过 `tests/test-all.sh` 执行所有测试套件
+  - 里程碑提交可用 `--no-verify` 绕过
 
-### Documentation Linter
-- `lint-documentation.sh` - Pre-commit documentation linter
-  - Validates folder documentation (README.md, or SKILL.md for skill directories)
-  - Validates source code .md file correspondence
-  - Validates test documentation presence
-  - Exit codes: 0 (pass), 1 (fail)
+### 文档 Linter
+- `lint-documentation.sh` - Pre-commit 文档 linter
+  - 验证文件夹文档（README.md，skill 目录则为 SKILL.md）
+  - 验证源代码 .md 文件的对应关系
+  - 验证测试文档是否存在
+  - 退出码：0（通过），1（失败）
 
-- `lint-documentation.md` - Documentation for the linter itself
-  - External interface (usage, exit codes)
-  - Internal helpers (check functions)
-  - Examples of usage and output
+- `lint-documentation.md` - linter 自身的文档
+  - 外部接口（用法、退出码）
+  - 内部辅助函数（check 函数）
+  - 用法和输出示例
 
-### Git Worktree Helper
-- `wt-cli.sh` - Worktree CLI wrapper (sources `src/cli/wt.sh`)
-  - Usage: `./scripts/wt-cli.sh <command> [args]`
-  - Canonical source: `src/cli/wt.sh`
-  - Commands:
-    - `init` - Initialize worktree environment (creates trees/main)
-    - `main` - Switch to main worktree (when sourced)
-    - `spawn <issue-number>` - Create worktree with GitHub validation
-    - `list` - Show all active worktrees
-    - `remove <issue-number>` - Remove worktree by issue number
-    - `prune` - Clean up stale worktree metadata
-    - `help` - Display help information
-  - Exit codes: 0 (success), 1 (error)
+### Git Worktree 辅助工具
+- `wt-cli.sh` - Worktree CLI 包装器（source `src/cli/wt.sh`）
+  - 用法：`./scripts/wt-cli.sh <command> [args]`
+  - 规范源：`src/cli/wt.sh`
+  - 命令：
+    - `init` - 初始化 worktree 环境（创建 trees/main）
+    - `main` - 切换到主 worktree（在 source 时）
+    - `spawn <issue-number>` - 创建 worktree 并进行 GitHub 验证
+    - `list` - 显示所有活动 worktree
+    - `remove <issue-number>` - 按 issue 编号移除 worktree
+    - `prune` - 清理过时的 worktree 元数据
+    - `help` - 显示帮助信息
+  - 退出码：0（成功），1（错误）
 
-- `worktree.sh` - Legacy worktree management (use `wt-cli.sh` instead)
+- `worktree.sh` - 旧版 worktree 管理（请改用 `wt-cli.sh`）
 
-### GitHub API Wrapper
+### GitHub API 包装器
 
-- `gh-graphql.sh` - GraphQL wrapper for GitHub Projects v2 API
-  - Usage: `./scripts/gh-graphql.sh <operation> [args...]`
-  - Operations: create-project, lookup-owner, lookup-project, add-item, list-fields, get-issue-project-item, update-field, create-field-option, review-threads
-  - Supports fixture mode for testing via `AGENTIZE_GH_API=fixture`
-  - See `gh-graphql.md` for complete documentation
+- `gh-graphql.sh` - GitHub Projects v2 API 的 GraphQL 包装器
+  - 用法：`./scripts/gh-graphql.sh <operation> [args...]`
+  - 操作：create-project、lookup-owner、lookup-project、add-item、list-fields、get-issue-project-item、update-field、create-field-option、review-threads
+  - 支持通过 `AGENTIZE_GH_API=fixture` 使用 fixture 模式进行测试
+  - 完整文档请参阅 `gh-graphql.md`
 
-### SDK CLI Wrappers
+### SDK CLI 包装器
 
-These scripts delegate to `src/cli/lol.sh`:
+这些脚本委托给 `src/cli/lol.sh`：
 
-- `agentize-project.sh` - Project command wrapper (calls `_lol_cmd_project`)
-  - Usage: Called by `lol project` command or directly with environment variables
-  - Environment variables: `AGENTIZE_PROJECT_MODE`, `AGENTIZE_PROJECT_ORG`, etc.
-  - Exit codes: 0 (success), 1 (failure)
+- `agentize-project.sh` - Project 命令包装器（调用 `_lol_cmd_project`）
+  - 用法：由 `lol project` 命令调用，或携带环境变量直接调用
+  - 环境变量：`AGENTIZE_PROJECT_MODE`、`AGENTIZE_PROJECT_ORG` 等
+  - 退出码：0（成功），1（失败）
 
-- `detect-lang.sh` - Language detection wrapper (calls `_lol_detect_lang`)
-  - Usage: `./scripts/detect-lang.sh <project_path>`
-  - Exit codes: 0 (detected), 1 (unable to detect)
+- `detect-lang.sh` - 语言检测包装器（调用 `_lol_detect_lang`）
+  - 用法：`./scripts/detect-lang.sh <project_path>`
+  - 退出码：0（检测到），1（无法检测）
 
-### Makefile Utilities
+### Makefile 实用工具
 
-#### Parameter Validation
-- `check-parameter.sh` - Mode-based parameter validation for agentize target
-  - Usage: `./scripts/check-parameter.sh <mode> <project_path> <project_name> <project_lang>`
-  - Validates required parameters based on mode (init/update)
-  - For **init mode**: Validates PROJECT_PATH, PROJECT_NAME, PROJECT_LANG, and template existence
-  - For **update mode**: Only validates PROJECT_PATH
-  - Exit codes: 0 (success), 1 (validation failed)
-  - Example:
+#### 参数验证
+- `check-parameter.sh` - agentize target 的基于模式的参数验证
+  - 用法：`./scripts/check-parameter.sh <mode> <project_path> <project_name> <project_lang>`
+  - 根据模式（init/update）验证必需参数
+  - 对于 **init 模式**：验证 PROJECT_PATH、PROJECT_NAME、PROJECT_LANG 以及模板是否存在
+  - 对于 **update 模式**：仅验证 PROJECT_PATH
+  - 退出码：0（成功），1（验证失败）
+  - 示例：
     ```bash
     ./scripts/check-parameter.sh "init" "/path/to/project" "my_project" "python"
     ```
 
-## Usage
+## 用法
 
-### Installing Pre-commit Hook
+### 安装 Pre-commit Hook
 
-The pre-commit hook should be linked to `.git/hooks/pre-commit`:
+pre-commit hook 应链接到 `.git/hooks/pre-commit`：
 
 ```bash
-# Link to git hooks (typically done during project setup)
+# 链接到 git hooks（通常在项目设置时完成）
 ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
 ```
 
-### Cross-Project Function Setup
+### 跨项目函数设置
 
-For the agentize repository itself, use `make setup` to generate a `setup.sh` with hardcoded paths:
+对于 agentize 仓库本身，使用 `make setup` 生成带有硬编码路径的 `setup.sh`：
 
 ```bash
 make setup
 source setup.sh
-# Add 'source /path/to/agentize/setup.sh' to your shell RC for persistence
+# 将 'source /path/to/agentize/setup.sh' 添加到你的 shell RC 以持久化
 ```
 
-This enables `wt` and `lol` CLI commands from any directory.
+这将使 `wt` 和 `lol` CLI 命令在任何目录中都可用。
 
-### Running Linter Manually
+### 手动运行 Linter
 
 ```bash
-# Run on all tracked files
+# 对所有被跟踪文件运行
 ./scripts/lint-documentation.sh
 
-# Check specific files (via git staging)
+# 检查特定文件（通过 git staging）
 git add path/to/files
-git commit  # Linter runs automatically
+git commit  # Linter 自动运行
 ```
 
-### Bypassing Hooks
+### 绕过 Hooks
 
-For milestone commits where documentation exists but implementation is incomplete:
+对于文档已存在但实现尚不完整的里程碑提交：
 
 ```bash
 git commit --no-verify -m "[milestone] message"

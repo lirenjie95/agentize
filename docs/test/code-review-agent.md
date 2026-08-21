@@ -1,127 +1,127 @@
-# Test: Code Review Agent
+# 测试：代码审查智能体
 
-Test coverage for the code-review agent created in issue #38.
+针对 issue #38 中创建的 code-review 智能体的测试覆盖。
 
-## Module Under Test
+## 被测模块
 
-`.claude/agents/code-quality-reviewer.md` - Comprehensive code review agent using Opus model
+`.claude/agents/code-quality-reviewer.md` - 使用 Opus 模型的综合代码审查智能体
 
-## Test Status
+## 测试状态
 
-**Status**: To test (dogfooding)
+**状态**：待测试（dogfooding）
 
-## Test Cases
+## 测试用例
 
-### TC-1: Agent Configuration
+### TC-1：智能体配置
 
-**Test**: Verify agent YAML frontmatter is correct
+**测试**：验证智能体 YAML frontmatter 正确
 
-**Validation**:
-- [ ] `name: code-quality-reviewer` is set
-- [ ] `description` is clear and actionable
-- [ ] `tools: Read, Grep, Glob, Bash` are specified
-- [ ] `model: opus` is specified
-- [ ] `skills: review-standard` is specified
+**验证点**：
+- [ ] 已设置 `name: code-quality-reviewer`
+- [ ] `description` 清晰且可操作
+- [ ] 已指定 `tools: Read, Grep, Glob, Bash`
+- [ ] 已指定 `model: opus`
+- [ ] 已指定 `skills: review-standard`
 
-**Expected**: Agent configuration matches specification in AGENT.md
-
----
-
-### TC-2: Agent Invocation
-
-**Test**: Verify agent can be invoked via Task tool
-
-**Validation**:
-- [ ] Agent can be called with `Task tool` and `subagent_type='code-quality-reviewer'`
-- [ ] Agent initializes with Opus model
-- [ ] Agent loads review-standard skill
-- [ ] Agent has access to specified tools
-
-**Expected**: Agent starts successfully and is ready to execute
+**预期**：智能体配置与 AGENT.md 中的规范匹配
 
 ---
 
-### TC-3: Isolated Context Execution
+### TC-2：智能体调用
 
-**Test**: Verify agent runs in isolated context
+**测试**：验证智能体可通过 Task 工具调用
 
-**Validation**:
-- [ ] Agent does not have access to parent conversation history
-- [ ] Agent workspace is clean
-- [ ] Agent returns only final report to parent
+**验证点**：
+- [ ] 智能体可通过 `Task tool` 以 `subagent_type='code-quality-reviewer'` 调用
+- [ ] 智能体以 Opus 模型初始化
+- [ ] 智能体加载 review-standard skill
+- [ ] 智能体可访问指定的工具
 
-**Expected**: Agent operates independently from parent conversation
-
----
-
-### TC-4: Review Execution
-
-**Test**: Verify agent performs code review correctly
-
-**Validation**:
-- [ ] Agent validates current branch (not main)
-- [ ] Agent gets changed files
-- [ ] Agent gets full diff
-- [ ] Agent applies review-standard skill (all 3 phases)
-- [ ] Agent generates structured report
-
-**Expected**: Agent produces complete review report with all phases
+**预期**：智能体成功启动并准备执行
 
 ---
 
-### TC-5: Error Handling
+### TC-3：隔离上下文执行
 
-**Test**: Verify agent handles error cases gracefully
+**测试**：验证智能体在隔离上下文中运行
 
-**Validation**:
-- [ ] Detects when on main branch and stops
-- [ ] Detects when no changes exist and stops
-- [ ] Detects when not in git repo and stops
-- [ ] Provides clear error messages
+**验证点**：
+- [ ] 智能体无法访问父对话历史
+- [ ] 智能体工作区是干净的
+- [ ] 智能体仅向父级返回最终报告
 
-**Expected**: Agent provides helpful error messages and stops execution appropriately
-
----
-
-### TC-6: Long Context Handling
-
-**Test**: Verify Opus model handles large diffs
-
-**Validation**:
-- [ ] Agent successfully processes diffs > 10 files
-- [ ] Agent successfully processes diffs > 500 lines
-- [ ] Agent completes within timeout (600s)
-- [ ] Agent provides thorough analysis even for large changes
-
-**Expected**: Agent leverages Opus's long context for comprehensive reviews
+**预期**：智能体独立于父对话运行
 
 ---
 
-### TC-7: Comparison with Command
+### TC-4：审查执行
 
-**Test**: Compare agent review vs command review on same diff
+**测试**：验证智能体正确执行代码审查
 
-**Validation**:
-- [ ] Both apply same review-standard skill
-- [ ] Both produce equivalent Phase 1 findings
-- [ ] Both produce equivalent Phase 2 findings
-- [ ] Both produce equivalent Phase 3 findings
-- [ ] Agent handles larger context better
+**验证点**：
+- [ ] 智能体验证当前分支（非 main）
+- [ ] 智能体获取变更文件
+- [ ] 智能体获取完整 diff
+- [ ] 智能体应用 review-standard skill（全部 3 个阶段）
+- [ ] 智能体生成结构化报告
 
-**Expected**: Consistent review standards, agent provides same quality with better context capacity
+**预期**：智能体产出包含所有阶段的完整审查报告
 
-## Dogfooding Validation
+---
 
-**First Use Date**: TBD
+### TC-5：错误处理
 
-**PR Tested**: TBD
+**测试**：验证智能体优雅处理错误情况
 
-**Findings**:
-- Agent initialization: TBD
-- Review execution: TBD
-- Report quality: TBD
-- Context handling: TBD
+**验证点**：
+- [ ] 检测到在 main 分支时停止
+- [ ] 检测到无变更时停止
+- [ ] 检测到不在 git 仓库时停止
+- [ ] 提供清晰的错误消息
 
-**Issues Found**: TBD
+**预期**：智能体提供有用的错误消息并适当停止执行
 
-**Validation Notes**: TBD
+---
+
+### TC-6：长上下文处理
+
+**测试**：验证 Opus 模型处理大型 diff
+
+**验证点**：
+- [ ] 智能体成功处理 > 10 个文件的 diff
+- [ ] 智能体成功处理 > 500 行的 diff
+- [ ] 智能体在超时时间内完成（600 秒）
+- [ ] 即使对于大型变更，智能体也能提供彻底的分析
+
+**预期**：智能体利用 Opus 的长上下文进行综合审查
+
+---
+
+### TC-7：与命令的对比
+
+**测试**：在同一 diff 上对比智能体审查与命令审查
+
+**验证点**：
+- [ ] 两者应用相同的 review-standard skill
+- [ ] 两者产出等价的阶段 1 发现
+- [ ] 两者产出等价的阶段 2 发现
+- [ ] 两者产出等价的阶段 3 发现
+- [ ] 智能体更好地处理更大的上下文
+
+**预期**：一致的审查标准，智能体以更好的上下文容量提供相同质量
+
+## Dogfooding 验证
+
+**首次使用日期**：待定
+
+**测试的 PR**：待定
+
+**发现**：
+- 智能体初始化：待定
+- 审查执行：待定
+- 报告质量：待定
+- 上下文处理：待定
+
+**发现的问题**：待定
+
+**验证备注**：待定

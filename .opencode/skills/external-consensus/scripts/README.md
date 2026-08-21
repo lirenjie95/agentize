@@ -1,7 +1,7 @@
 # Scripts
 
-This folder contains helper scripts used by the external-consensus skill.
+本文件夹包含 external-consensus skill 使用的辅助脚本。
 
-## Files
+## 文件
 
-- `external-consensus.sh` - Runs the external consensus workflow used by the skill.
+- `external-consensus.sh` - 运行该 skill 使用的外部共识工作流。

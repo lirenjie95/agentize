@@ -1,7 +1,7 @@
-# VS Code Docs
+# VS Code 文档
 
-Documentation for the VS Code extension and its user-facing workflows.
+关于 VS Code 扩展及其面向用户的工作流的文档。
 
-## Organization
+## 组织
 
-- `settings-ui.md` explains how the Settings tab configures backend defaults and where values are stored.
+- `settings-ui.md` 说明 Settings 标签页如何配置后端默认值，以及这些值存储在哪里。

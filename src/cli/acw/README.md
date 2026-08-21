@@ -1,28 +1,28 @@
-# acw Module Directory
+# acw 模块目录
 
-## Purpose
+## 目的
 
-Modular implementation of the Agent CLI Wrapper (`acw`) command.
+Agent CLI Wrapper（`acw`）命令的模块化实现。
 
-## Module Map
+## 模块映射
 
-| File | Dependencies | Exports |
+| 文件 | 依赖 | 导出 |
 |------|--------------|---------|
-| `helpers.sh` | None | Validation helpers (`_acw_validate_args`, `_acw_check_cli`, `_acw_ensure_output_dir`, `_acw_check_input_file`) and chat session helpers (`_acw_chat_*`) (private) |
-| `providers.sh` | `helpers.sh` | `_acw_invoke_claude`, `_acw_invoke_codex`, `_acw_invoke_opencode`, `_acw_invoke_cursor`, `_acw_invoke_kimi`, `_acw_invoke_gemini` (private) |
-| `completion.sh` | None | `_acw_complete` (private) |
-| `dispatch.sh` | `helpers.sh`, `providers.sh`, `completion.sh` | `acw` (public); orchestrates chat session creation, continuation, and history prepending |
+| `helpers.sh` | 无 | 校验辅助函数（`_acw_validate_args`、`_acw_check_cli`、`_acw_ensure_output_dir`、`_acw_check_input_file`）和聊天会话辅助函数（`_acw_chat_*`）（私有） |
+| `providers.sh` | `helpers.sh` | `_acw_invoke_claude`、`_acw_invoke_codex`、`_acw_invoke_opencode`、`_acw_invoke_cursor`、`_acw_invoke_kimi`、`_acw_invoke_gemini`（私有） |
+| `completion.sh` | 无 | `_acw_complete`（私有） |
+| `dispatch.sh` | `helpers.sh`、`providers.sh`、`completion.sh` | `acw`（公开）；编排聊天会话的创建、续接和历史前置 |
 
-## Load Order
+## 加载顺序
 
-The parent `acw.sh` sources modules in this order:
+父级 `acw.sh` 按以下顺序 source 各模块：
 
-1. `helpers.sh` - No dependencies (private helper functions)
-2. `providers.sh` - Uses helper functions
-3. `completion.sh` - No dependencies (completion support)
-4. `dispatch.sh` - Uses helpers, providers, and completion
+1. `helpers.sh` - 无依赖（私有辅助函数）
+2. `providers.sh` - 使用辅助函数
+3. `completion.sh` - 无依赖（补全支持）
+4. `dispatch.sh` - 使用 helpers、providers 和 completion
 
-## Architecture
+## 架构
 
 ```
 acw.sh (thin loader)
@@ -54,29 +54,29 @@ acw.sh (thin loader)
     |     +-- _acw_complete()
     |
     +-- dispatch.sh
-          +-- acw()  [public entry point]
+          +-- acw()  [公开入口点]
           +-- _acw_usage()
 ```
 
-## Provider Support Matrix
+## 提供方支持矩阵
 
-| Provider | Binary | Input Method | Output Method | Status |
+| 提供方 | 二进制 | 输入方式 | 输出方式 | 状态 |
 |----------|--------|--------------|---------------|--------|
-| claude | `claude` | `-p @file` | `> file` | Full |
-| codex | `codex` | `< file` | `> file` | Full |
-| opencode | `opencode` | TBD | TBD | Best-effort |
-| cursor | `agent` | TBD | TBD | Best-effort |
-| kimi | `kimi` | `< file` (`--print`) | `> file` (stream-json stripped) | Best-effort |
-| gemini | `gemini` | `-p "$(cat file)"` | `> file` (stream-json stripped) | Best-effort |
+| claude | `claude` | `-p @file` | `> file` | 完整 |
+| codex | `codex` | `< file` | `> file` | 完整 |
+| opencode | `opencode` | TBD | TBD | 尽力支持 |
+| cursor | `agent` | TBD | TBD | 尽力支持 |
+| kimi | `kimi` | `< file`（`--print`） | `> file`（剥离 stream-json） | 尽力支持 |
+| gemini | `gemini` | `-p "$(cat file)"` | `> file`（剥离 stream-json） | 尽力支持 |
 
-## Runtime Dependencies
+## 运行时依赖
 
-- Kimi output normalization uses `python` (stdlib JSON) to strip stream-json into plain text.
+- Kimi 输出规范化使用 `python`（标准库 JSON）将 stream-json 剥离为纯文本。
 
-## Conventions
+## 约定
 
-- Only `acw` is the public function (no prefix)
-- All other function names prefixed with `_acw_` for internal use
-- Exit codes follow `acw.md` specification (0-4, 127)
-- All functions support both bash and zsh
-- `--stdout` mode routes output to `/dev/stdout` and merges provider stderr into stdout for the invocation
+- 只有 `acw` 是公开函数（无前缀）
+- 所有其他函数名以 `_acw_` 为前缀，仅供内部使用
+- 退出码遵循 `acw.md` 规范（0-4、127）
+- 所有函数同时支持 bash 和 zsh
+- `--stdout` 模式将输出路由到 `/dev/stdout`，并在调用时将提供方 stderr 合并进 stdout
